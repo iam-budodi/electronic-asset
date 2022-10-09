@@ -1,16 +1,11 @@
 package com.assets.management.electronic.model;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "computers")
-public class Computer extends Device {
+//@Table(name = "computers")
+public class Computer extends ElectronicDevice {
 //public class Computer {
 
 	@NotNull
@@ -23,22 +18,22 @@ public class Computer extends Device {
 //	public LocalDate commissionedDate;
 //	public String    serialNumber;
 
-	@OneToOne(
-			mappedBy = "computer", cascade = CascadeType.ALL,
-			fetch = FetchType.LAZY, optional = false, orphanRemoval = true
-	)
-	@PrimaryKeyJoinColumn
-	public QRCode code;
-
-	public void addCode(QRCode code) {
-		this.code = code;
-		code.setComputer(this);
-	}
-
-	public void removeCode() {
-		code.setComputer(null);
-		this.code = null;
-	}
+//	@OneToOne(
+//			mappedBy = "computer", cascade = CascadeType.ALL,
+//			fetch = FetchType.LAZY, optional = false, orphanRemoval = true
+//	)
+//	@PrimaryKeyJoinColumn
+//	public QRCode code;
+//
+//	public void addCode(QRCode code) {
+//		this.code = code;
+//		code.setComputer(this);
+//	}
+//
+//	public void removeCode() {
+//		code.setComputer(null);
+//		this.code = null;
+//	}
 
 	@Override
 	public String toString() {

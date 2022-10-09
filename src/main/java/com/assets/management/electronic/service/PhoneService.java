@@ -9,13 +9,13 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
 import com.assets.management.electronic.client.QrProxy;
-import com.assets.management.electronic.model.Computer;
 import com.assets.management.electronic.model.QrContent;
 import com.assets.management.electronic.model.SmartPhone;
 import com.assets.management.electronic.model.Status;
@@ -25,39 +25,37 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 @ApplicationScoped
 @Transactional(Transactional.TxType.REQUIRED)
-public class DeviceService {
+public class PhoneService {
 
 	@Inject
-	Logger LOG; 
-	
+	Logger LOG;
+
 	@Inject
 	@RestClient
 	QrProxy qrProxy;
 
-	public SmartPhone persistPhone(@Valid SmartPhone phone)  {
-		LOG.info("Received Phone: " + phone);
-		
-		phone.generatedAt = Instant.now();  
-		SmartPhone.persist(phone); 
-		PanacheQuery<QrContent> query = SmartPhone.find("id", phone.id).project(QrContent.class);
-		 
-		QrContent qrContent = query.singleResult(); 
-		byte[] qrCode = qrProxy.CreateQrString(qrContent); 
-		String qrString = Base64.getEncoder().encodeToString(qrCode);
-		phone.qrString = qrString;  
-		 
-		return phone;
+	public SmartPhone persistPhone(@Valid SmartPhone phone) {
+		phone.generatedAt = Instant.now();
+		SmartPhone.persist(phone);
+		phone.qrString = retrieveQrString(phone);
+		return Panache.getEntityManager().merge(phone);
 	}
-
-	public byte[] persistComputer(@Valid Computer computer)  {
-//		computer.qrString = genQrString(computer);
-		Computer.persist(computer);
-		return Base64.getDecoder().decode(computer.qrString);
+	
+	public SmartPhone updatePhone(@Valid SmartPhone phone, @NotNull Long id) {
+		SmartPhone sPhone = Panache.getEntityManager()
+				.getReference(SmartPhone.class, id);
+		phone.qrString = retrieveQrString(sPhone);
+		phone.updatedAt = Instant.now();
+		
+		return Panache.getEntityManager().merge(phone);
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<SmartPhone> findAllPhones() {
-		return SmartPhone.listAll();
+	public List<SmartPhone> listAllPhones(
+	        Integer pageIndex,
+	        Integer pageSize
+	) {
+		return SmartPhone.findAll().page(pageIndex, pageSize).list();
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
@@ -91,20 +89,20 @@ public class DeviceService {
 		return SmartPhone.count();
 	}
 
-	public SmartPhone updatePhone(@Valid SmartPhone phone, Long id) {
-		SmartPhone sPhone = Panache.getEntityManager().getReference(
-				SmartPhone.class, id
-		);
-
-		Panache.getEntityManager().merge(phone);
-		return sPhone;
-	}
 
 	public void deletePhone(Long id) {
-		SmartPhone phone = Panache.getEntityManager().getReference(
-				SmartPhone.class, id
-		);
+		SmartPhone phone = Panache.getEntityManager()
+		        .getReference(SmartPhone.class, id);
 
 		phone.delete();
-	} 
+	}
+
+	private String retrieveQrString(SmartPhone phone) {
+		PanacheQuery<QrContent> query = SmartPhone.find("id", phone.id)
+		        .project(QrContent.class);
+
+		QrContent qrContent = query.singleResult();
+		byte[]    code      = qrProxy.CreateQrString(qrContent);
+		return Base64.getEncoder().encodeToString(code);
+	}
 }

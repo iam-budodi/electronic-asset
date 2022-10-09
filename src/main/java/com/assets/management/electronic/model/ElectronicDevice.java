@@ -10,27 +10,29 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.smallrye.common.constraint.NotNull;
 
-@MappedSuperclass
+//@MappedSuperclass
 
-//@Entity
-//@Table(name = "devices")
-//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Entity
+@Table(name = "electronic_devices")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 //@NamedQueries(
 //		value = { @NamedQuery(
 //				name = "Device.sortCountByStatus",
 //				query = "select status, count(*) total from Device d where d.status = :status group by status, total"
 //		) }
 //)
-public class Device extends PanacheEntity {
+public class ElectronicDevice extends PanacheEntity {
 
 	@Column(length = 100)
 	public String name;
@@ -49,22 +51,25 @@ public class Device extends PanacheEntity {
 	@Column(name = "manufactured_date")
 	public LocalDate manufacturedDate;
 
-//	@NotNull
+	@NotNull
 	@Column(name = "stocked_at")
 	public Instant generatedAt;
+	
+	@Column(name = "updated_at")
+	public Instant updatedAt;
 
 //	@NotNull
 	@Column(name = "commissioning_date")
-	public Instant commissionedDate;
-
-	@Column(name = "qr_string", length = 4000)
-	public String qrString;
+	public Instant commissionedDate; 
 
 	@Column(length = 3000)
 	public String comment; 
 
 	@Enumerated(EnumType.STRING)
 	public Status status;
+ 
+	@Column(name = "qr_string", length = 4000)
+	public String qrString;
 
 	@Transient
 	public Integer timeInUse;

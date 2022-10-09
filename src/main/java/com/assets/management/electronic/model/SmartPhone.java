@@ -2,19 +2,14 @@ package com.assets.management.electronic.model;
 
 import java.math.BigDecimal;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "smart_phones")
+//@Table(name = "smart_phones")
 //@DiscriminatorValue("S")
-public class SmartPhone extends Device {
+public class SmartPhone extends ElectronicDevice {
 
 	@NotNull
 	@Column(name = "topped_up")
@@ -32,33 +27,33 @@ public class SmartPhone extends Device {
 //	public QRCode code;
 
 	// Vlad
-	@OneToOne(
-			mappedBy = "phone", cascade = CascadeType.ALL,
-			fetch = FetchType.LAZY, optional = false, orphanRemoval = true
-	)
-	@PrimaryKeyJoinColumn
-	public QRCode code;
+//	@OneToOne(
+//	        mappedBy = "phone", cascade = CascadeType.ALL,
+//	        fetch = FetchType.LAZY, optional = false, orphanRemoval = true
+//	)
+//	@PrimaryKeyJoinColumn
+//	public QRCode code;
+//
+//	public void addCode(QRCode code) {
+//		this.code = code;
+//		code.setPhone(this);
+//	}
+//
+//	public void removeCode() {
+//		code.setPhone(null);
+//		this.code = null;
+//	}
 
-	public void addCode(QRCode code) {
-		this.code = code;
-		code.setPhone(this);
-	}
-
-	public void removeCode() {
-		code.setPhone(null);
-		this.code = null;
-	} 
-	
 	@Override
 	public String toString() {
 		return "SmartPhone [toppedUp=" + toppedUp + ", topupAmout="
-				+ topupAmout + ", paid=" + paid + ", code=" + code + ", name="
-				+ name + ", brand=" + brand + ", serialNumber=" + serialNumber
-				+ ", manufacturer=" + manufacturer + ", manufacturedDate="
-				+ manufacturedDate + ", generatedAt=" + generatedAt
-				+ ", commissionedDate=" + commissionedDate + ", qrString="
-				+ qrString + ", comment=" + comment + ", status=" + status
-				+ ", timeInUse=" + timeInUse + ", id=" + id + "]";
+		        + topupAmout + ", paid=" + paid + ", name="
+		        + name + ", brand=" + brand + ", serialNumber=" + serialNumber
+		        + ", manufacturer=" + manufacturer + ", manufacturedDate="
+		        + manufacturedDate + ", generatedAt=" + generatedAt
+		        + ", commissionedDate=" + commissionedDate + ", comment="
+		        + comment + ", status=" + status + ", timeInUse=" + timeInUse
+		        + ", id=" + id + "]";
 	}
 
 //	public void addQR(QRCode code) {
@@ -89,6 +84,5 @@ public class SmartPhone extends Device {
 //		builder.append("\n}");
 //		return builder.toString();
 //	}
-	
-	
+
 }
