@@ -8,9 +8,12 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -98,6 +101,39 @@ public class PhoneResource {
 		        .listAllPhones(pageIndex, pageSize);
 
 		return Response.ok(phones).build();
+	}
+
+	@GET
+	@Path("/count")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response countAll() {
+//		long phones = phoneService.listPhonesCount();
+		return Response.ok(phoneService.listPhonesCount()).build();
+	}
+
+	@GET
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response findPhone(@PathParam("id") @NotNull Long id) {
+		SmartPhone phone;
+		try {
+			phone = phoneService.findPhoneById(id);
+		} catch (NotFoundException nfe) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		return Response.ok(phone).build();
+	}
+
+	@DELETE
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deletePhone(@PathParam("id") @NotNull Long id) {
+		try {
+			phoneService.deletePhone(id);
+		} catch (EntityNotFoundException nfe) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		return Response.noContent().build();
 	}
 
 }

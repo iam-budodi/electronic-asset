@@ -18,9 +18,9 @@ import org.jboss.logging.Logger;
 import com.assets.management.electronic.client.QrProxy;
 import com.assets.management.electronic.model.QrContent;
 import com.assets.management.electronic.model.SmartPhone;
-import com.assets.management.electronic.model.Status;
 
 import io.quarkus.hibernate.orm.panache.Panache;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 @ApplicationScoped
@@ -40,13 +40,13 @@ public class PhoneService {
 		phone.qrString = retrieveQrString(phone);
 		return Panache.getEntityManager().merge(phone);
 	}
-	
+
 	public SmartPhone updatePhone(@Valid SmartPhone phone, @NotNull Long id) {
 		SmartPhone sPhone = Panache.getEntityManager()
-				.getReference(SmartPhone.class, id);
+		        .getReference(SmartPhone.class, id);
 		phone.qrString = retrieveQrString(sPhone);
 		phone.updatedAt = Instant.now();
-		
+
 		return Panache.getEntityManager().merge(phone);
 	}
 
@@ -59,42 +59,52 @@ public class PhoneService {
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public SmartPhone findPhoneById(Long id) {
+	public SmartPhone findPhoneById(@NotNull Long id) {
 		Optional<SmartPhone> phone = SmartPhone.findByIdOptional(id);
 		return phone.orElseThrow(() -> new NotFoundException());
 	}
 
-	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<SmartPhone> listAvailablePhones() {
-		return SmartPhone.list("status", Status.Available);
-	}
-
-	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<SmartPhone> listTakenPhones() {
-		return SmartPhone.list("status", Status.Taken);
-	}
-
-	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<SmartPhone> listFaultyPhones() {
-		return SmartPhone.list("status", Status.Faulty);
-	}
-
-	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<SmartPhone> listEOLPhones() {
-		return SmartPhone.list("status", Status.EOL);
-	}
+//	@Transactional(Transactional.TxType.SUPPORTS)
+//	public List<SmartPhone> listAvailablePhones() {
+//		return SmartPhone.list("status", Status.Available);
+//	}
+//
+//	@Transactional(Transactional.TxType.SUPPORTS)
+//	public List<SmartPhone> listTakenPhones() {
+//		return SmartPhone.list("status", Status.Taken);
+//	}
+//
+//	@Transactional(Transactional.TxType.SUPPORTS)
+//	public List<SmartPhone> listFaultyPhones() {
+//		return SmartPhone.list("status", Status.Faulty);
+//	}
+//
+//	@Transactional(Transactional.TxType.SUPPORTS)
+//	public List<SmartPhone> listEOLPhones() {
+//		return SmartPhone.list("status", Status.EOL);
+//	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Long countAllPhones() {
 		return SmartPhone.count();
 	}
+	
+	
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public List<PanacheEntityBase> listPhonesCount() {
+		return SmartPhone.find(
+		        "select status, count(sp.status) as total "
+		        + "from SmartPhone sp "
+		        + "group by status"
+		).list();
 
+	}
 
-	public void deletePhone(Long id) {
-		SmartPhone phone = Panache.getEntityManager()
-		        .getReference(SmartPhone.class, id);
-
-		phone.delete();
+	public void deletePhone(@NotNull Long id) {
+		Panache
+			.getEntityManager()
+			.getReference(SmartPhone.class, id)
+			.delete();
 	}
 
 	private String retrieveQrString(SmartPhone phone) {

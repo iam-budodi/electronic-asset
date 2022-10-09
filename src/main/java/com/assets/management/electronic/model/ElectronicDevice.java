@@ -12,6 +12,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
@@ -26,12 +28,22 @@ import io.smallrye.common.constraint.NotNull;
 @Entity
 @Table(name = "electronic_devices")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@NamedQueries(
+        value = { @NamedQuery(
+                name = "Device.countByStatus",
+                query = "select status, count(d) as total "
+                        + "from ElectronicDevice d " 
+                		+ "group by status"
+        ) }
+)
 //@NamedQueries(
 //		value = { @NamedQuery(
-//				name = "Device.sortCountByStatus",
-//				query = "select status, count(*) total from Device d where d.status = :status group by status, total"
-//		) }
-//)
+//				name = "Device.countByStatus",
+//				query = "select status, count(d) total "
+//						+ "from ElectronicDevice d "
+//						+ "where d.status = :status group by status, total"
+//				) }
+//		)
 public class ElectronicDevice extends PanacheEntity {
 
 	@Column(length = 100)
@@ -54,20 +66,20 @@ public class ElectronicDevice extends PanacheEntity {
 	@NotNull
 	@Column(name = "stocked_at")
 	public Instant generatedAt;
-	
+
 	@Column(name = "updated_at")
 	public Instant updatedAt;
 
 //	@NotNull
 	@Column(name = "commissioning_date")
-	public Instant commissionedDate; 
+	public Instant commissionedDate;
 
 	@Column(length = 3000)
-	public String comment; 
+	public String comment;
 
 	@Enumerated(EnumType.STRING)
 	public Status status;
- 
+
 	@Column(name = "qr_string", length = 4000)
 	public String qrString;
 
@@ -83,12 +95,10 @@ public class ElectronicDevice extends PanacheEntity {
 			return;
 		}
 
-		LocalDate date = LocalDateTime.ofInstant(
-				commissionedDate, ZoneOffset.UTC
-		).toLocalDate();
-		LocalDate current = LocalDateTime.ofInstant(
-				Instant.now(), ZoneOffset.UTC
-		).toLocalDate();
+		LocalDate date    = LocalDateTime
+		        .ofInstant(commissionedDate, ZoneOffset.UTC).toLocalDate();
+		LocalDate current = LocalDateTime
+		        .ofInstant(Instant.now(), ZoneOffset.UTC).toLocalDate();
 		timeInUse = Period.between(date, current).getYears();
 	}
 }

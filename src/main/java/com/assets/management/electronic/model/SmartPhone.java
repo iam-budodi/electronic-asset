@@ -4,11 +4,22 @@ import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.validation.constraints.NotNull;
 
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+
 @Entity
-//@Table(name = "smart_phones")
-//@DiscriminatorValue("S")
+@NamedQueries(
+        value = { @NamedQuery(
+                name = "SmartPhone.countByStatus",
+                query = "select count(sp.status) as total "
+                        + "from SmartPhone sp " 
+                		+ "group by status"
+        ) }
+)
+
 public class SmartPhone extends ElectronicDevice {
 
 	@NotNull
@@ -20,6 +31,10 @@ public class SmartPhone extends ElectronicDevice {
 
 	@NotNull
 	public Boolean paid;
+	
+	public static long countPhone() {
+		return count("#SmartPhone.countByStatus");
+	}
 
 	// Baeldung
 //	@OneToOne(cascade = CascadeType.ALL)
