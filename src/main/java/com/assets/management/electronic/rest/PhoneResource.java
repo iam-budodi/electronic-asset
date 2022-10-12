@@ -9,6 +9,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -41,24 +42,25 @@ public class PhoneResource {
 	PhoneService phoneService;
 
 	@POST
-	@Path("/vendor/{id}/phones")
+	@Path("/vendors/{id}/phones")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response addSmartPhone(@PathParam("id") Long vendorId,
+	public Response addSmartPhone(
+	        @PathParam("id") Long vendorId,
 	        @Valid SmartPhone phone,
 	        @Context UriInfo uriInfo
-	) { 		 
+	) {
 		SmartPhone newPhone; // = null;
 		try {
 			newPhone = phoneService.persistPhone(phone, vendorId);
-		} catch (NoResultException nre) {
+		} catch (NoResultException | NotFoundException nfe) {
 			return Response.status(Response.Status.NOT_FOUND).build();
-		} catch (NonUniqueResultException nur) {
+		} catch (NonUniqueResultException | BadRequestException bre) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
-		
-		if (newPhone == null) 
-			return Response.status(Response.Status.NOT_FOUND).build();
+//
+//		if (newPhone == null)
+//			return Response.status(Response.Status.NOT_FOUND).build();
 
 		URI uri = uriInfo.getAbsolutePathBuilder()
 		        .path(Long.toString(newPhone.id)).build();
@@ -66,10 +68,10 @@ public class PhoneResource {
 	}
 
 	@PUT
-	@Path("/{id}")
+	@Path("/phones/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateSmartPhone(
-	        @PathParam("id") Long id,
+	        @PathParam("id") @NotNull Long id,
 	        @Valid SmartPhone phone
 	) {
 
@@ -93,9 +95,10 @@ public class PhoneResource {
 	}
 
 	@GET
-	@Path("/vendor/{id}/phones")
+	@Path("/vendors/{id}/phones")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response listAllPhonesByVendor(@PathParam("id") Long vendorId,
+	public Response listAllPhonesByVendor(
+	        @PathParam("id") Long vendorId,
 	        @QueryParam("page") @DefaultValue("0") Integer pageIndex,
 	        @QueryParam("size") @DefaultValue("15") Integer pageSize
 	) {
@@ -106,16 +109,23 @@ public class PhoneResource {
 	}
 
 	@GET
-	@Path("/count")
+	@Path("/phones/total")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response countPhonesPerStatus() { 
+	public Response totalPhonesCount() {
+		return Response.ok(phoneService.countAllPhones()).build();
+	}
+	
+	@GET
+	@Path("/phones/count")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response countPhonesPerStatus() {
 		return Response.ok(phoneService.countPhonesPerStatus()).build();
 	}
 
 	@GET
-	@Path("/{id}")
+	@Path("/phones/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response findPhone(@PathParam("id") @NotNull Long id) {
+	public Response findPhoneByVendorId(@PathParam("id") @NotNull Long id) {
 		SmartPhone phone;
 		try {
 			phone = phoneService.findPhoneById(id);
@@ -126,7 +136,7 @@ public class PhoneResource {
 	}
 
 	@DELETE
-	@Path("/{id}")
+	@Path("/phones/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deletePhone(@PathParam("id") @NotNull Long id) {
 		try {
@@ -135,6 +145,18 @@ public class PhoneResource {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 		return Response.noContent().build();
+	}
+	
+	@DELETE
+	@Path("/vendors/{id}/phones")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteAllPhonesByVendor(
+	        @PathParam("id") Long vendorId
+	) {
+		Long numberOfDeletedPhones = phoneService
+		        .deleteAllPhone(vendorId);
+
+		return Response.ok(numberOfDeletedPhones).build();
 	}
 
 }

@@ -18,7 +18,7 @@ import org.jboss.logging.Logger;
 import com.assets.management.electronic.model.Vendor;
 import com.assets.management.electronic.service.VendorService;
 
-@Path("/vendors")
+@Path("/")
 public class VendorResource {
 
 	@Inject
@@ -28,11 +28,12 @@ public class VendorResource {
 	VendorService vendorService;
 
 	@POST
+	@Path("/vendors")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response addVendor(@Valid Vendor vendor, @Context UriInfo uriInfo) {
 		vendorService.persistVendor(vendor);
-		LOG.info("Check Phone Properties: " + vendor);
+		LOG.info("Check Vendor: " + vendor);
 		URI uri = uriInfo.getAbsolutePathBuilder()
 		        .path(Long.toString(vendor.id)).build();
 

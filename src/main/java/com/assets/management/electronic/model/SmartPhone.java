@@ -12,24 +12,24 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-@Entity 
+@Entity
 public class SmartPhone extends ElectronicDevice {
 
 	@NotNull
 	@Column(name = "topped_up")
 	public Boolean toppedUp;
- 
+
 	@Column(name = "topup_amount")
 	public BigDecimal topupAmout;
 
 	@NotNull
-	public Boolean paid; 
-	
-	@ManyToOne(fetch = FetchType.LAZY)
+	public Boolean paid;
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "vendor_id", nullable = false)
-	  @OnDelete(action = OnDeleteAction.CASCADE)
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	public Vendor vendor;
-	
+
 	public void setVendor(Vendor vendor) {
 		this.vendor = vendor;
 	}
@@ -60,10 +60,11 @@ public class SmartPhone extends ElectronicDevice {
 	@Override
 	public String toString() {
 		return "SmartPhone [toppedUp=" + toppedUp + ", topupAmout="
-		        + topupAmout + ", paid=" + paid  + ", brand=" + brand + ", serialNumber=" + serialNumber
-		        + ", generatedAt=" + generatedAt
-		        + ", commissionedDate=" + commissionedDate  + ", status=" + status + ", timeInUse=" + timeInUse
-		        + ", id=" + id + "]";
+		        + topupAmout + ", paid=" + paid + ", brand=" + brand
+		        + ", serialNumber=" + serialNumber + ", generatedAt="
+		        + generatedAt + ", commissionedDate=" + commissionedDate
+		        + ", status=" + status + ", timeInUse=" + timeInUse + ", id="
+		        + id + "]";
 	}
 
 //	public void addQR(QRCode code) {

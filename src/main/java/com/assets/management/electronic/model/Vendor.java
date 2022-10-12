@@ -1,12 +1,7 @@
 package com.assets.management.electronic.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -19,6 +14,10 @@ public class Vendor extends PanacheEntity {
 	@NotNull
 	@Column(name = "company_name", length = 100, nullable = false)
 	public String companyName;
+
+	@NotNull
+	@Column(length = 100, nullable = false)
+	public String service;
 
 	@NotNull
 	@Column(name = "contact_person", length = 100, nullable = false)

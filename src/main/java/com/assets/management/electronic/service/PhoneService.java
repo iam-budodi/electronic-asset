@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -38,10 +39,12 @@ public class PhoneService {
 	public SmartPhone persistPhone(
 	        @Valid SmartPhone phone,
 	        @NotNull Long vendorId
-	) {
-//		Vendor vendor = Vendor.findById(vendorId);
+	) { 
+		Optional<Vendor> optional = Vendor.findByIdOptional(vendorId);
+		LOG.info("Is Vendor Present " + optional.get());
+		Vendor vendor = optional.orElseThrow(() -> new BadRequestException());
 
-		phone.vendor = Vendor.findById(vendorId);
+		phone.vendor = vendor;
 		phone.generatedAt = Instant.now();
 
 		SmartPhone.persist(phone);
@@ -63,9 +66,7 @@ public class PhoneService {
 	        Long vendorId,
 	        Integer pageIndex,
 	        Integer pageSize
-	) {
-
-//		Vendor vendor = Vendor.findById(vendorId);
+	) { 
 		return SmartPhone.find(
 		        "select sp " 
 		        		+ "from SmartPhone sp "
@@ -96,6 +97,12 @@ public class PhoneService {
 
 	public void deletePhone(@NotNull Long id) {
 		Panache.getEntityManager().getReference(SmartPhone.class, id).delete();
+	}
+	
+	public Long deleteAllPhone(@NotNull Long vendorId) {
+		Optional<Vendor> optional = Vendor.findByIdOptional(vendorId);
+		Vendor vendor = optional.orElseThrow(() -> new BadRequestException());
+		return SmartPhone.deleteAll();
 	}
 
 	private String retrieveQrString(SmartPhone phone) {
