@@ -1,15 +1,30 @@
 package com.assets.management.electronic.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
-@Entity
-//@Table(name = "computers")
+@Entity 
 public class Computer extends ElectronicDevice {
 //public class Computer {
 
-	@NotNull
-	public Boolean mouse;
+
+	@Column(name = "computer_name", length = 100)
+	public String assetName;
+	
+	@Column(name = "asset_tag", length = 100)
+	public String assetTag;
+	
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	public Vendor vendor;
+	
+	public void setVendor(Vendor vendor) {
+		this.vendor = vendor;
+	}
+	
 //	public String    brand;
 //	public String    name;
 //	public String    comment;
@@ -40,13 +55,11 @@ public class Computer extends ElectronicDevice {
 		StringBuilder builder = new StringBuilder();
 		builder.append("\n{");
 		builder.append("\nSN: ").append(serialNumber).append("\t");
-		builder.append("\nBRAND: ").append(brand).append("\t");
-		builder.append("\nMANUFACTURER: ").append(manufacturer).append("\t");
+		builder.append("\nBRAND: ").append(brand).append("\t"); 
 //		builder.append("\nCOMMISSIONED DATE: ").append(
 //				commissionedDate.equals(null) ? "Still in stock"
 //						: commissionedDate
-//		).append("\t");
-		builder.append("\nMOUSE: ").append(mouse ? "Yes" : "No");
+//		).append("\t"); 
 		builder.append("\n}");
 		return builder.toString();
 	}

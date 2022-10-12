@@ -4,36 +4,34 @@ import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-@Entity
-@NamedQueries(
-        value = { @NamedQuery(
-                name = "SmartPhone.countByStatus",
-                query = "select count(sp.status) as total "
-                        + "from SmartPhone sp " 
-                		+ "group by status"
-        ) }
-)
-
+@Entity 
 public class SmartPhone extends ElectronicDevice {
 
 	@NotNull
 	@Column(name = "topped_up")
 	public Boolean toppedUp;
-
+ 
 	@Column(name = "topup_amount")
 	public BigDecimal topupAmout;
 
 	@NotNull
-	public Boolean paid;
+	public Boolean paid; 
 	
-	public static long countPhone() {
-		return count("#SmartPhone.countByStatus");
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "vendor_id", nullable = false)
+	  @OnDelete(action = OnDeleteAction.CASCADE)
+	public Vendor vendor;
+	
+	public void setVendor(Vendor vendor) {
+		this.vendor = vendor;
 	}
 
 	// Baeldung
@@ -62,12 +60,9 @@ public class SmartPhone extends ElectronicDevice {
 	@Override
 	public String toString() {
 		return "SmartPhone [toppedUp=" + toppedUp + ", topupAmout="
-		        + topupAmout + ", paid=" + paid + ", name="
-		        + name + ", brand=" + brand + ", serialNumber=" + serialNumber
-		        + ", manufacturer=" + manufacturer + ", manufacturedDate="
-		        + manufacturedDate + ", generatedAt=" + generatedAt
-		        + ", commissionedDate=" + commissionedDate + ", comment="
-		        + comment + ", status=" + status + ", timeInUse=" + timeInUse
+		        + topupAmout + ", paid=" + paid  + ", brand=" + brand + ", serialNumber=" + serialNumber
+		        + ", generatedAt=" + generatedAt
+		        + ", commissionedDate=" + commissionedDate  + ", status=" + status + ", timeInUse=" + timeInUse
 		        + ", id=" + id + "]";
 	}
 

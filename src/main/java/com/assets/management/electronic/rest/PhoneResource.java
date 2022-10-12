@@ -31,7 +31,7 @@ import org.jboss.logging.Logger;
 import com.assets.management.electronic.model.SmartPhone;
 import com.assets.management.electronic.service.PhoneService;
 
-@Path("/devices/phone")
+@Path("/")
 public class PhoneResource {
 
 	@Inject
@@ -41,27 +41,28 @@ public class PhoneResource {
 	PhoneService phoneService;
 
 	@POST
+	@Path("/vendor/{id}/phones")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response addSmartPhone(
+	public Response addSmartPhone(@PathParam("id") Long vendorId,
 	        @Valid SmartPhone phone,
 	        @Context UriInfo uriInfo
-	) {
-
-		SmartPhone qrStream; // = null;
+	) { 		 
+		SmartPhone newPhone; // = null;
 		try {
-			qrStream = phoneService.persistPhone(phone);
+			newPhone = phoneService.persistPhone(phone, vendorId);
 		} catch (NoResultException nre) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		} catch (NonUniqueResultException nur) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
+		
+		if (newPhone == null) 
+			return Response.status(Response.Status.NOT_FOUND).build();
 
-		LOG.info("Check Phone Properties: " + qrStream);
 		URI uri = uriInfo.getAbsolutePathBuilder()
-		        .path(Long.toString(qrStream.id)).build();
+		        .path(Long.toString(newPhone.id)).build();
 		return Response.created(uri).build();
-
 	}
 
 	@PUT
@@ -92,13 +93,14 @@ public class PhoneResource {
 	}
 
 	@GET
+	@Path("/vendor/{id}/phones")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response listAllPhones(
+	public Response listAllPhonesByVendor(@PathParam("id") Long vendorId,
 	        @QueryParam("page") @DefaultValue("0") Integer pageIndex,
 	        @QueryParam("size") @DefaultValue("15") Integer pageSize
 	) {
 		List<SmartPhone> phones = phoneService
-		        .listAllPhones(pageIndex, pageSize);
+		        .allPhonesByVendor(vendorId, pageIndex, pageSize);
 
 		return Response.ok(phones).build();
 	}
@@ -106,9 +108,8 @@ public class PhoneResource {
 	@GET
 	@Path("/count")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response countAll() {
-//		long phones = phoneService.listPhonesCount();
-		return Response.ok(phoneService.listPhonesCount()).build();
+	public Response countPhonesPerStatus() { 
+		return Response.ok(phoneService.countPhonesPerStatus()).build();
 	}
 
 	@GET

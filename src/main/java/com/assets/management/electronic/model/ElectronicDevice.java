@@ -12,43 +12,19 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.PostLoad;
-import javax.persistence.PostPersist;
-import javax.persistence.PostUpdate;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.smallrye.common.constraint.NotNull;
 
-//@MappedSuperclass
-
+ 
 @Entity
 @Table(name = "electronic_devices")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@NamedQueries(
-        value = { @NamedQuery(
-                name = "Device.countByStatus",
-                query = "select status, count(d) as total "
-                        + "from ElectronicDevice d " 
-                		+ "group by status"
-        ) }
-)
-//@NamedQueries(
-//		value = { @NamedQuery(
-//				name = "Device.countByStatus",
-//				query = "select status, count(d) total "
-//						+ "from ElectronicDevice d "
-//						+ "where d.status = :status group by status, total"
-//				) }
-//		)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)  
 public class ElectronicDevice extends PanacheEntity {
-
-	@Column(length = 100)
-	public String name;
-
+ 
 	@NotNull
 	@Column(length = 100, nullable = false)
 	public String brand;
@@ -57,12 +33,9 @@ public class ElectronicDevice extends PanacheEntity {
 	@Column(name = "serial_number", length = 100, nullable = false)
 	public String serialNumber;
 
-	@Column(length = 100)
-	public String manufacturer;
-
-	@Column(name = "manufactured_date")
-	public LocalDate manufacturedDate;
-
+	@Column(name = "acquisition_date")
+	public LocalDate acquisitionDate; 
+	
 	@NotNull
 	@Column(name = "stocked_at")
 	public Instant generatedAt;
@@ -74,31 +47,36 @@ public class ElectronicDevice extends PanacheEntity {
 	@Column(name = "commissioning_date")
 	public Instant commissionedDate;
 
-	@Column(length = 3000)
-	public String comment;
-
 	@Enumerated(EnumType.STRING)
 	public Status status;
 
+	@Column(name = "time_in_use")
+	public Integer timeInUse; 
+	
 	@Column(name = "qr_string", length = 4000)
 	public String qrString;
-
-	@Transient
-	public Integer timeInUse;
-
-	@PostLoad
-	@PostPersist
-	@PostUpdate
-	protected void calculateAge() {
-		if (commissionedDate == null) {
-			timeInUse = null;
-			return;
-		}
-
-		LocalDate date    = LocalDateTime
-		        .ofInstant(commissionedDate, ZoneOffset.UTC).toLocalDate();
-		LocalDate current = LocalDateTime
-		        .ofInstant(Instant.now(), ZoneOffset.UTC).toLocalDate();
-		timeInUse = Period.between(date, current).getYears();
-	}
+	
+ 
+//	@PrePersist
+//	@PreUpdate
+//	protected void retire() {
+//		if (commissionedDate == null) {
+//			status = Status.Available;
+//			return;
+//		}
+//
+//		LocalDate date    = LocalDateTime
+//    						.ofInstant(commissionedDate, ZoneOffset.UTC)
+//    						.toLocalDate();
+//		
+//		LocalDate current = LocalDateTime
+//		        			.ofInstant(Instant.now(), ZoneOffset.UTC)
+//		        			.toLocalDate();
+//		
+//		timeInUse = Period
+//				.between(date, current)
+//				.getYears();
+//		
+//		if (timeInUse >= 5) status = Status.Retired;
+//	}
 }
