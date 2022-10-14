@@ -42,7 +42,7 @@ public class PhoneResource {
 	PhoneService phoneService;
 
 	@POST
-	@Path("/vendors/{id}/phones")
+	@Path("/vendor/{id}/phones")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response addSmartPhone(
@@ -50,6 +50,7 @@ public class PhoneResource {
 	        @Valid SmartPhone phone,
 	        @Context UriInfo uriInfo
 	) {
+		LOG.info("Check Phone: " + phone);
 //		SmartPhone newPhone; // = null;
 		try {
 			phoneService.persistPhone(phone, vendorId);
@@ -95,7 +96,7 @@ public class PhoneResource {
 	}
 
 	@GET
-	@Path("/vendors/{id}/phones")
+	@Path("/vendor/{id}/phones")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response listAllPhonesByVendor(
 	        @PathParam("id") Long vendorId,
@@ -148,7 +149,7 @@ public class PhoneResource {
 	}
 	
 	@DELETE
-	@Path("/vendors/{id}/phones")
+	@Path("/vendor/{id}/phones")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteAllPhonesByVendor(
 	        @PathParam("id") Long vendorId
