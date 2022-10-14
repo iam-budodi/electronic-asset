@@ -50,9 +50,9 @@ public class PhoneResource {
 	        @Valid SmartPhone phone,
 	        @Context UriInfo uriInfo
 	) {
-		SmartPhone newPhone; // = null;
+//		SmartPhone newPhone; // = null;
 		try {
-			newPhone = phoneService.persistPhone(phone, vendorId);
+			phoneService.persistPhone(phone, vendorId);
 		} catch (NoResultException | NotFoundException nfe) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		} catch (NonUniqueResultException | BadRequestException bre) {
@@ -63,7 +63,7 @@ public class PhoneResource {
 //			return Response.status(Response.Status.NOT_FOUND).build();
 
 		URI uri = uriInfo.getAbsolutePathBuilder()
-		        .path(Long.toString(newPhone.id)).build();
+		        .path(Long.toString(phone.id)).build();
 		return Response.created(uri).build();
 	}
 
