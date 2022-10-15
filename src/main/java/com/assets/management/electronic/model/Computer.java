@@ -3,8 +3,12 @@ package com.assets.management.electronic.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity 
 public class Computer extends ElectronicDevice {
@@ -16,11 +20,12 @@ public class Computer extends ElectronicDevice {
 	
 	@Column(name = "asset_tag", length = 100)
 	public String assetTag;
-	
-
-	@ManyToOne(fetch = FetchType.LAZY)
+ 
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "vendor_id", nullable = false)
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	public Vendor vendor;
-	
+
 	public void setVendor(Vendor vendor) {
 		this.vendor = vendor;
 	}
