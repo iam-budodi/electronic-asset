@@ -1,4 +1,4 @@
-package com.assets.management.electronic.model;
+package com.assets.management.assets.model;
 
 public enum Status {
 

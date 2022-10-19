@@ -1,4 +1,4 @@
-package com.assets.management.electronic.rest;
+package com.assets.management.assets.rest;
 
 import java.net.URI;
 import java.util.List;
@@ -29,30 +29,32 @@ import javax.ws.rs.core.UriInfo;
 
 import org.jboss.logging.Logger;
 
-import com.assets.management.electronic.model.Computer;
-import com.assets.management.electronic.service.ComputerService;
+import com.assets.management.assets.model.Phone;
+import com.assets.management.assets.service.PhoneService; 
 
 @Path("/")
-public class ComputerResource {
+public class PhoneResource {
 
 	@Inject
 	Logger LOG;
 
 	@Inject
-	ComputerService computerService;
+	PhoneService phoneService;
 
+	// mark to delete
 	@POST
-	@Path("/vendor/{id}/computers")
+	@Path("/vendor/{id}/phones")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response addSmartPhone(
+	public Response addPhone(
 	        @PathParam("id") Long vendorId,
-	        @Valid Computer computer,
+	        @Valid Phone phone,
 	        @Context UriInfo uriInfo
 	) {
-		LOG.info("Check Computer: " + computer);
+		LOG.info("Check Phone: " + phone);
+//		Phone newPhone; // = null;
 		try {
-			computerService.persistComputer(computer, vendorId);
+			phoneService.persistPhone(phone, vendorId);
 		} catch (NoResultException | NotFoundException nfe) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		} catch (NonUniqueResultException | BadRequestException bre) {
@@ -63,27 +65,27 @@ public class ComputerResource {
 //			return Response.status(Response.Status.NOT_FOUND).build();
 
 		URI uri = uriInfo.getAbsolutePathBuilder()
-		        .path(Long.toString(computer.id)).build();
+		        .path(Long.toString(phone.id)).build();
 		return Response.created(uri).build();
 	}
 
 	@PUT
-	@Path("/computers/{id}")
+	@Path("/phones/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateComputer(
+	public Response updatePhone(
 	        @PathParam("id") @NotNull Long id,
-	        @Valid Computer computer
+	        @Valid Phone phone
 	) {
 
-		if (computer == null || id == null)
+		if (phone == null || id == null)
 			return Response.status(Response.Status.BAD_REQUEST).build();
 
-		if (!id.equals(computer.id))
-			return Response.status(Response.Status.CONFLICT).entity(computer)
+		if (!id.equals(phone.id))
+			return Response.status(Response.Status.CONFLICT).entity(phone)
 			        .build();
 
 		try {
-			computerService.updateComputer(computer, id);
+			phoneService.updatePhone(phone, id);
 		} catch (EntityNotFoundException | NoResultException enf) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		} catch (NonUniqueResultException nur) {
@@ -94,67 +96,72 @@ public class ComputerResource {
 
 	}
 
+	// mark to delete
 	@GET
-	@Path("/vendor/{id}/computers")
+	@Path("/vendor/{id}/phones")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response listAllComputersByVendor(
+	public Response listAllPhonesByVendor(
 	        @PathParam("id") Long vendorId,
 	        @QueryParam("page") @DefaultValue("0") Integer pageIndex,
 	        @QueryParam("size") @DefaultValue("15") Integer pageSize
 	) {
-		List<Computer> computers = computerService
-		        .allComputersByVendor(vendorId, pageIndex, pageSize);
+		List<Phone> phones = phoneService
+		        .allPhonesByVendor(vendorId, pageIndex, pageSize);
 
-		return Response.ok(computers).build();
+		return Response.ok(phones).build();
 	}
 
 	@GET
-	@Path("/computers/total")
+	@Path("/phones/total")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response totalComputersCount() {
-		return Response.ok(computerService.countAllComputers()).build();
+	public Response totalPhonesCount() {
+		return Response.ok(phoneService.countAllPhones()).build();
+	}
+	
+	@GET
+	@Path("/phones/count")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response countPhonesPerStatus() {
+		return Response.ok(phoneService.countPhonesPerStatus()).build();
 	}
 
 	@GET
-	@Path("/computers/count")
+	@Path("/phones/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response countComputersPerStatus() {
-		return Response.ok(computerService.countComputerPerStatus()).build();
-	}
-
-	@GET
-	@Path("/computers/{id}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response findComputerByVendorId(@PathParam("id") @NotNull Long id) {
-		Computer computer;
+	public Response findPhoneByVendorId(@PathParam("id") @NotNull Long id) {
+		Phone phone;
 		try {
-			computer = computerService.findComputerById(id);
+			phone = phoneService.findPhoneById(id);
 		} catch (NotFoundException nfe) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
-		return Response.ok(computer).build();
+		return Response.ok(phone).build();
 	}
 
 	@DELETE
-	@Path("/computers/{id}")
+	@Path("/phones/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteComputer(@PathParam("id") @NotNull Long id) {
+	public Response deletePhone(@PathParam("id") @NotNull Long id) {
 		try {
-			computerService.deleteComputer(id);
+			phoneService.deletePhone(id);
 		} catch (EntityNotFoundException nfe) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 		return Response.noContent().build();
 	}
+	
 
+	// mark to delete
 	@DELETE
-	@Path("/vendor/{id}/computers")
+	@Path("/vendor/{id}/phones")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteAllComputersByVendor(
+	public Response deleteAllPhonesByVendor(
 	        @PathParam("id") Long vendorId
 	) {
-		Long deletedComputers = computerService.deleteAllComputer(vendorId);
+		Long numberOfDeletedPhones = phoneService
+		        .deleteAllPhone(vendorId);
 
-		return Response.ok(deletedComputers).build();
+		return Response.ok(numberOfDeletedPhones).build();
 	}
+
 }

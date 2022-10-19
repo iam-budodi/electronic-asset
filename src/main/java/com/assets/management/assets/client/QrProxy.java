@@ -1,4 +1,4 @@
-package com.assets.management.electronic.client;
+package com.assets.management.assets.client;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -8,16 +8,17 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-import com.assets.management.electronic.model.QrContent;
+import com.assets.management.assets.model.QrContent;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
+@Path("/devices")
 @RegisterRestClient
 @RegisterForReflection
 public interface QrProxy {
 
 	@POST
-	@Path("/devices/qr")
+	@Path("/qr")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces("image/png") 
 	byte[] CreateQrString(QrContent content);

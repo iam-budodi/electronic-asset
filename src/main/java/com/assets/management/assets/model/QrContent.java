@@ -1,4 +1,4 @@
-package com.assets.management.electronic.model;
+package com.assets.management.assets.model;
 
 import java.time.Instant;
 
@@ -8,20 +8,20 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 public class QrContent {
 	public final Long    id;
 	public final String  serialNumber;
-	public final String  brand;
-	public final Instant generatedAt;
+	public final String  modelName;
+	public final Instant stockedAt;
 
-	public QrContent(Long id, String serialNumber, String brand,
-			Instant generatedAt) {
+	public QrContent(Long id, String serialNumber, String modelName,
+			Instant stockedAt) {
 		this.id           = id;
 		this.serialNumber = serialNumber;
-		this.brand        = brand;
-		this.generatedAt  = generatedAt;
+		this.modelName        = modelName;
+		this.stockedAt  = stockedAt;
 	}
 
 	@Override
 	public String toString() {
 		return "QrContent [id=" + id + ", serialNumber=" + serialNumber
-				+ ", brand=" + brand + ", generatedAt=" + generatedAt + "]";
+				+ ", modelName=" + modelName + ", stockedAt=" + stockedAt + "]";
 	} 
 }

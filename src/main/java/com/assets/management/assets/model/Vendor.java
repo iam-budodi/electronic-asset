@@ -1,4 +1,4 @@
-package com.assets.management.electronic.model;
+package com.assets.management.assets.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,21 +24,6 @@ public class Vendor extends PanacheEntity {
 	public String contactPerson;
 
 	@NotNull
-	@Column(name = "escalation_person", length = 100, nullable = false)
-	public String escalationPerson;
-
-//	@OneToMany(
-//	        mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true
-//	) 
-//	public List<SmartPhone> phones = new ArrayList<>();
-//
-//	public void addPhone(SmartPhone phone) {
-//		phones.add(phone);
-//		phone.setVendor(this);
-//	}
-//
-//	public void removePhone(SmartPhone phone) {
-//		phones.remove(phone);
-//		phone.setVendor(null);
-//	}
+	@Column(name = "escalating_person", length = 100, nullable = false)
+	public String escalatingPerson;
 }

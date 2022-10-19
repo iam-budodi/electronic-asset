@@ -1,4 +1,4 @@
-package com.assets.management.electronic.service;
+package com.assets.management.assets.service;
 
 import java.time.Instant;
 import java.util.Base64;
@@ -16,10 +16,10 @@ import javax.ws.rs.NotFoundException;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
-import com.assets.management.electronic.client.QrProxy;
-import com.assets.management.electronic.model.QrContent;
-import com.assets.management.electronic.model.SmartPhone;
-import com.assets.management.electronic.model.Vendor;
+import com.assets.management.assets.client.QrProxy;
+import com.assets.management.assets.model.Phone;
+import com.assets.management.assets.model.QrContent;
+import com.assets.management.assets.model.Vendor;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
@@ -36,8 +36,9 @@ public class PhoneService {
 	@RestClient
 	QrProxy qrProxy;
 
-	public SmartPhone persistPhone(
-	        @Valid SmartPhone phone,
+	// delete
+	public Phone persistPhone(
+	        @Valid Phone phone,
 	        @NotNull Long vendorId
 	) { 
 		Optional<Vendor> optional = Vendor.findByIdOptional(vendorId);
@@ -45,68 +46,71 @@ public class PhoneService {
 		Vendor vendor = optional.orElseThrow(() -> new BadRequestException());
 
 		phone.vendor = vendor;
-		phone.generatedAt = Instant.now();
+		phone.stockedAt = Instant.now();
 
-		SmartPhone.persist(phone);
+		Phone.persist(phone);
 		phone.qrString = retrieveQrString(phone);
 		return Panache.getEntityManager().merge(phone);
 	}
 
-	public SmartPhone updatePhone(@Valid SmartPhone phone, @NotNull Long id) {
-		SmartPhone sPhone = Panache.getEntityManager()
-		        .getReference(SmartPhone.class, id);
+	public Phone updatePhone(@Valid Phone phone, @NotNull Long id) {
+		Phone sPhone = Panache.getEntityManager()
+		        .getReference(Phone.class, id);
 		phone.qrString = retrieveQrString(sPhone);
 		phone.updatedAt = Instant.now();
 
 		return Panache.getEntityManager().merge(phone);
 	}
 
+	// delete
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<SmartPhone> allPhonesByVendor(
+	public List<Phone> allPhonesByVendor(
 	        Long vendorId,
 	        Integer pageIndex,
 	        Integer pageSize
 	) { 
-		return SmartPhone.find(
+		return Phone.find(
 		        "select sp " 
-		        		+ "from SmartPhone sp "
+		        		+ "from Phone sp "
 		                + "where sp.vendor.id = ?1",
 		                vendorId
 		).page(pageIndex, pageSize).list();
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public SmartPhone findPhoneById(@NotNull Long id) {
-		Optional<SmartPhone> phone = SmartPhone.findByIdOptional(id);
+	public Phone findPhoneById(@NotNull Long id) {
+		Optional<Phone> phone = Phone.findByIdOptional(id);
 		return phone.orElseThrow(() -> new NotFoundException());
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Long countAllPhones() {
-		return SmartPhone.count();
+		return Phone.count();
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public List<PanacheEntityBase> countPhonesPerStatus() {
-		return SmartPhone.find(
+		return Phone.find(
 		        "select status, count(sp.status) as total "
-		                + "from SmartPhone sp " + "group by status"
+		                + "from Phone sp " + "group by status"
 		).list();
 
 	}
 
 	public void deletePhone(@NotNull Long id) {
-		Panache.getEntityManager().getReference(SmartPhone.class, id).delete();
+		Panache.getEntityManager().getReference(Phone.class, id).delete();
 	}
 	
+	// delete
 	public Long deleteAllPhone(@NotNull Long vendorId) {
 		Optional<Vendor> optional = Vendor.findByIdOptional(vendorId);
-		Vendor vendor = optional.orElseThrow(() -> new BadRequestException());
-		return SmartPhone.deleteAll();
+		// Vendor vendor = 
+		optional.orElseThrow(() -> new BadRequestException());
+		return Phone.deleteAll();
 	}
-
-	private String retrieveQrString(SmartPhone phone) {
-		PanacheQuery<QrContent> query = SmartPhone.find("id", phone.id)
+// delete
+	private String retrieveQrString(Phone phone) {
+		PanacheQuery<QrContent> query = Phone.find("id", phone.id)
 		        .project(QrContent.class);
 
 		QrContent qrContent = query.singleResult();
