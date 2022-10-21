@@ -113,7 +113,8 @@ public class VendorResource {
 
 		return Response.status(Status.NO_CONTENT).build();
 	}
-
+	
+	// TODO: make deleting as hard as possible
 	@DELETE
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)

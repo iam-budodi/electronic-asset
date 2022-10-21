@@ -17,6 +17,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
 import com.assets.management.assets.client.QrProxy;
+import com.assets.management.assets.model.Asset;
 import com.assets.management.assets.model.Phone;
 import com.assets.management.assets.model.QrContent;
 import com.assets.management.assets.model.Vendor;
@@ -27,7 +28,7 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 @ApplicationScoped
 @Transactional(Transactional.TxType.REQUIRED)
-public class PhoneService {
+public class AssetService {
 
 	@Inject
 	Logger LOG;
@@ -37,20 +38,9 @@ public class PhoneService {
 	QrProxy qrProxy;
 
 	// delete
-	public Phone persistPhone(
-	        @Valid Phone phone,
-	        @NotNull Long vendorId
-	) { 
-		Optional<Vendor> optional = Vendor.findByIdOptional(vendorId);
-		LOG.info("Is Vendor Present " + optional.get());
-		Vendor vendor = optional.orElseThrow(() -> new BadRequestException());
-
-		phone.vendor = vendor;
-		phone.stockedAt = Instant.now();
-
-		Phone.persist(phone);
-		phone.qrString = retrieveQrString(phone);
-		return Panache.getEntityManager().merge(phone);
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public List<Asset> getAllAssets(Integer pageIndex, Integer pageSize) {
+		return Asset.find("from Asset a").page(pageIndex, pageSize).list();
 	}
 
 	public Phone updatePhone(@Valid Phone phone, @NotNull Long id) {
@@ -60,21 +50,6 @@ public class PhoneService {
 		phone.updatedAt = Instant.now();
 
 		return Panache.getEntityManager().merge(phone);
-	}
-
-	// delete
-	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<Phone> allPhonesByVendor(
-	        Long vendorId,
-	        Integer pageIndex,
-	        Integer pageSize
-	) { 
-		return Phone.find(
-		        "select sp " 
-		        		+ "from Phone sp "
-		                + "where sp.vendor.id = ?1",
-		                vendorId
-		).page(pageIndex, pageSize).list();
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
@@ -91,8 +66,8 @@ public class PhoneService {
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public List<PanacheEntityBase> countPhonesPerStatus() {
 		return Phone.find(
-		        "select status, count(sp.status) as total "
-		                + "from Phone sp " + "group by status"
+		        "select status, count(sp.status) as total " + "from Phone sp "
+		                + "group by status"
 		).list();
 
 	}
@@ -100,21 +75,22 @@ public class PhoneService {
 	public void deletePhone(@NotNull Long id) {
 		Panache.getEntityManager().getReference(Phone.class, id).delete();
 	}
-	
+
 	// delete
 	public Long deleteAllPhone(@NotNull Long vendorId) {
 		Optional<Vendor> optional = Vendor.findByIdOptional(vendorId);
-		// Vendor vendor = 
+		// Vendor vendor =
 		optional.orElseThrow(() -> new BadRequestException());
 		return Phone.deleteAll();
 	}
+
 // delete
 	private String retrieveQrString(Phone phone) {
 		PanacheQuery<QrContent> query = Phone.find("id", phone.id)
 		        .project(QrContent.class);
 
 		QrContent qrContent = query.singleResult();
-		byte[]    code      = qrProxy.CreateQrString(qrContent);
+		byte[]    code      = qrProxy.createQrString(qrContent);
 		return Base64.getEncoder().encodeToString(code);
 	}
 }

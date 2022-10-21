@@ -61,7 +61,7 @@ public class Asset extends PanacheEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	public EndUser endUser;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY) 
 	public Vendor vendor;
 
 	@Override

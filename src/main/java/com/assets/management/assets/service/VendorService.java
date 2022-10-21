@@ -119,7 +119,7 @@ public class VendorService {
 		        .project(QrContent.class);
 
 		QrContent qrContent = query.singleResult();
-		byte[]    code      = qrProxy.CreateQrString(qrContent);
+		byte[]    code      = qrProxy.createQrString(qrContent);
 		return Base64.getEncoder().encodeToString(code);
 	}
 }

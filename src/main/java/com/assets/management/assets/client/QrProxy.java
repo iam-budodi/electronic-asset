@@ -12,7 +12,7 @@ import com.assets.management.assets.model.QrContent;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
-@Path("/devices")
+@Path("/codes")
 @RegisterRestClient
 @RegisterForReflection
 public interface QrProxy {
@@ -21,5 +21,5 @@ public interface QrProxy {
 	@Path("/qr")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces("image/png") 
-	byte[] CreateQrString(QrContent content);
+	byte[] createQrString(QrContent content);
 }
