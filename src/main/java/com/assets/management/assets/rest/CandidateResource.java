@@ -4,11 +4,14 @@ import java.net.URI;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -27,6 +30,7 @@ import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.Asset;
 import com.assets.management.assets.model.EndUser;
+import com.assets.management.assets.model.Vendor;
 import com.assets.management.assets.service.CandidateService;
 
 @Path("/candidates")
@@ -52,6 +56,80 @@ public class CandidateResource {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
 		return Response.created(uri).build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response listCandidates(
+	        @QueryParam("page") @DefaultValue("0") Integer pageIndex,
+	        @QueryParam("size") @DefaultValue("15") Integer pageSize
+	) {
+		List<EndUser> candidates = candidateService
+		        .getAllCandidates(pageIndex, pageSize);
+		return Response.ok(candidates).build();
+	}
+
+	@GET
+	@Path("/count")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response countCandidates() {
+		return Response.ok(candidateService.countCandidates()).build();
+	}
+
+	@GET
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response findCandidate(@PathParam("id") @NotNull Long id) {
+		EndUser candidate;
+		try {
+			candidate = candidateService.findById(id);
+		} catch (NotFoundException nfe) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		return Response.ok(candidate).build();
+	}
+
+	@PUT
+	@Path("/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateCandidate(
+	        @PathParam("id") @NotNull Long id,
+	        @Valid EndUser candidate
+	) {
+
+		if (candidate == null || id == null)
+			return Response.status(Response.Status.BAD_REQUEST).build();
+
+		if (!id.equals(candidate.id))
+			return Response.status(Response.Status.CONFLICT).entity(candidate)
+			        .build();
+
+		try {
+			candidateService.updateById(candidate, id);
+		} catch (EntityNotFoundException | NoResultException enf) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		return Response.status(Status.NO_CONTENT).build();
+	}
+
+	// TODO: make deleting as hard as possible i.e fails due to foreign key
+	@DELETE
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteCandidate(@PathParam("id") @NotNull Long id) {
+		try {
+			candidateService.deleteById(id);
+		} catch (EntityNotFoundException nfe) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		return Response.noContent().build();
+	}
+
+	@DELETE
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteAllVendors() {
+		return Response.ok(candidateService.deleteAll()).build();
 	}
 
 	@PUT

@@ -19,6 +19,7 @@ import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.Asset;
 import com.assets.management.assets.model.EndUser;
+import com.assets.management.assets.model.Vendor;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 
@@ -33,6 +34,35 @@ public class CandidateService {
 		EndUser.persist(endUser);
 		return uri.getAbsolutePathBuilder().path(Long.toString(endUser.id))
 		        .build();
+	}
+
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public List<EndUser> getAllCandidates(Integer page, Integer size) {
+		return EndUser.find("from EndUser eu").page(page, size).list();
+	}
+
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public Long countCandidates() {
+		return EndUser.count();
+	}
+
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public EndUser findById(@NotNull Long id) {
+		Optional<EndUser> candidate = EndUser.findByIdOptional(id);
+		return candidate.orElseThrow(() -> new NotFoundException());
+	}
+
+	public EndUser updateById(@Valid EndUser candidate, @NotNull Long id) {
+		Panache.getEntityManager().getReference(EndUser.class, id);
+		return Panache.getEntityManager().merge(candidate);
+	}
+
+	public void deleteById(@NotNull Long id) {
+		Panache.getEntityManager().getReference(EndUser.class, id).delete();
+	}
+
+	public Long deleteAll() {
+		return EndUser.deleteAll();
 	}
 
 	public void assignAsset(@Valid Asset asset, @NotNull Long candidateId) {

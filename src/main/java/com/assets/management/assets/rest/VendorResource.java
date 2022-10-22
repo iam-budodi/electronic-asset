@@ -61,13 +61,11 @@ public class VendorResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response listVendors(
-	        @PathParam("id") Long vendorId,
 	        @QueryParam("page") @DefaultValue("0") Integer pageIndex,
 	        @QueryParam("size") @DefaultValue("15") Integer pageSize
 	) {
-		List<Vendor> vendor = vendorService
-		        .getAllVendors(vendorId, pageIndex, pageSize);
-		return Response.ok(vendor).build();
+		List<Vendor> vendors = vendorService.getAllVendors(pageIndex, pageSize);
+		return Response.ok(vendors).build();
 	}
 
 	@GET
@@ -113,7 +111,7 @@ public class VendorResource {
 
 		return Response.status(Status.NO_CONTENT).build();
 	}
-	
+
 	// TODO: make deleting as hard as possible
 	@DELETE
 	@Path("/{id}")
@@ -127,9 +125,9 @@ public class VendorResource {
 		return Response.noContent().build();
 	}
 
-	@DELETE 
+	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteAllVendors() { 
+	public Response deleteAllVendors() {
 		return Response.ok(vendorService.deleteAllVendors()).build();
 	}
 

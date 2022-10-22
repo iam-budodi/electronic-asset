@@ -23,6 +23,7 @@ import com.assets.management.assets.client.QrProxy;
 import com.assets.management.assets.model.Asset;
 import com.assets.management.assets.model.QrContent;
 import com.assets.management.assets.model.Vendor;
+import com.assets.management.assets.util.QrCodeString;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
@@ -33,10 +34,13 @@ public class VendorService {
 
 	@Inject
 	Logger LOG;
-
+	
 	@Inject
-	@RestClient
-	QrProxy qrProxy;
+	QrCodeString qrCodeString;
+//
+//	@Inject
+//	@RestClient
+//	QrProxy qrProxy;
 
 	public URI createVendor(@Valid Vendor vendor, @Context UriInfo uriInfo) {
 		Vendor.persist(vendor);
@@ -45,11 +49,7 @@ public class VendorService {
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<Vendor> getAllVendors(
-	        Long vendorId,
-	        Integer pageIndex,
-	        Integer pageSize
-	) {
+	public List<Vendor> getAllVendors(Integer pageIndex, Integer pageSize) {
 		return Vendor.find("from Vendor vp").page(pageIndex, pageSize).list();
 	}
 
@@ -74,7 +74,7 @@ public class VendorService {
 	public void deleteVendorById(@NotNull Long id) {
 		Panache.getEntityManager().getReference(Vendor.class, id).delete();
 	}
- 
+
 	public Long deleteAllVendors() {
 		return Vendor.deleteAll();
 	}
@@ -93,7 +93,7 @@ public class VendorService {
 
 		Asset.persist(asset);
 		LOG.info("Check retrned asset:  " + asset.id);
-		asset.qrString = retrieveQrString(asset);
+		asset.qrString = qrCodeString.formatCodeImgToStr(asset);
 		Panache.getEntityManager().merge(asset);
 		return uriInfo.getAbsolutePathBuilder().path(Long.toString(asset.id))
 		        .build();
@@ -112,14 +112,14 @@ public class VendorService {
 		Optional<Vendor> optional = Vendor.findByIdOptional(vendorId);
 		optional.orElseThrow(() -> new NotFoundException());
 		return Asset.delete("vendor.id = ?1", vendorId);
-	} 
-	
-	private String retrieveQrString(Asset asset) {
-		PanacheQuery<QrContent> query = Asset.find("id", asset.id)
-		        .project(QrContent.class);
-
-		QrContent qrContent = query.singleResult();
-		byte[]    code      = qrProxy.createQrString(qrContent);
-		return Base64.getEncoder().encodeToString(code);
 	}
+//
+//	private String retrieveQrString(Asset asset) {
+//		PanacheQuery<QrContent> query = Asset.find("id", asset.id)
+//		        .project(QrContent.class);
+//
+//		QrContent qrContent = query.singleResult();
+//		byte[]    code      = qrProxy.createQrString(qrContent);
+//		return Base64.getEncoder().encodeToString(code);
+//	}
 }

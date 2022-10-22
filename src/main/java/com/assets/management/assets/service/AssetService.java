@@ -33,24 +33,21 @@ public class AssetService {
 	@Inject
 	Logger LOG;
 
-	@Inject
-	@RestClient
-	QrProxy qrProxy;
-
-	// delete
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<Asset> getAllAssets(Integer pageIndex, Integer pageSize) {
-		return Asset.find("from Asset a").page(pageIndex, pageSize).list();
+	public List<Asset> getAllAssets(Integer page, Integer size) {
+		return Asset.find("from Asset a").page(page, size).list();
 	}
-
-	public Phone updatePhone(@Valid Phone phone, @NotNull Long id) {
-		Phone sPhone = Panache.getEntityManager()
-		        .getReference(Phone.class, id);
-		phone.qrString = retrieveQrString(sPhone);
-		phone.updatedAt = Instant.now();
-
-		return Panache.getEntityManager().merge(phone);
-	}
+//
+//	public Phone updateAsset(@Valid Asset asset, @NotNull Long assetId) {
+//		Asset assetFound = Panache.getEntityManager()
+//		        .getReference(Asset.class, assetId);
+//		
+//		if (assetFound.serialNumber != asset.serialNumber || assetFound.modelName != asset.modelName)
+//			asset.qrString = retrieveQrString(asset);
+//		phone.updatedAt = Instant.now();
+//
+//		return Panache.getEntityManager().merge(phone);
+//	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Phone findPhoneById(@NotNull Long id) {
@@ -84,13 +81,4 @@ public class AssetService {
 		return Phone.deleteAll();
 	}
 
-// delete
-	private String retrieveQrString(Phone phone) {
-		PanacheQuery<QrContent> query = Phone.find("id", phone.id)
-		        .project(QrContent.class);
-
-		QrContent qrContent = query.singleResult();
-		byte[]    code      = qrProxy.createQrString(qrContent);
-		return Base64.getEncoder().encodeToString(code);
-	}
 }
