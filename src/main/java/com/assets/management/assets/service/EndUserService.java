@@ -19,13 +19,12 @@ import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.Asset;
 import com.assets.management.assets.model.EndUser;
-import com.assets.management.assets.model.Vendor;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 
 @ApplicationScoped
 @Transactional(Transactional.TxType.REQUIRED)
-public class CandidateService {
+public class EndUserService {
 
 	@Inject
 	Logger LOG;

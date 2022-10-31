@@ -30,28 +30,27 @@ import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.Asset;
 import com.assets.management.assets.model.EndUser;
-import com.assets.management.assets.model.Vendor;
-import com.assets.management.assets.service.CandidateService;
+import com.assets.management.assets.service.EndUserService;
 
-@Path("/candidates")
-public class CandidateResource {
+@Path("/users")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public class EndUserResource {
 
 	@Inject
 	Logger LOG;
 
 	@Inject
-	CandidateService candidateService;
+	EndUserService endUserService;
 
 	@POST
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response createCandidate(
+	public Response createEndUsers(
 	        @Valid EndUser endUser,
 	        @Context UriInfo uriInfo
 	) {
 		URI uri;
 		try {
-			uri = candidateService.createCandidate(endUser, uriInfo);
+			uri = endUserService.createCandidate(endUser, uriInfo);
 		} catch (IllegalArgumentException ex) {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
@@ -59,30 +58,30 @@ public class CandidateResource {
 	}
 
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response listCandidates(
+//	@Produces(MediaType.APPLICATION_JSON)
+	public Response listEndUsers(
 	        @QueryParam("page") @DefaultValue("0") Integer pageIndex,
 	        @QueryParam("size") @DefaultValue("15") Integer pageSize
 	) {
-		List<EndUser> candidates = candidateService
+		List<EndUser> candidates = endUserService
 		        .getAllCandidates(pageIndex, pageSize);
 		return Response.ok(candidates).build();
 	}
 
 	@GET
 	@Path("/count")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response countCandidates() {
-		return Response.ok(candidateService.countCandidates()).build();
+//	@Produces(MediaType.APPLICATION_JSON)
+	public Response countEndUsers() {
+		return Response.ok(endUserService.countCandidates()).build();
 	}
 
 	@GET
 	@Path("/{id}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response findCandidate(@PathParam("id") @NotNull Long id) {
+//	@Produces(MediaType.APPLICATION_JSON)
+	public Response findEndUser(@PathParam("id") @NotNull Long id) {
 		EndUser candidate;
 		try {
-			candidate = candidateService.findById(id);
+			candidate = endUserService.findById(id);
 		} catch (NotFoundException nfe) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
@@ -91,8 +90,8 @@ public class CandidateResource {
 
 	@PUT
 	@Path("/{id}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateCandidate(
+//	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateEndUser(
 	        @PathParam("id") @NotNull Long id,
 	        @Valid EndUser candidate
 	) {
@@ -105,7 +104,7 @@ public class CandidateResource {
 			        .build();
 
 		try {
-			candidateService.updateById(candidate, id);
+			endUserService.updateById(candidate, id);
 		} catch (EntityNotFoundException | NoResultException enf) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
@@ -116,10 +115,10 @@ public class CandidateResource {
 	// TODO: make deleting as hard as possible i.e fails due to foreign key
 	@DELETE
 	@Path("/{id}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteCandidate(@PathParam("id") @NotNull Long id) {
+//	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteEndUser(@PathParam("id") @NotNull Long id) {
 		try {
-			candidateService.deleteById(id);
+			endUserService.deleteById(id);
 		} catch (EntityNotFoundException nfe) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
@@ -127,15 +126,15 @@ public class CandidateResource {
 	}
 
 	@DELETE
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteAllVendors() {
-		return Response.ok(candidateService.deleteAll()).build();
+//	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteAllEndUsers() {
+		return Response.ok(endUserService.deleteAll()).build();
 	}
 
 	@PUT
 	@Path("/{id}/assets")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
+//	@Produces(MediaType.APPLICATION_JSON)
+//	@Consumes(MediaType.APPLICATION_JSON)
 	public Response assignAsset(
 	        @PathParam("id") Long candidateId,
 	        @Valid Asset asset
@@ -149,7 +148,7 @@ public class CandidateResource {
 			return Response.status(Status.CONFLICT).build();
 
 		try {
-			candidateService.assignAsset(asset, candidateId);
+			endUserService.assignAsset(asset, candidateId);
 		} catch (IllegalArgumentException | BadRequestException bre) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
@@ -159,21 +158,21 @@ public class CandidateResource {
 
 	@GET
 	@Path("/{id}/assets")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response listAllCandidateAssets(@PathParam("id") Long candidateId) {
-		List<Asset> assets = candidateService.getAllAssets(candidateId);
+//	@Produces(MediaType.APPLICATION_JSON)
+	public Response listAllEndUserAssets(@PathParam("id") Long candidateId) {
+		List<Asset> assets = endUserService.getAllAssets(candidateId);
 		return Response.ok(assets).build();
 	}
 
 	@DELETE
 	@Path("/{id}/assets")
-	@Produces(MediaType.APPLICATION_JSON)
+//	@Produces(MediaType.APPLICATION_JSON)
 	public Response unAssignAsset(
 	        @PathParam("id") Long candidateId,
 	        @QueryParam("sn") @NotNull String serialNumber
 	) {
 		try {
-			candidateService.unAssignAsset(candidateId, serialNumber);
+			endUserService.unAssignAsset(candidateId, serialNumber);
 		} catch (IllegalArgumentException | NotFoundException bre) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}

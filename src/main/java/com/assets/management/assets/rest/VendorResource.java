@@ -139,8 +139,7 @@ public class VendorResource {
 	        @PathParam("id") Long vendorId,
 	        @Valid Asset asset,
 	        @Context UriInfo uriInfo
-	) {
-		LOG.info("Check Asset: " + asset);
+	) { 
 		URI uri;
 		try {
 			uri = vendorService.addAsset(asset, vendorId, uriInfo);
