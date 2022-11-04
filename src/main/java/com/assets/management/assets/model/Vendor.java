@@ -26,4 +26,14 @@ public class Vendor extends PanacheEntity {
 	@NotNull
 	@Column(name = "escalating_person", length = 100, nullable = false)
 	public String escalatingPerson;
+
+//	public Vendor(
+//	        String companyName, String service, String contactPerson,
+//	        String escalatingPerson
+//	) {
+//		this.companyName = companyName;
+//		this.service = service;
+//		this.contactPerson = contactPerson;
+//		this.escalatingPerson = escalatingPerson;
+//	}
 }

@@ -1,7 +1,6 @@
 package com.assets.management.assets.rest;
 
 import static io.restassured.RestAssured.given;
-import static io.restassured.config.RestAssuredConfig.config;
 import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -12,7 +11,6 @@ import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,9 +20,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
-
-import org.jboss.logging.Logger;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -32,11 +27,8 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import com.assets.management.assets.model.EndUser;
 
-import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
-import io.restassured.config.EncoderConfig;
 import io.restassured.http.ContentType;
 
 @QuarkusTest
@@ -62,10 +54,11 @@ class EndUserResourceTest {
 	        1992, 06, 26
 	);
 
-	// asset for end user
-	private static final String    DEFAULT_MODEL_NAME = "Macbook Pro 2022 M2 Chip";
-	private static final String    DEFAULT_MODEL_NUMBER = "MB-P2022M/CP";
-	private static final String    DEFAULT_SERIAL_NUMBER  = "R58R52PG3CH";
+//	// asset for end user
+//	private static final String    DEFAULT_MODEL_NAME = "Macbook Pro 2022 M2 Chip";
+//	private static final String    DEFAULT_MODEL_NUMBER = "MB-P2022M/CP";
+//	private static final String    DEFAULT_SERIAL_NUMBER  = "R58R52PG3CH";
+	
 	private static String candidateId; 
 	
 //	@TestHTTPResource
@@ -258,7 +251,19 @@ class EndUserResourceTest {
 		then()
 			.statusCode(NOT_FOUND.getStatusCode());
 	}
-	
+//	
+//	@Test
+//	@Order(12)
+//	void shouldAssignAssetToEndUser() {
+//		PanacheMock.mock(Vendor.class);
+//		PanacheMock.mock(Asset.class);
+//		
+//		Vendor vendor = new Vendor("UBX", "Data Centre", "Richard Seba", "Japhet Sebastian");
+//		Asset asset = new Asset("Server rack", "XYZ12345", "R58R52PG3CH");
+//		
+//		Mockito.
+//	}
+//	
 	private TypeRef<List<EndUser>> getEndUserTypeRef() {
 		return new TypeRef<List<EndUser>>() {
 			

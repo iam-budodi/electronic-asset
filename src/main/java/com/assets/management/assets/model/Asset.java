@@ -63,6 +63,16 @@ public class Asset extends PanacheEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY) 
 	public Vendor vendor;
+//	
+//	
+//
+//	public Asset(
+//	        String modelName, String modelNumber, String serialNumber
+//	) { 
+//		this.modelName = modelName;
+//		this.modelNumber = modelNumber;
+//		this.serialNumber = serialNumber; 
+//	}
 
 	@Override
 	public int hashCode() {
