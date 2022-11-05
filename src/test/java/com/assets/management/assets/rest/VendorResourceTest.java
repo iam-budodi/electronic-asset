@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.assets.management.assets.model.Vendor;
+import com.assets.management.assets.model.Supplier;
 
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
@@ -55,7 +55,7 @@ class VendorResourceTest {
 	@Test
 	@Order(1)
 	void shouldNotAddInvalidVendor() {
-		Vendor vendor = new Vendor();
+		Supplier vendor = new Supplier();
 		vendor.companyName = null; 
 
 		given()
@@ -83,7 +83,7 @@ class VendorResourceTest {
 	@Test
 	@Order(3)
 	void shouldAddVendor() {
-		Vendor vendor = new Vendor();
+		Supplier vendor = new Supplier();
 		vendor.companyName = DEFAULT_COMPANY_NAME;
 		vendor.service = DEFAULT_SERVICE;
 		vendor.contactPerson = DEFAULT_CONTACT_PERSON;
@@ -157,7 +157,7 @@ class VendorResourceTest {
 	@Test
 	@Order(7)
 	void shouldUpdateVendor() {
-		Vendor vendor = new Vendor();
+		Supplier vendor = new Supplier();
 		vendor.id = Long.valueOf(vendorId);
 		vendor.companyName = UPDATED_COMPANY_NAME;
 		vendor.service = UPDATED_SERVICE;
@@ -177,7 +177,7 @@ class VendorResourceTest {
 	@Test
 	@Order(8)
 	void shouldCheckUpdatedVendor() {
-		List<Vendor> vendors =
+		List<Supplier> vendors =
 			given()
 				.accept(APPLICATION_JSON).
 			when()
@@ -233,8 +233,8 @@ class VendorResourceTest {
 	
 	// TODO: Tests add assets
 	
-	private TypeRef<List<Vendor>> getVendorTypeRef() {
-		return new TypeRef<List<Vendor>>() {
+	private TypeRef<List<Supplier>> getVendorTypeRef() {
+		return new TypeRef<List<Supplier>>() {
 			
 		};
 	} 

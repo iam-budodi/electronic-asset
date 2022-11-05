@@ -14,9 +14,9 @@ import javax.ws.rs.NotFoundException;
 
 import org.jboss.logging.Logger;
 
-import com.assets.management.assets.model.Asset;
-import com.assets.management.assets.model.Asset;
-import com.assets.management.assets.model.Vendor;
+import com.assets.management.assets.model.Item;
+import com.assets.management.assets.model.Item;
+import com.assets.management.assets.model.Supplier;
 import com.assets.management.assets.util.QrCodeString;
 
 import io.quarkus.hibernate.orm.panache.Panache;
@@ -33,19 +33,19 @@ public class AssetService {
     QrCodeString qrCodeString;
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public List<Asset> getAllAssets(Integer page, Integer size) {
-        return Asset.find("from Asset a").page(page, size).list();
+    public List<Item> getAllAssets(Integer page, Integer size) {
+        return Item.find("from Asset a").page(page, size).list();
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public Asset findById(@NotNull Long id) {
-        Optional<Asset> asset = Asset.findByIdOptional(id);
+    public Item findById(@NotNull Long id) {
+        Optional<Item> asset = Item.findByIdOptional(id);
         return asset.orElseThrow(NotFoundException::new);
     }
 
-    public void updateAsset(@Valid Asset asset, @NotNull Long assetId) {
-        Asset assetFound = Panache.getEntityManager()
-                .getReference(Asset.class, assetId);
+    public void updateAsset(@Valid Item asset, @NotNull Long assetId) {
+        Item assetFound = Panache.getEntityManager()
+                .getReference(Item.class, assetId);
 
         if (!assetFound.serialNumber.equals(asset.serialNumber)
                 || !assetFound.modelName.equals(asset.modelName))
@@ -58,12 +58,12 @@ public class AssetService {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public Long countAllAssets() {
-        return Asset.count();
+        return Item.count();
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public List<PanacheEntityBase> countAssetPerVendor() {
-        return Asset.find(
+        return Item.find(
                 "select a.vendor.companyName, count(a.vendor) as total from Asset a group by a.vendor.companyName"
         ).list();
 
@@ -71,14 +71,14 @@ public class AssetService {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public List<PanacheEntityBase> countAssetPerStatus() {
-        return Asset.find(
+        return Item.find(
                 "select a.status, count(a.status) as total from Asset a group by a.status"
         ).list();
 
     }
 
     public void deleteById(@NotNull Long id) {
-		Panache.getEntityManager().getReference(Asset.class, id).delete();
+		Panache.getEntityManager().getReference(Item.class, id).delete();
 	}
  
 }

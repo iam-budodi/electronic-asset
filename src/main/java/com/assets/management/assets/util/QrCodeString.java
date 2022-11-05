@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.assets.management.assets.client.QrProxy;
-import com.assets.management.assets.model.Asset;
+import com.assets.management.assets.model.Item;
 import com.assets.management.assets.model.QrContent;
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
@@ -20,8 +20,8 @@ public class QrCodeString {
 	@RestClient
 	QrProxy qrProxy;
 
-	public  String formatCodeImgToStr(Asset asset) {
-		PanacheQuery<QrContent> query = Asset.find("id", asset.id)
+	public  String formatCodeImgToStr(Item asset) {
+		PanacheQuery<QrContent> query = Item.find("id", asset.id)
 		        .project(QrContent.class);
 
 		QrContent qrContent = query.singleResult();

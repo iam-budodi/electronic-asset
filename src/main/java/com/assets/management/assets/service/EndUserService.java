@@ -17,8 +17,8 @@ import javax.ws.rs.core.UriInfo;
 
 import org.jboss.logging.Logger;
 
-import com.assets.management.assets.model.Asset;
-import com.assets.management.assets.model.EndUser;
+import com.assets.management.assets.model.Item;
+import com.assets.management.assets.model.Employee;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 
@@ -29,45 +29,45 @@ public class EndUserService {
 	@Inject
 	Logger LOG;
 
-	public URI createCandidate(@Valid EndUser endUser, @Context UriInfo uri) {
-		EndUser.persist(endUser);
+	public URI createCandidate(@Valid Employee endUser, @Context UriInfo uri) {
+		Employee.persist(endUser);
 		return uri.getAbsolutePathBuilder().path(Long.toString(endUser.id))
 		        .build();
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<EndUser> getAllCandidates(Integer page, Integer size) {
-		return EndUser.find("from EndUser eu").page(page, size).list();
+	public List<Employee> getAllCandidates(Integer page, Integer size) {
+		return Employee.find("from EndUser eu").page(page, size).list();
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Long countCandidates() {
-		return EndUser.count();
+		return Employee.count();
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public EndUser findById(@NotNull Long id) {
-		Optional<EndUser> candidate = EndUser.findByIdOptional(id);
+	public Employee findById(@NotNull Long id) {
+		Optional<Employee> candidate = Employee.findByIdOptional(id);
 		return candidate.orElseThrow(() -> new NotFoundException());
 	}
 
-	public EndUser updateById(@Valid EndUser candidate, @NotNull Long id) {
-		Panache.getEntityManager().getReference(EndUser.class, id);
+	public Employee updateById(@Valid Employee candidate, @NotNull Long id) {
+		Panache.getEntityManager().getReference(Employee.class, id);
 		return Panache.getEntityManager().merge(candidate);
 	}
 
 	public void deleteById(@NotNull Long id) {
-		Panache.getEntityManager().getReference(EndUser.class, id).delete();
+		Panache.getEntityManager().getReference(Employee.class, id).delete();
 	}
 
 	public Long deleteAll() {
-		return EndUser.deleteAll();
+		return Employee.deleteAll();
 	}
 
-	public void assignAsset(@Valid Asset asset, @NotNull Long candidateId) {
-		Optional<EndUser> optional = EndUser.findByIdOptional(candidateId);
+	public void assignAsset(@Valid Item asset, @NotNull Long candidateId) {
+		Optional<Employee> optional = Employee.findByIdOptional(candidateId);
 		LOG.info("Is EndUser Present " + optional.get());
-		EndUser endUser = optional.orElseThrow(
+		Employee endUser = optional.orElseThrow(
 		        () -> new BadRequestException("Candidate dont exist")
 		);
 
@@ -77,12 +77,12 @@ public class EndUserService {
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<Asset> getAllAssets(Long candidateId) {
-		return Asset.find("endUser.id = ?1", candidateId).list();
+	public List<Item> getAllAssets(Long candidateId) {
+		return Item.find("endUser.id = ?1", candidateId).list();
 	}
 
 	public void unAssignAsset(@NotNull Long candidateId, String serialNumber) {
-		Asset asset = Asset.find(
+		Item asset = Item.find(
 		        "endUser.id = ?1 and serialNumber = ?2", candidateId,
 		        serialNumber
 		).firstResult();

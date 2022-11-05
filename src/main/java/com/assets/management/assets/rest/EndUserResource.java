@@ -28,8 +28,8 @@ import javax.ws.rs.core.UriInfo;
 
 import org.jboss.logging.Logger;
 
-import com.assets.management.assets.model.Asset;
-import com.assets.management.assets.model.EndUser;
+import com.assets.management.assets.model.Item;
+import com.assets.management.assets.model.Employee;
 import com.assets.management.assets.service.EndUserService;
 
 @Path("/users")
@@ -45,7 +45,7 @@ public class EndUserResource {
 
 	@POST
 	public Response createEndUsers(
-	        @Valid EndUser endUser,
+	        @Valid Employee endUser,
 	        @Context UriInfo uriInfo
 	) {
 		URI uri;
@@ -63,7 +63,7 @@ public class EndUserResource {
 	        @QueryParam("page") @DefaultValue("0") Integer pageIndex,
 	        @QueryParam("size") @DefaultValue("15") Integer pageSize
 	) {
-		List<EndUser> candidates = endUserService
+		List<Employee> candidates = endUserService
 		        .getAllCandidates(pageIndex, pageSize);
 		return Response.ok(candidates).build();
 	}
@@ -79,7 +79,7 @@ public class EndUserResource {
 	@Path("/{id}")
 //	@Produces(MediaType.APPLICATION_JSON)
 	public Response findEndUser(@PathParam("id") @NotNull Long id) {
-		EndUser candidate;
+		Employee candidate;
 		try {
 			candidate = endUserService.findById(id);
 		} catch (NotFoundException nfe) {
@@ -93,7 +93,7 @@ public class EndUserResource {
 //	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateEndUser(
 	        @PathParam("id") @NotNull Long id,
-	        @Valid EndUser candidate
+	        @Valid Employee candidate
 	) {
 
 		if (candidate == null || id == null)
@@ -137,7 +137,7 @@ public class EndUserResource {
 //	@Consumes(MediaType.APPLICATION_JSON)
 	public Response assignAsset(
 	        @PathParam("id") Long candidateId,
-	        @Valid Asset asset
+	        @Valid Item asset
 	) {
 		LOG.info("Check Asset: " + asset);
 
@@ -160,7 +160,7 @@ public class EndUserResource {
 	@Path("/{id}/assets")
 //	@Produces(MediaType.APPLICATION_JSON)
 	public Response listAllEndUserAssets(@PathParam("id") Long candidateId) {
-		List<Asset> assets = endUserService.getAllAssets(candidateId);
+		List<Item> assets = endUserService.getAllAssets(candidateId);
 		return Response.ok(assets).build();
 	}
 

@@ -29,8 +29,8 @@ import javax.ws.rs.core.UriInfo;
 
 import org.jboss.logging.Logger;
 
-import com.assets.management.assets.model.Asset;
-import com.assets.management.assets.model.Vendor;
+import com.assets.management.assets.model.Item;
+import com.assets.management.assets.model.Supplier;
 import com.assets.management.assets.service.VendorService;
 
 @Path("/vendors")
@@ -46,7 +46,7 @@ public class VendorResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createVendor(
-	        @Valid Vendor vendor,
+	        @Valid Supplier vendor,
 	        @Context UriInfo uriInfo
 	) {
 		URI uri;
@@ -64,7 +64,7 @@ public class VendorResource {
 	        @QueryParam("page") @DefaultValue("0") Integer pageIndex,
 	        @QueryParam("size") @DefaultValue("15") Integer pageSize
 	) {
-		List<Vendor> vendors = vendorService.getAllVendors(pageIndex, pageSize);
+		List<Supplier> vendors = vendorService.getAllVendors(pageIndex, pageSize);
 		return Response.ok(vendors).build();
 	}
 
@@ -79,7 +79,7 @@ public class VendorResource {
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response findVendorById(@PathParam("id") @NotNull Long id) {
-		Vendor vendor;
+		Supplier vendor;
 		try {
 			vendor = vendorService.findById(id);
 		} catch (NotFoundException nfe) {
@@ -93,7 +93,7 @@ public class VendorResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateVendor(
 	        @PathParam("id") @NotNull Long id,
-	        @Valid Vendor vendor
+	        @Valid Supplier vendor
 	) {
 
 		if (vendor == null || id == null)
@@ -137,7 +137,7 @@ public class VendorResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response addAsset(
 	        @PathParam("id") Long vendorId,
-	        @Valid Asset asset,
+	        @Valid Item asset,
 	        @Context UriInfo uriInfo
 	) { 
 		URI uri;
@@ -161,7 +161,7 @@ public class VendorResource {
 	        @QueryParam("page") @DefaultValue("0") Integer pageIndex,
 	        @QueryParam("size") @DefaultValue("15") Integer pageSize
 	) {
-		List<Asset> assets = vendorService
+		List<Item> assets = vendorService
 		        .getAllAssets(vendorId, pageIndex, pageSize);
 
 		return Response.ok(assets).build();

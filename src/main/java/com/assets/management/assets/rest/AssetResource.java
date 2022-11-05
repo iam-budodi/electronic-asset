@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.jboss.logging.Logger;
 
-import com.assets.management.assets.model.Asset;
+import com.assets.management.assets.model.Item;
 import com.assets.management.assets.service.AssetService;
 
 @Path("/assets")
@@ -33,7 +33,7 @@ public class AssetResource {
             @QueryParam("page") @DefaultValue("0") Integer pageIndex,
             @QueryParam("size") @DefaultValue("15") Integer pageSize
     ) {
-        List<Asset> assets = assetService.getAllAssets(pageIndex, pageSize);
+        List<Item> assets = assetService.getAllAssets(pageIndex, pageSize);
         return Response.ok(assets).build();
     }
 
@@ -41,7 +41,7 @@ public class AssetResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response findAsset(@PathParam("id") @NotNull Long id) {
-        Asset asset;
+        Item asset;
         try {
             asset = assetService.findById(id);
         } catch (NotFoundException nfe) {
@@ -76,7 +76,7 @@ public class AssetResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateAsset(
             @PathParam("id") @NotNull Long id,
-            @Valid Asset asset
+            @Valid Item asset
     ) {
 
         if (asset == null || id == null)

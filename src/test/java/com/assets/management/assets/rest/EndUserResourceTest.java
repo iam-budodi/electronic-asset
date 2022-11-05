@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.assets.management.assets.model.EndUser;
+import com.assets.management.assets.model.Employee;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.common.mapper.TypeRef;
@@ -68,7 +68,7 @@ class EndUserResourceTest {
 	@Test
 	@Order(1)
 	void shouldNotAddInvalidAssetUser() {
-		EndUser assetUser = new EndUser();
+		Employee assetUser = new Employee();
 		assetUser.firstName = null; 
 
 		given()
@@ -97,7 +97,7 @@ class EndUserResourceTest {
 	@Test
 	@Order(3)
 	void shouldAddAssetUser() {
-		EndUser assetUser = new EndUser();
+		Employee assetUser = new Employee();
 		assetUser.firstName = DEFAULT_FIRST_NAME;
 		assetUser.lastName = DEFAULT_LAST_NAME;
 		assetUser.address = DEFAULT_ADDRESS;
@@ -176,7 +176,7 @@ class EndUserResourceTest {
 	@Test
 	@Order(7)
 	void shouldUpdateAssetUser() {
-		EndUser assetUser = new EndUser();
+		Employee assetUser = new Employee();
 		assetUser.id = Long.valueOf(candidateId);
 		assetUser.firstName = UPDATED_FIRST_NAME;
 		assetUser.lastName = UPDATED_LAST_NAME;
@@ -198,7 +198,7 @@ class EndUserResourceTest {
 	@Test
 	@Order(8)
 	void shouldCheckUpdatedAssetUser() {
-		List<EndUser> users =
+		List<Employee> users =
 			given()
 				.accept(APPLICATION_JSON).
 			when()
@@ -264,8 +264,8 @@ class EndUserResourceTest {
 //		Mockito.
 //	}
 //	
-	private TypeRef<List<EndUser>> getEndUserTypeRef() {
-		return new TypeRef<List<EndUser>>() {
+	private TypeRef<List<Employee>> getEndUserTypeRef() {
+		return new TypeRef<List<Employee>>() {
 			
 		};
 	}
