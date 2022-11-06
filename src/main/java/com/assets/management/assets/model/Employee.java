@@ -4,10 +4,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
@@ -46,6 +48,12 @@ public class Employee extends Person {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	public Department department;
+
+	@OneToOne(
+	        mappedBy = "employee", cascade = CascadeType.ALL,
+	        fetch = FetchType.LAZY
+	)
+	public Address address;
 
 	@Transient
 	public LocalDate endAt;

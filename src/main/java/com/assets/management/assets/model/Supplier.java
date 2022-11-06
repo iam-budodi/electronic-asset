@@ -27,11 +27,6 @@ public class Supplier extends PanacheEntity {
 	
 	@NotNull
 	@Column(name = "registered_by", length = 64, nullable = false)
-	public String registeredBy;
-	
-	// contact person foreign key
-	@NotNull
-	@Column(name = "contact_person", length = 100, nullable = false)
-	public String contactPerson;
+	public String registeredBy; 
  
 }
