@@ -16,7 +16,7 @@ import javax.ws.rs.core.Response.Status;
 import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.Item;
-import com.assets.management.assets.service.AssetService;
+import com.assets.management.assets.service.ItemService;
 
 @Path("/assets")
 public class AssetResource {
@@ -25,7 +25,7 @@ public class AssetResource {
     Logger LOG;
 
     @Inject
-    AssetService assetService;
+    ItemService assetService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

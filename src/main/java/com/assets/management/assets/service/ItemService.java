@@ -24,7 +24,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 @ApplicationScoped
 @Transactional(Transactional.TxType.REQUIRED)
-public class AssetService {
+public class ItemService {
 
     @Inject
     Logger LOG;

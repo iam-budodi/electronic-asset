@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity; 
@@ -23,20 +24,13 @@ public class Item extends PanacheEntity {
 	
 	@NotNull
 	@Column(name = "serial_number", length = 32, nullable = false)
-	public String serialNumber;
-	
-	@NotNull
-	@Column(name = "item_tag", length = 64, nullable = false)
-	public String itemTag;
-
-	
-	@Column(name = "item_qr_code", length = 4000)
-	public String itemQrCode;
+	public String serialNumber; 
 	
 	@NotNull 
 	public BigDecimal cost;
 	
 	@NotNull 
+	@Min(1)
 	@Column(name = "quantity", nullable = false)
 	public Integer qty; 
 	
