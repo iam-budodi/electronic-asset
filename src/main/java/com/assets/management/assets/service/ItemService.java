@@ -9,14 +9,11 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 
 import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.Item;
-import com.assets.management.assets.model.Item;
-import com.assets.management.assets.model.Supplier;
 import com.assets.management.assets.util.QrCodeString;
 
 import io.quarkus.hibernate.orm.panache.Panache;
@@ -47,11 +44,11 @@ public class ItemService {
         Item assetFound = Panache.getEntityManager()
                 .getReference(Item.class, assetId);
 
-        if (!assetFound.serialNumber.equals(asset.serialNumber)
-                || !assetFound.modelName.equals(asset.modelName))
-            asset.qrString = qrCodeString.formatCodeImgToStr(asset);
-
-        asset.updatedAt = Instant.now();
+//        if (!assetFound.serialNumber.equals(asset.serialNumber)
+//                || !assetFound.modelName.equals(asset.modelName))
+//            asset.qrString = qrCodeString.formatCodeImgToStr(asset);
+//
+//        asset.updatedAt = Instant.now();
         Panache.getEntityManager().merge(asset);
     }
 

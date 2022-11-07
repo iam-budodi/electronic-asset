@@ -144,8 +144,8 @@ public class EndUserResource {
 		if (asset.id == null)
 			return Response.status(Response.Status.BAD_REQUEST).build();
 
-		if (asset.endUser != null)
-			return Response.status(Status.CONFLICT).build();
+//		if (asset.endUser != null)
+//			return Response.status(Status.CONFLICT).build();
 
 		try {
 			endUserService.assignAsset(asset, candidateId);

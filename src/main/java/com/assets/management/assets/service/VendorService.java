@@ -77,13 +77,13 @@ public class VendorService {
             @Context UriInfo uriInfo
     ) {
         Optional<Supplier> optional = Supplier.findByIdOptional(vendorId);
-
-        asset.vendor = optional.orElseThrow(NotFoundException::new);
-        asset.stockedAt = Instant.now();
+//
+//        asset.vendor = optional.orElseThrow(NotFoundException::new);
+//        asset.stockedAt = Instant.now();
 
         Item.persist(asset);
         LOG.info("Check retrned asset:  " + asset.id);
-        asset.qrString = qrCodeString.formatCodeImgToStr(asset);
+//        asset.qrString = qrCodeString.formatCodeImgToStr(asset);
         Panache.getEntityManager().merge(asset);
         return uriInfo.getAbsolutePathBuilder().path(Long.toString(asset.id))
                 .build();

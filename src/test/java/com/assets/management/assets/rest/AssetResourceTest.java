@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import io.quarkus.test.junit.QuarkusTest;
 
-@QuarkusTest
+//@QuarkusTest
 public class AssetResourceTest {
 
 //    @Test

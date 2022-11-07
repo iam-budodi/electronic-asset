@@ -34,14 +34,14 @@ public class Person extends PanacheEntity {
 	public String lastName;
 	
 	@Enumerated(EnumType.STRING)
-	public String gender;
+	public Gender gender;
 	
 	@NotNull
 	@Column(name = "birthdate")
 	public LocalDate DoB;
 
 	@NotNull
-	@Column(name = "phone_name")
+	@Column(name = "phone_number")
 	public String mobile;
 	
 	@NotNull

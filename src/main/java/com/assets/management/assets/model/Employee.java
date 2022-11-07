@@ -22,8 +22,8 @@ import javax.validation.constraints.NotNull;
 public class Employee extends Person {
 
 	@NotNull
-	@Column(name = "employee_id")
-	public String employeeId;
+	@Column(name = "work_id")
+	public String workId;
 
 	@NotNull
 	@Column(name = "start_at")

@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "contact_person")
+@Table(name = "contact_persons")
 public class ContactPerson extends Person {
 
 	@NotNull
@@ -21,7 +21,7 @@ public class ContactPerson extends Person {
 	public Supplier supplier;
 
 	@OneToOne(
-	        mappedBy = "contact_person", cascade = CascadeType.ALL,
+	        mappedBy = "contactPerson", cascade = CascadeType.ALL,
 	        fetch = FetchType.LAZY
 	)
 	public Address address;

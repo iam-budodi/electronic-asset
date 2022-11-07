@@ -70,9 +70,9 @@ public class EndUserService {
 		Employee endUser = optional.orElseThrow(
 		        () -> new BadRequestException("Candidate dont exist")
 		);
-
-		asset.endUser = endUser;
-		asset.employDate = Instant.now();
+//
+//		asset.endUser = endUser;
+//		asset.employDate = Instant.now();
 		Panache.getEntityManager().merge(asset);
 	}
 
@@ -88,7 +88,7 @@ public class EndUserService {
 		).firstResult();
 		if (asset == null)
 			throw new NotFoundException("Record not found!");
-		asset.endUser = null;
+//		asset.endUser = null;
 
 		Panache.getEntityManager().merge(asset);
 	}
