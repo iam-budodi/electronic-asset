@@ -31,7 +31,7 @@ import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.Item;
 import com.assets.management.assets.model.Supplier;
-import com.assets.management.assets.service.VendorService;
+import com.assets.management.assets.service.SupplierService;
 
 @Path("/vendors")
 public class VendorResource {
@@ -40,7 +40,7 @@ public class VendorResource {
 	Logger LOG;
 
 	@Inject
-	VendorService vendorService;
+	SupplierService vendorService;
 
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)

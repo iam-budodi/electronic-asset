@@ -30,7 +30,7 @@ import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.Item;
 import com.assets.management.assets.model.Employee;
-import com.assets.management.assets.service.EndUserService;
+import com.assets.management.assets.service.EmployeeService;
 
 @Path("/users")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -41,7 +41,7 @@ public class EndUserResource {
 	Logger LOG;
 
 	@Inject
-	EndUserService endUserService;
+	EmployeeService endUserService;
 
 	@POST
 	public Response createEndUsers(
