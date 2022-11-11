@@ -27,6 +27,6 @@ public class Department extends PanacheEntity {
 	}
 	
 	 public static Optional<Department> findByName(String name) {
-	       return find("name", name).firstResultOptional();
+	       return find("LOWER(name)", name.toLowerCase()).firstResultOptional();
 	   }
 }
