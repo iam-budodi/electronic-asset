@@ -4,13 +4,14 @@ import static io.restassured.RestAssured.given;
 import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.CONFLICT;
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+import static javax.ws.rs.core.Response.Status.CONFLICT; 
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static javax.ws.rs.core.Response.Status.OK;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -57,25 +58,26 @@ class DepartmentResourceTest {
 			.get()
 			.then()
 			 	.statusCode(Status.OK.getStatusCode())
-			 	.body("isEmpty()", is(true)); 
+			 	.body("isEmpty()", is(true))
+				.contentType(APPLICATION_JSON); 
 	}
 	
 	@Test
 	@Order(2)
 	void shouldNotCreateInvalidDepartment() {
 		final Department department = new Department();
-		department.id = Long.valueOf(1);
+		// department.id = Long.valueOf(1);
 		department.name = null;
 		department.description = DEFAULT_DESCRIPTION;
 	 
-			given()
+			given() 
 				.body(department)
 				.header(CONTENT_TYPE, APPLICATION_JSON)
 				.header(ACCEPT, APPLICATION_JSON)
 				.when()
 				.post()
 				.then()
-					.statusCode(INTERNAL_SERVER_ERROR.getStatusCode());
+					.statusCode(BAD_REQUEST.getStatusCode());
 		 
 	}
 	
@@ -114,7 +116,8 @@ class DepartmentResourceTest {
 			.get()
 			.then()
 			 	.statusCode(OK.getStatusCode())
-			 	.body("", hasSize(1)); 
+			 	.body("", hasSize(1))
+				.contentType(APPLICATION_JSON); 
 	}
 	
 	@Test
@@ -170,13 +173,28 @@ class DepartmentResourceTest {
 			.get()
 			.then()
 				.statusCode(OK.getStatusCode())
+				.contentType(APPLICATION_JSON)
 				.body("id", is(Integer.valueOf(departmentId)))
 				.body("name", is(DEFAULT_NAME))
 				.body("description", is(DEFAULT_DESCRIPTION));
 	}
 
+		
 	@Test
 	@Order(9)
+	void shouldCountDepartment() {  
+		given()
+			.header(ACCEPT, APPLICATION_JSON)
+			.when()
+			.get()
+			.then()
+				.statusCode(OK.getStatusCode())
+				.contentType(APPLICATION_JSON)
+				.body(containsString("1"));
+	}
+
+	@Test
+	@Order(10)
 	void shouldFailToUpdateDepartment() {
 		final Department department = new Department();
 		department.id = Long.valueOf(departmentId);
@@ -195,7 +213,7 @@ class DepartmentResourceTest {
 	}
 	
 	@Test
-	@Order(10)
+	@Order(11)
 	void shouldUpdateDepartment() {
 		final Department department = new Department();
 		department.id = Long.valueOf(departmentId);
@@ -214,7 +232,7 @@ class DepartmentResourceTest {
 	}
  
 	@Test
-	@Order(11)
+	@Order(12)
 	void shouldNotDeleteDepartmentByInvalidId() {  
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
@@ -226,7 +244,7 @@ class DepartmentResourceTest {
 	}
 
 	@Test
-	@Order(12)
+	@Order(13)
 	void shouldDeleteDepartmentById() {  
 		given()
 			.header(ACCEPT, APPLICATION_JSON)

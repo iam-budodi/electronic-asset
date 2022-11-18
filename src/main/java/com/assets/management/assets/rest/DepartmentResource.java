@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -27,7 +26,6 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.Department;
-import com.assets.management.assets.model.Employee;
 import com.assets.management.assets.service.DepartmentService;
 
 @Path("/departments")
@@ -59,6 +57,14 @@ public class DepartmentResource {
 		return departmentService.findDepartment(deptId).map(
 		        department -> Response.ok(department).build()
 		).orElseGet(() -> Response.status(Status.NOT_FOUND).build());
+	} 
+
+	
+	@GET
+	@Path("/count")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response countDepartment() { 
+		return Response.ok(Department.count()).build();
 	} 
 	
 	@POST

@@ -1,4 +1,4 @@
-# electronic-asset Project
+# rest-book Project
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
@@ -43,19 +43,23 @@ Or, if you don't have GraalVM installed, you can run the native executable build
 ./mvnw package -Pnative -Dquarkus.native.container-build=true
 ```
 
-You can then execute your native executable with: `./target/electronic-asset-1.0.0-runner`
+You can then execute your native executable with: `./target/rest-book-1.0.0-runner`
 
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
 
 ## Related Guides
 
-- SmallRye Fault Tolerance ([guide](https://quarkus.io/guides/microprofile-fault-tolerance)): Build fault-tolerant network services
-- SmallRye Health ([guide](https://quarkus.io/guides/microprofile-health)): Monitor service health
+- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code for Hibernate ORM via the active record or the repository pattern
+- Hibernate Validator ([guide](https://quarkus.io/guides/validation)): Validate object properties (field, getter) and method parameters for your beans (REST, CDI, JPA)
+- SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui)): Document your REST APIs with OpenAPI - comes with Swagger UI
+- RESTEasy Classic JSON-B ([guide](https://quarkus.io/guides/rest-json)): JSON-B serialization support for RESTEasy Classic
+- JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
+- RESTEasy Classic ([guide](https://quarkus.io/guides/resteasy)): REST endpoint framework implementing JAX-RS and more
 
 ## Provided Code
 
-### SmallRye Health
+### RESTEasy JAX-RS
 
-Monitor your application's health using SmallRye Health
+Easily start your RESTful Web Services
 
-[Related guide section...](https://quarkus.io/guides/smallrye-health)
+[Related guide section...](https://quarkus.io/guides/getting-started#the-jax-rs-resources)
