@@ -10,6 +10,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 @Entity
@@ -38,10 +40,16 @@ public class Address extends PanacheEntity {
 	@OneToOne(fetch = FetchType.LAZY)
 	@MapsId
 	@JoinColumn(name = "employee_id")
+	@JsonIgnore
 	public Employee employee;
 	
-	@OneToOne(fetch = FetchType.LAZY)
-	@MapsId
-	@JoinColumn(name = "contact_person_id")
-	public ContactPerson contactPerson;
+	// @OneToOne(fetch = FetchType.LAZY)
+	// @MapsId
+	// @JoinColumn(name = "contact_person_id")
+	// public ContactPerson contactPerson;
+
+	// public void setEmployee(Employee employee) {
+	// 	this.employee = employee;
+	// 	this.id = employee.id;
+	// }
 }

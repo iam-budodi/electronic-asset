@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.japhet.store.quarkus-microservice</groupId>
-  <artifactId>rest-book</artifactId>
+  <artifactId>electronic-asset</artifactId>
   <version>1.0.0</version>
   <name>Assets Management :: Electronic Asset REST Microservice</name>
   <properties>

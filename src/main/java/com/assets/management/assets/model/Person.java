@@ -36,9 +36,9 @@ public class Person extends PanacheEntity {
 	@Enumerated(EnumType.STRING)
 	public Gender gender;
 	
-	@NotNull
-	@Column(name = "birthdate")
-	public LocalDate DoB;
+	// @NotNull
+	// @Column(name = "birthdate")
+	// public LocalDate DoB;
 
 	@NotNull
 	@Column(name = "phone_number")
@@ -48,18 +48,18 @@ public class Person extends PanacheEntity {
 	@Column
 	public String email;
 	
-	@Transient
-	public Integer age;
+	// @Transient
+	// public Integer age;
 
-	@PostLoad  
-	@PostPersist
-	@PostUpdate
-	protected void calculateAge() {
-		if (DoB == null) {
-			age = null;
-			return;
-		}
+	// @PostLoad  
+	// @PostPersist
+	// @PostUpdate
+	// protected void calculateAge() {
+	// 	if (DoB == null) {
+	// 		age = null;
+	// 		return;
+	// 	}
 
-		age = Period.between(DoB, LocalDate.now()).getYears();
-	}
+	// 	age = Period.between(DoB, LocalDate.now()).getYears();
+	// }
 }

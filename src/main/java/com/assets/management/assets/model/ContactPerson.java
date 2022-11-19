@@ -20,9 +20,9 @@ public class ContactPerson extends Person {
 	@ManyToOne(fetch = FetchType.LAZY)
 	public Supplier supplier;
 
-	@OneToOne(
-	        mappedBy = "contactPerson", cascade = CascadeType.ALL,
-	        fetch = FetchType.LAZY
-	)
-	public Address address;
+	// @OneToOne(
+	//         mappedBy = "contactPerson", cascade = CascadeType.ALL,
+	//         fetch = FetchType.LAZY
+	// )
+	// public Address address;
 }

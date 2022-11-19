@@ -32,79 +32,69 @@ import com.assets.management.assets.model.Item;
 import com.assets.management.assets.model.Employee;
 import com.assets.management.assets.service.EmployeeService;
 
-@Path("/users")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-public class EndUserResource {
+@Path("/employees")
+public class EmployeeResource {
 
 	@Inject
 	Logger LOG;
 
 	@Inject
-	EmployeeService endUserService;
+	EmployeeService employeeService;
 
 	@POST
-	public Response createEndUsers(
-	        @Valid Employee endUser,
-	        @Context UriInfo uriInfo
-	) {
-		URI uri;
-		try {
-			uri = endUserService.createCandidate(endUser, uriInfo);
-		} catch (IllegalArgumentException ex) {
-			return Response.status(Status.BAD_REQUEST).build();
-		}
-		return Response.created(uri).build();
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response createEmployee(@Valid Employee employee, @Context UriInfo uriInfo) {
+		employee = employeeService.addEmployee(employee);
+		URI employeeUri = uriInfo.getAbsolutePathBuilder().path(Long.toString(employee.id)).build();
+
+		return Response.created(employeeUri).build();
 	}
 
 	@GET
-//	@Produces(MediaType.APPLICATION_JSON)
-	public Response listEndUsers(
-	        @QueryParam("page") @DefaultValue("0") Integer pageIndex,
-	        @QueryParam("size") @DefaultValue("15") Integer pageSize
-	) {
-		List<Employee> candidates = endUserService
-		        .getAllCandidates(pageIndex, pageSize);
-		return Response.ok(candidates).build();
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response listEmployees(
+			@QueryParam("page") @DefaultValue("0") Integer pageIndex,
+			@QueryParam("size") @DefaultValue("15") Integer pageSize) {
+		List<Employee> employees = employeeService
+				.getAllCandidates(pageIndex, pageSize);
+		return Response.ok(employees).build();
 	}
-
-	@GET
-	@Path("/count")
-//	@Produces(MediaType.APPLICATION_JSON)
-	public Response countEndUsers() {
-		return Response.ok(endUserService.countCandidates()).build();
-	}
-
+	
 	@GET
 	@Path("/{id}")
-//	@Produces(MediaType.APPLICATION_JSON)
-	public Response findEndUser(@PathParam("id") @NotNull Long id) {
-		Employee candidate;
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response findEmployee(@PathParam("id") @NotNull Long id) {
+		Employee employee;
 		try {
-			candidate = endUserService.findById(id);
+			employee = employeeService.findById(id);
 		} catch (NotFoundException nfe) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
-		return Response.ok(candidate).build();
+		return Response.ok(employee).build();
+	}
+
+	@GET
+	@Path("/count") 
+	public Response countEmployees() {
+		return Response.ok(employeeService.countEmployees()).build();
 	}
 
 	@PUT
 	@Path("/{id}")
-//	@Consumes(MediaType.APPLICATION_JSON)
+	// @Consumes(MediaType.APPLICATION_JSON)
 	public Response updateEndUser(
-	        @PathParam("id") @NotNull Long id,
-	        @Valid Employee candidate
-	) {
+			@PathParam("id") @NotNull Long id,
+			@Valid Employee candidate) {
 
 		if (candidate == null || id == null)
 			return Response.status(Response.Status.BAD_REQUEST).build();
 
 		if (!id.equals(candidate.id))
 			return Response.status(Response.Status.CONFLICT).entity(candidate)
-			        .build();
+					.build();
 
 		try {
-			endUserService.updateById(candidate, id);
+			employeeService.updateById(candidate, id);
 		} catch (EntityNotFoundException | NoResultException enf) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
@@ -115,10 +105,10 @@ public class EndUserResource {
 	// TODO: make deleting as hard as possible i.e fails due to foreign key
 	@DELETE
 	@Path("/{id}")
-//	@Produces(MediaType.APPLICATION_JSON)
+	// @Produces(MediaType.APPLICATION_JSON)
 	public Response deleteEndUser(@PathParam("id") @NotNull Long id) {
 		try {
-			endUserService.deleteById(id);
+			employeeService.deleteById(id);
 		} catch (EntityNotFoundException nfe) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
@@ -126,29 +116,28 @@ public class EndUserResource {
 	}
 
 	@DELETE
-//	@Produces(MediaType.APPLICATION_JSON)
+	// @Produces(MediaType.APPLICATION_JSON)
 	public Response deleteAllEndUsers() {
-		return Response.ok(endUserService.deleteAll()).build();
+		return Response.ok(employeeService.deleteAll()).build();
 	}
 
 	@PUT
 	@Path("/{id}/assets")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	@Consumes(MediaType.APPLICATION_JSON)
+	// @Produces(MediaType.APPLICATION_JSON)
+	// @Consumes(MediaType.APPLICATION_JSON)
 	public Response assignAsset(
-	        @PathParam("id") Long candidateId,
-	        @Valid Item asset
-	) {
+			@PathParam("id") Long candidateId,
+			@Valid Item asset) {
 		LOG.info("Check Asset: " + asset);
 
 		if (asset.id == null)
 			return Response.status(Response.Status.BAD_REQUEST).build();
 
-//		if (asset.endUser != null)
-//			return Response.status(Status.CONFLICT).build();
+		// if (asset.endUser != null)
+		// return Response.status(Status.CONFLICT).build();
 
 		try {
-			endUserService.assignAsset(asset, candidateId);
+			employeeService.assignAsset(asset, candidateId);
 		} catch (IllegalArgumentException | BadRequestException bre) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
@@ -158,21 +147,20 @@ public class EndUserResource {
 
 	@GET
 	@Path("/{id}/assets")
-//	@Produces(MediaType.APPLICATION_JSON)
+	// @Produces(MediaType.APPLICATION_JSON)
 	public Response listAllEndUserAssets(@PathParam("id") Long candidateId) {
-		List<Item> assets = endUserService.getAllAssets(candidateId);
+		List<Item> assets = employeeService.getAllAssets(candidateId);
 		return Response.ok(assets).build();
 	}
 
 	@DELETE
 	@Path("/{id}/assets")
-//	@Produces(MediaType.APPLICATION_JSON)
+	// @Produces(MediaType.APPLICATION_JSON)
 	public Response unAssignAsset(
-	        @PathParam("id") Long candidateId,
-	        @QueryParam("sn") @NotNull String serialNumber
-	) {
+			@PathParam("id") Long candidateId,
+			@QueryParam("sn") @NotNull String serialNumber) {
 		try {
-			endUserService.unAssignAsset(candidateId, serialNumber);
+			employeeService.unAssignAsset(candidateId, serialNumber);
 		} catch (IllegalArgumentException | NotFoundException bre) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}

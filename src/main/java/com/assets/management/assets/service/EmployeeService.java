@@ -18,6 +18,7 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.Item;
+import com.assets.management.assets.model.Address;
 import com.assets.management.assets.model.Employee;
 
 import io.quarkus.hibernate.orm.panache.Panache;
@@ -29,26 +30,29 @@ public class EmployeeService {
 	@Inject
 	Logger LOG;
 
-	public URI createCandidate(@Valid Employee endUser, @Context UriInfo uri) {
-		Employee.persist(endUser);
-		return uri.getAbsolutePathBuilder().path(Long.toString(endUser.id))
-		        .build();
+	public Employee addEmployee(@Valid Employee employee) {
+		employee.createdAt = Instant.now(); 
+		employee.address.employee = employee;
+		employee.address.id = employee.id;
+		
+		Employee.persist(employee);
+		return employee;
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public List<Employee> getAllCandidates(Integer page, Integer size) {
-		return Employee.find("from EndUser eu").page(page, size).list();
-	}
-
-	@Transactional(Transactional.TxType.SUPPORTS)
-	public Long countCandidates() {
-		return Employee.count();
+		return Employee.find("from Employee em").page(page, size).list();
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Employee findById(@NotNull Long id) {
-		Optional<Employee> candidate = Employee.findByIdOptional(id);
-		return candidate.orElseThrow(() -> new NotFoundException());
+		Optional<Employee> employee = Employee.findByIdOptional(id);
+		return employee.orElseThrow(() -> new NotFoundException());
+	}
+
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public Long countEmployees() {
+		return Employee.count();
 	}
 
 	public Employee updateById(@Valid Employee candidate, @NotNull Long id) {

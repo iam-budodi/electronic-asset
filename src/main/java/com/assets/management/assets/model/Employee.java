@@ -24,10 +24,14 @@ public class Employee extends Person {
 	@NotNull
 	@Column(name = "work_id")
 	public String workId;
+	
+	@NotNull
+	@Column(name = "birthdate")
+	public LocalDate dateOfBirth;
 
 	@NotNull
-	@Column(name = "start_at")
-	public LocalDate startAt;
+	@Column(name = "hire_date")
+	public LocalDate hireDate;
 
 	public String status;
 
@@ -43,9 +47,6 @@ public class Employee extends Person {
 	@Column(name = "updated_by")
 	public String updatedBy;
 
-	@Column(name = "birth_date")
-	public LocalDate birthDate;
-
 	@ManyToOne(fetch = FetchType.LAZY)
 	public Department department;
 
@@ -58,16 +59,28 @@ public class Employee extends Person {
 	@Transient
 	public LocalDate endAt;
 
+	// @PostLoad  
+	// @PostPersist
+	// @PostUpdate
+	// protected void calculateAge() {
+	// 	if (dateOfBirth == null) {
+	// 		age = null;
+	// 		return;
+	// 	}
+
+	// 	age = Period.between(dateOfBirth, LocalDate.now()).getYears();
+	// }
+
 	@PostLoad
 	@PostPersist
 	@PostUpdate
 	protected void retireDate() {
-		if (startAt == null) {
+		if (hireDate == null) {
 			endAt = null;
 			return;
 		}
 
-		Period timeOfService = Period.between(startAt, LocalDate.now());
-		endAt = startAt.plus(timeOfService);
+		Period timeOfService = Period.between(hireDate, LocalDate.now());
+		endAt = hireDate.plus(timeOfService);
 	}
 }
