@@ -1,6 +1,5 @@
 package com.assets.management.assets.model;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -34,18 +33,6 @@ public class Employee extends Person {
 	public LocalDate hireDate;
 
 	public String status;
-
-	@Column(name = "created_at")
-	public Instant createdAt;
-
-	@Column(name = "updated_at")
-	public Instant updatedAt;
-
-	@Column(name = "created_by")
-	public String createdBy;
-
-	@Column(name = "updated_by")
-	public String updatedBy;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	public Department department;

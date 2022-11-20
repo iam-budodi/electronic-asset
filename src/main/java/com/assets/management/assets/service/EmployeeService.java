@@ -1,6 +1,5 @@
 package com.assets.management.assets.service;
 
-import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -12,13 +11,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 
 import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.Item;
-import com.assets.management.assets.model.Address;
 import com.assets.management.assets.model.Employee;
 
 import io.quarkus.hibernate.orm.panache.Panache;
@@ -31,7 +27,6 @@ public class EmployeeService {
 	Logger LOG;
 
 	public Employee addEmployee(@Valid Employee employee) {
-		employee.createdAt = Instant.now(); 
 		employee.address.employee = employee;
 		employee.address.id = employee.id;
 		
@@ -40,34 +35,24 @@ public class EmployeeService {
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<Employee> getAllCandidates(Integer page, Integer size) {
+	public List<Employee> listAllEmployees(Integer page, Integer size) {
 		return Employee.find("from Employee em").page(page, size).list();
 	}
 
-	@Transactional(Transactional.TxType.SUPPORTS)
-	public Employee findById(@NotNull Long id) {
-		Optional<Employee> employee = Employee.findByIdOptional(id);
-		return employee.orElseThrow(() -> new NotFoundException());
+	public Employee updateById(@Valid Employee employee, @NotNull Long empId) {
+		Panache.getEntityManager().getReference(Employee.class, empId);
+		return Panache.getEntityManager().merge(employee);
 	}
 
-	@Transactional(Transactional.TxType.SUPPORTS)
-	public Long countEmployees() {
-		return Employee.count();
-	}
-
-	public Employee updateById(@Valid Employee candidate, @NotNull Long id) {
-		Panache.getEntityManager().getReference(Employee.class, id);
-		return Panache.getEntityManager().merge(candidate);
-	}
-
-	public void deleteById(@NotNull Long id) {
-		Panache.getEntityManager().getReference(Employee.class, id).delete();
+	public void deleteById(@NotNull Long empId) {
+		Panache.getEntityManager().getReference(Employee.class, empId).delete();
 	}
 
 	public Long deleteAll() {
 		return Employee.deleteAll();
 	}
 
+	// Move to assignment  API
 	public void assignAsset(@Valid Item asset, @NotNull Long candidateId) {
 		Optional<Employee> optional = Employee.findByIdOptional(candidateId);
 		LOG.info("Is EndUser Present " + optional.get());

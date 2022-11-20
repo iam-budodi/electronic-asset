@@ -41,15 +41,5 @@ public class Address extends PanacheEntity {
 	@MapsId
 	@JoinColumn(name = "employee_id")
 	@JsonIgnore
-	public Employee employee;
-	
-	// @OneToOne(fetch = FetchType.LAZY)
-	// @MapsId
-	// @JoinColumn(name = "contact_person_id")
-	// public ContactPerson contactPerson;
-
-	// public void setEmployee(Employee employee) {
-	// 	this.employee = employee;
-	// 	this.id = employee.id;
-	// }
+	public Employee employee; 
 }

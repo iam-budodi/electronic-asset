@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.validation.Valid;
@@ -41,6 +42,34 @@ public class EmployeeResource {
 	@Inject
 	EmployeeService employeeService;
 
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response listEmployees(
+			@QueryParam("page") @DefaultValue("0") Integer pageIndex,
+			@QueryParam("size") @DefaultValue("15") Integer pageSize) {
+		List<Employee> employees = employeeService
+				.listAllEmployees(pageIndex, pageSize);
+		return Response.ok(employees).build();
+	}
+
+	@GET
+	@Path("/{id}")
+	@Transactional(Transactional.TxType.SUPPORTS)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response findEmployee(@PathParam("id") @NotNull Long empId) {
+		return Employee.findByIdOptional(empId).map(
+				employee -> Response.ok(employee).build())
+				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
+	}
+
+	@GET
+	@Path("/count")
+	@Transactional(Transactional.TxType.SUPPORTS)
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response countEmployees() {
+		return Response.ok(Employee.count()).build();
+	}
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createEmployee(@Valid Employee employee, @Context UriInfo uriInfo) {
@@ -50,51 +79,19 @@ public class EmployeeResource {
 		return Response.created(employeeUri).build();
 	}
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response listEmployees(
-			@QueryParam("page") @DefaultValue("0") Integer pageIndex,
-			@QueryParam("size") @DefaultValue("15") Integer pageSize) {
-		List<Employee> employees = employeeService
-				.getAllCandidates(pageIndex, pageSize);
-		return Response.ok(employees).build();
-	}
-	
-	@GET
-	@Path("/{id}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response findEmployee(@PathParam("id") @NotNull Long id) {
-		Employee employee;
-		try {
-			employee = employeeService.findById(id);
-		} catch (NotFoundException nfe) {
-			return Response.status(Status.NOT_FOUND).build();
-		}
-		return Response.ok(employee).build();
-	}
-
-	@GET
-	@Path("/count") 
-	public Response countEmployees() {
-		return Response.ok(employeeService.countEmployees()).build();
-	}
-
 	@PUT
 	@Path("/{id}")
-	// @Consumes(MediaType.APPLICATION_JSON)
-	public Response updateEndUser(
-			@PathParam("id") @NotNull Long id,
-			@Valid Employee candidate) {
-
-		if (candidate == null || id == null)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateEmployee(@PathParam("id") @NotNull Long empId, @Valid Employee employee) {
+		if (employee == null || empId == null)
 			return Response.status(Response.Status.BAD_REQUEST).build();
 
-		if (!id.equals(candidate.id))
-			return Response.status(Response.Status.CONFLICT).entity(candidate)
+		if (!empId.equals(employee.id))
+			return Response.status(Response.Status.CONFLICT).entity(employee)
 					.build();
 
 		try {
-			employeeService.updateById(candidate, id);
+			employeeService.updateById(employee, empId);
 		} catch (EntityNotFoundException | NoResultException enf) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
@@ -102,25 +99,25 @@ public class EmployeeResource {
 		return Response.status(Status.NO_CONTENT).build();
 	}
 
-	// TODO: make deleting as hard as possible i.e fails due to foreign key
 	@DELETE
 	@Path("/{id}")
-	// @Produces(MediaType.APPLICATION_JSON)
-	public Response deleteEndUser(@PathParam("id") @NotNull Long id) {
+	public Response deleteEmployee(@PathParam("id") @NotNull Long empId) {
 		try {
-			employeeService.deleteById(id);
+			employeeService.deleteById(empId);
 		} catch (EntityNotFoundException nfe) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 		return Response.noContent().build();
 	}
 
+	// TODO: make it delete multiple selected employees object
 	@DELETE
-	// @Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
 	public Response deleteAllEndUsers() {
 		return Response.ok(employeeService.deleteAll()).build();
 	}
 
+	// Move to assignment  API
 	@PUT
 	@Path("/{id}/assets")
 	// @Produces(MediaType.APPLICATION_JSON)

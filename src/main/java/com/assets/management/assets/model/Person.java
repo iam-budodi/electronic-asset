@@ -1,20 +1,18 @@
 package com.assets.management.assets.model;
 
-import java.time.LocalDate;
-import java.time.Period;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.PostLoad;
-import javax.persistence.PostPersist;
-import javax.persistence.PostUpdate;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @MappedSuperclass
 public class Person extends PanacheEntity {
@@ -34,11 +32,7 @@ public class Person extends PanacheEntity {
 	public String lastName;
 	
 	@Enumerated(EnumType.STRING)
-	public Gender gender;
-	
-	// @NotNull
-	// @Column(name = "birthdate")
-	// public LocalDate DoB;
+	public Gender gender; 
 
 	@NotNull
 	@Column(name = "phone_number")
@@ -47,19 +41,19 @@ public class Person extends PanacheEntity {
 	@NotNull
 	@Column
 	public String email;
+
+	@CreationTimestamp
+	@Column(name = "created_at")
+	public LocalDateTime createdAt;
+
+	@UpdateTimestamp
+	@Column(name = "updated_at")
+	public LocalDateTime updatedAt;
+
+	@Column(name = "created_by")
+	public String createdBy;
+
+	@Column(name = "updated_by")
+	public String updatedBy;
 	
-	// @Transient
-	// public Integer age;
-
-	// @PostLoad  
-	// @PostPersist
-	// @PostUpdate
-	// protected void calculateAge() {
-	// 	if (DoB == null) {
-	// 		age = null;
-	// 		return;
-	// 	}
-
-	// 	age = Period.between(DoB, LocalDate.now()).getYears();
-	// }
 }
