@@ -47,7 +47,7 @@ public class DepartmentResource {
 		return Department.findByName(deptName).map(
 		        department -> Response.ok(department).build()
 		).orElseGet(() -> Response.status(Status.NOT_FOUND).build());
-	} 
+	}
 
 	@GET
 	@Path("/{id}")
@@ -57,25 +57,25 @@ public class DepartmentResource {
 		return departmentService.findDepartment(deptId).map(
 		        department -> Response.ok(department).build()
 		).orElseGet(() -> Response.status(Status.NOT_FOUND).build());
-	} 
+	}
 
-	
 	@GET
 	@Path("/count")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response countDepartment() { 
+	public Response countDepartment() {
 		return Response.ok(Department.count()).build();
-	} 
-	
+	}
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createDepartment(
 	        @Valid Department department, @Context UriInfo uriInfo
 	) {
-		URI departmentUri = departmentService.insertDepartment(
-		        department, uriInfo
-		);
-		return Response.created(departmentUri).build();
+		Department dept    = departmentService.insertDepartment(department);
+		URI        deptUri = uriInfo.getAbsolutePathBuilder().path(
+		        Long.toString(dept.id)
+		).build();
+		return Response.created(deptUri).build();
 	}
 
 	@PUT

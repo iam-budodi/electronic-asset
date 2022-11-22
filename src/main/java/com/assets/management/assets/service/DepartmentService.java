@@ -1,15 +1,13 @@
 package com.assets.management.assets.service;
 
-import java.net.URI;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 
 import org.jboss.logging.Logger;
 
@@ -23,34 +21,32 @@ public class DepartmentService {
 
 	@Inject
 	Logger LOG;
-	
-	public URI insertDepartment(
-	        @Valid Department department, @Context UriInfo uriInfo
-	) {
+
+	public Department insertDepartment(@Valid Department department) {
 		Department.persist(department);
-		return uriInfo.getAbsolutePathBuilder().path(
-		        Long.toString(department.id)
-		).build();
+		return department;
+
 	}
 
 	public void updateDepartment(
-	        @Valid Department department, @NotNull Long id
+	        @Valid Department department, @NotNull Long deptId
 	) {
-		Panache.getEntityManager().getReference(Department.class, id);
-		Panache.getEntityManager().merge(department);
+		findDepartment(deptId).map(
+		        foundDept -> Panache.getEntityManager().merge(department)
+		).orElseThrow(EntityNotFoundException::new);
 	}
 
-	public void deleteDepartment(@NotNull Long id) {
+	public void deleteDepartment(@NotNull Long deptId) {
 		Department department = Panache.getEntityManager().getReference(
-		        Department.class, id
+		        Department.class, deptId
 		);
 		department.delete();
 	}
- 
+
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public Optional<Department> findDepartment(@NotNull Long deptId) { 
+	public Optional<Department> findDepartment(@NotNull Long deptId) {
 		LOG.debug("DEPT ID IN SVC : " + deptId);
-		return Department.findByIdOptional(deptId); 
+		return Department.findByIdOptional(deptId);
 	}
 
 }
