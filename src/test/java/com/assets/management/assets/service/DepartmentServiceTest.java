@@ -155,8 +155,7 @@ class DepartmentServiceTest {
 	@Test
 	@Order(11)
 	void shouldDeleteDepartment() {
-		service.deleteDepartment(deptId);
-
+		service.deleteDepartment(deptId); 
 		Optional<Department> department = service.findDepartment(deptId);
 		assertFalse(department.isPresent());
 	}
