@@ -130,7 +130,7 @@ public class VendorResource {
 	public Response deleteAllVendors() {
 		return Response.ok(vendorService.deleteAllVendors()).build();
 	}
-
+	// to be deleted
 	@POST
 	@Path("/{id}/assets")
 	@Produces(MediaType.APPLICATION_JSON)

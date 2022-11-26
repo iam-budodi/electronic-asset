@@ -1,6 +1,6 @@
 package com.assets.management.assets.model;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,10 +23,10 @@ public class Supplier extends PanacheEntity {
 
 	@NotNull
 	@Column(name = "registered_at")
-	public Instant registeredAt;
-	
+	public LocalDate registeredAt;
+
 	@NotNull
 	@Column(name = "registered_by", length = 64, nullable = false)
-	public String registeredBy; 
- 
+	public String registeredBy;
+
 }

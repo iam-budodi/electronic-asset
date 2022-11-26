@@ -42,16 +42,16 @@ public class Item extends PanacheEntity {
 
 	@Column(length = 1000)
 	public String description;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	public Category category;
+//	
+//	@ManyToOne(fetch = FetchType.LAZY)
+//	public Category category;
 
 	@ManyToOne(fetch = FetchType.LAZY) 
 	public Supplier supplier; 
- 
-	@OneToOne(
-	        mappedBy = "item", cascade = CascadeType.ALL,
-	        fetch = FetchType.LAZY
-	)
-	public Label label;
+// 
+//	@OneToOne(
+//	        mappedBy = "item", cascade = CascadeType.ALL,
+//	        fetch = FetchType.LAZY
+//	)
+//	public Label label;
 }
