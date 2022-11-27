@@ -48,7 +48,7 @@ public class EmployeeResource {
 			@QueryParam("page") @DefaultValue("0") Integer pageIndex,
 			@QueryParam("size") @DefaultValue("15") Integer pageSize) {
 		List<Employee> employees = employeeService
-				.listAllEmployees(pageIndex, pageSize);
+				.listEmployees(pageIndex, pageSize);
 		return Response.ok(employees).build();
 	}
 

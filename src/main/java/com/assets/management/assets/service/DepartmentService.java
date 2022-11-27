@@ -8,6 +8,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.NotFoundException;
 
 import org.jboss.logging.Logger;
 
@@ -29,11 +30,13 @@ public class DepartmentService {
 	}
 
 	public void updateDepartment(
-	        @Valid Department department, @NotNull Long deptId
+	        @Valid Department dept, @NotNull Long deptId
 	) {
 		findDepartment(deptId).map(
-		        foundDept -> Panache.getEntityManager().merge(department)
-		).orElseThrow(EntityNotFoundException::new);
+		        foundDept -> Panache.getEntityManager().merge(dept)
+		).orElseThrow(
+				() -> new NotFoundException("Department dont exist")
+				);
 	}
 
 	public void deleteDepartment(@NotNull Long deptId) {

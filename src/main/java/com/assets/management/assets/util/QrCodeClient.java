@@ -14,18 +14,20 @@ import com.assets.management.assets.model.QrContent;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 @ApplicationScoped
-public class QrCodeString {
+public class QrCodeClient {
 
 	@Inject
 	@RestClient
 	QrProxy qrProxy;
 
-	public  String formatCodeImgToStr(Item asset) {
-		PanacheQuery<QrContent> query = Item.find("id", asset.id)
-		        .project(QrContent.class);
+	public String formatQrImgToString(Item item) {
+		// Query projection
+		PanacheQuery<QrContent> query = Item
+				.find("id", item.id)
+				.project(QrContent.class);
 
 		QrContent qrContent = query.singleResult();
-		byte[]    code      = qrProxy.createQrString(qrContent);
+		byte[] code = qrProxy.createQrString(qrContent);
 		return Base64.getEncoder().encodeToString(code);
 	}
 }

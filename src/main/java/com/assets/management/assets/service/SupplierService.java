@@ -18,7 +18,7 @@ import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.Item;
 import com.assets.management.assets.model.Supplier;
-import com.assets.management.assets.util.QrCodeString;
+import com.assets.management.assets.util.QrCodeClient;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 
@@ -30,7 +30,7 @@ public class SupplierService {
 	Logger LOG;
 
 	@Inject
-	QrCodeString qrCodeString;
+	QrCodeClient qrCodeString;
 //
 //	@Inject
 //	@RestClient

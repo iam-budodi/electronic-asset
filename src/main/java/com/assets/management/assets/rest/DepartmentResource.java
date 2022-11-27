@@ -52,8 +52,7 @@ public class DepartmentResource {
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response findDepartmentById(@PathParam("id") @NotNull Long deptId) {
-		LOG.debug("DEPT ID FROM TEST : " + deptId);
+	public Response findDept(@PathParam("id") @NotNull Long deptId) {
 		return departmentService.findDepartment(deptId).map(
 		        department -> Response.ok(department).build()
 		).orElseGet(() -> Response.status(Status.NOT_FOUND).build());

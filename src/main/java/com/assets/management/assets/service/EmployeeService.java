@@ -29,14 +29,17 @@ public class EmployeeService {
 	public Employee addEmployee(@Valid Employee employee) {
 		employee.address.employee = employee;
 		employee.address.id = employee.id;
-		
+
 		Employee.persist(employee);
 		return employee;
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<Employee> listAllEmployees(Integer page, Integer size) {
-		return Employee.find("from Employee em").page(page, size).list();
+	public List<Employee> listEmployees(Integer page, Integer size) {
+		return Employee
+				.find("from Employee em")
+				.page(page, size)
+				.list();
 	}
 
 	public Employee updateById(@Valid Employee employee, @NotNull Long empId) {
@@ -52,13 +55,11 @@ public class EmployeeService {
 		return Employee.deleteAll();
 	}
 
-	// Move to assignment  API
+	// Move to assignment API
 	public void assignAsset(@Valid Item asset, @NotNull Long candidateId) {
 		Optional<Employee> optional = Employee.findByIdOptional(candidateId);
 		LOG.info("Is EndUser Present " + optional.get());
-		Employee endUser = optional.orElseThrow(
-		        () -> new BadRequestException("Candidate dont exist")
-		);
+		Employee endUser = optional.orElseThrow(() -> new BadRequestException("Candidate dont exist"));
 //
 //		asset.endUser = endUser;
 //		asset.employDate = Instant.now();
@@ -71,10 +72,7 @@ public class EmployeeService {
 	}
 
 	public void unAssignAsset(@NotNull Long candidateId, String serialNumber) {
-		Item asset = Item.find(
-		        "endUser.id = ?1 and serialNumber = ?2", candidateId,
-		        serialNumber
-		).firstResult();
+		Item asset = Item.find("endUser.id = ?1 and serialNumber = ?2", candidateId, serialNumber).firstResult();
 		if (asset == null)
 			throw new NotFoundException("Record not found!");
 //		asset.endUser = null;

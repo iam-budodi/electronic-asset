@@ -23,7 +23,7 @@ public class Employee extends Person {
 	@NotNull
 	@Column(name = "work_id")
 	public String workId;
-	
+
 	@NotNull
 	@Column(name = "birthdate")
 	public LocalDate dateOfBirth;
@@ -37,25 +37,24 @@ public class Employee extends Person {
 	@ManyToOne(fetch = FetchType.LAZY)
 	public Department department;
 
-	@OneToOne(
-	        mappedBy = "employee", cascade = CascadeType.ALL,
-	        fetch = FetchType.LAZY
-	)
+	@OneToOne(mappedBy = "employee", 
+			cascade = CascadeType.ALL, 
+			fetch = FetchType.LAZY)
 	public Address address;
 
 	@Transient
 	public LocalDate endAt;
 
-	// @PostLoad  
+	// @PostLoad
 	// @PostPersist
 	// @PostUpdate
 	// protected void calculateAge() {
-	// 	if (dateOfBirth == null) {
-	// 		age = null;
-	// 		return;
-	// 	}
+	// if (dateOfBirth == null) {
+	// age = null;
+	// return;
+	// }
 
-	// 	age = Period.between(dateOfBirth, LocalDate.now()).getYears();
+	// age = Period.between(dateOfBirth, LocalDate.now()).getYears();
 	// }
 
 	@PostLoad

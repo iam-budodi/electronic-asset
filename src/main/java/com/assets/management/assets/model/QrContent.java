@@ -18,10 +18,4 @@ public class QrContent {
 		this.modelName        = modelName;
 		this.stockedAt  = stockedAt;
 	}
-
-	@Override
-	public String toString() {
-		return "QrContent [id=" + id + ", serialNumber=" + serialNumber
-				+ ", modelName=" + modelName + ", stockedAt=" + stockedAt + "]";
-	} 
 }

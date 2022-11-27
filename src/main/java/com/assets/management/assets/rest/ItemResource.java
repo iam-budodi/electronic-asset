@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
@@ -24,116 +25,117 @@ import com.assets.management.assets.service.ItemService;
 @Path("/items")
 public class ItemResource {
 
-    @Inject
-    Logger LOG;
+	@Inject
+	Logger LOG;
 
-    @Inject
-    ItemService itemService;
-    
-	@POST
-//	@Path("/{id}/assets")
+	@Inject
+	ItemService itemService;
+
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
+	public Response listAllItems(
+			@QueryParam("page") @DefaultValue("0") Integer pIndex,
+			@QueryParam("size") @DefaultValue("15") Integer pSize) {
+		List<Item> items = itemService
+				.getAllItems(pIndex, pSize);
+		
+		return Response.ok(items).build();
+	}
+
+	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response addAsset(
-//	        @PathParam("id") Long vendorId,
-	        @Valid Item asset,
-	        @Context UriInfo uriInfo
-	) { 
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response insertItem(
+			@Valid Item item, @Context UriInfo uriInfo) {
 		try {
-			asset = itemService.addItem(asset);
+			item = itemService.addItem(item);
 		} catch (NoResultException | NotFoundException nfe) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		} catch (NonUniqueResultException | IllegalArgumentException
-		        | BadRequestException bre) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
+				| BadRequestException bre) {
+			return Response
+					.status(Response.Status.BAD_REQUEST)
+					.build();
 		}
-		URI        uri = uriInfo.getAbsolutePathBuilder().path(
-		        Long.toString(asset.id)
-		).build();
+		
+		URI uri = uriInfo
+				.getAbsolutePathBuilder()
+				.path(Long.toString(item.id))
+				.build();
 
 		return Response.created(uri).build();
 	}
-    
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response listAllItems(
-            @QueryParam("page") @DefaultValue("0") Integer pageIndex,
-            @QueryParam("size") @DefaultValue("15") Integer pageSize
-    ) {
-    	LOG.info("Calling all items service...");
-        List<Item> items = itemService.getAllItems(pageIndex, pageSize);
-        return Response.ok(items).build();
-    }
 
-    @GET
-    @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response findItem(@PathParam("id") @NotNull Long itemId) {
-        Item item;
-        try {
-        	item = itemService.findById(itemId);
-        } catch (NotFoundException nfe) {
-            return Response.status(Status.NOT_FOUND).build();
-        }
-        return Response.ok(item).build();
-    }
+	@GET
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public Response findItem(@PathParam("id") @NotNull Long itemId) {
+		return Item.findByIdOptional(itemId).map(
+				item -> Response.ok(item).build()
+				).orElseGet(
+						() -> Response
+						.status(Status.NOT_FOUND)
+						.build()
+						);
+	}
 
-    @GET
-    @Path("/count")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response countAssetPerVendor() {
-        return Response.ok(itemService.countAssetPerVendor()).build();
-    }
+	@GET
+	@Path("/count")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response countPerSupplier() {
+		return Response
+				.ok(itemService.countItemPerSupplier())
+				.build();
+	}
 
-    @GET
-    @Path("/status")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response countAssetPerStatus() {
-        return Response.ok(itemService.countAssetPerStatus()).build();
-    }
+	@GET
+	@Path("/status")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response countPerStatus() {
+		return Response.ok(itemService.countItemPerStatus()).build();
+	}
 
-    @GET
-    @Path("/total")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response totalAssetsCount() {
-        return Response.ok(itemService.countAllAssets()).build();
-    }
+	@GET
+	@Path("/total")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public Response totalCount() {
+		return Response.ok(Item.count()).build();
+	}
 
-    @PUT
-    @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateAsset(
-            @PathParam("id") @NotNull Long id,
-            @Valid Item asset
-    ) {
+	@PUT
+	@Path("/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateItem(
+			@PathParam("id") @NotNull Long itemId, @Valid Item item) {
+		if (!itemId.equals(item.id))
+			return Response
+					.status(Response.Status.CONFLICT)
+					.entity(item).build();
 
-        if (asset == null || id == null)
-            return Response.status(Response.Status.BAD_REQUEST).build();
+		try {
+			itemService.updateItem(item, itemId);
+		} catch (NotFoundException | NoResultException enf) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		} catch (NonUniqueResultException nur) {
+			return Response
+					.status(Response.Status.BAD_REQUEST)
+					.build();
+		}
 
-        if (!id.equals(asset.id))
-            return Response.status(Response.Status.CONFLICT).entity(asset)
-                    .build();
+		return Response.status(Status.NO_CONTENT).build();
+	}
 
-        try {
-            itemService.updateAsset(asset, id);
-        } catch (EntityNotFoundException | NoResultException enf) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        } catch (NonUniqueResultException nur) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-
-        return Response.status(Status.NO_CONTENT).build();
-    }
-
-    @DELETE
-    @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteAsset(@PathParam("id") @NotNull Long id) {
-        try {
-            itemService.deleteById(id);
-        } catch (EntityNotFoundException nfe) {
-            return Response.status(Status.NOT_FOUND).build();
-        }
-        return Response.noContent().build();
-    }
+	@DELETE
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response delItem(@PathParam("id") @NotNull Long itemId) {
+		try {
+			itemService.deleteById(itemId);
+		} catch (EntityNotFoundException nfe) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		return Response.noContent().build();
+	}
 }

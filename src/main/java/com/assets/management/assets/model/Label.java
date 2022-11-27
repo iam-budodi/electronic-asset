@@ -10,6 +10,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 @Entity
@@ -25,9 +27,11 @@ public class Label extends PanacheEntity {
 	@Size(max = 4000)
 	@Column(name = "item_qr_code", length = 4000, nullable = false)
 	public String itemQrCode;
-
-	@OneToOne(fetch = FetchType.LAZY)
-	@MapsId
-	@JoinColumn(name = "item_id")
-	public Item item;
+	
+//  should be generated and mapped on the assignment and transfer table
+//	@OneToOne(fetch = FetchType.LAZY)
+//	@MapsId
+//	@JoinColumn(name = "item_id")
+//	@JsonIgnore
+//	public Item item;
 }
