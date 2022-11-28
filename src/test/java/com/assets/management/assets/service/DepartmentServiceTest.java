@@ -1,6 +1,10 @@
 package com.assets.management.assets.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 import java.util.Random;
@@ -8,6 +12,7 @@ import java.util.Random;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
+import javax.ws.rs.NotFoundException;
 
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -98,7 +103,7 @@ class DepartmentServiceTest {
 		department.description = UPDATED_DESCRIPTION;
 
 		Long randomId = new Random().nextLong();
-		assertThrows(EntityNotFoundException.class, () -> {
+		assertThrows(NotFoundException.class, () -> {
 			service.updateDepartment(department, randomId); 
 		});  
 	}
