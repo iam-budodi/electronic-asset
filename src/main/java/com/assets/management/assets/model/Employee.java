@@ -37,9 +37,7 @@ public class Employee extends Person {
 	@ManyToOne(fetch = FetchType.LAZY)
 	public Department department;
 
-	@OneToOne(mappedBy = "employee", 
-			cascade = CascadeType.ALL, 
-			fetch = FetchType.LAZY)
+	@OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	public Address address;
 
 	@Transient
@@ -66,7 +64,9 @@ public class Employee extends Person {
 			return;
 		}
 
-		Period timeOfService = Period.between(hireDate, LocalDate.now());
+		Period timeOfService = 
+				Period
+					.between(hireDate, LocalDate.now());
 		endAt = hireDate.plus(timeOfService);
 	}
 }
