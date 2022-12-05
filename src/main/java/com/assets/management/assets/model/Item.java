@@ -27,10 +27,10 @@ public class Item extends PanacheEntity {
 	@Column(name = "item_name", length = 64, nullable = false)
 	public String itemName;
 
-	// Think about remove this property to assignment and transfer
-	@NotNull
-	@Column(name = "serial_number", length = 32, nullable = false)
-	public String serialNumber;
+	// moved to assignment and transfer
+//	@NotNull
+//	@Column(name = "serial_number", length = 32, nullable = false)
+//	public String serialNumber;
 
 	@NotNull
 	public BigDecimal cost;
@@ -38,7 +38,7 @@ public class Item extends PanacheEntity {
 	@NotNull
 	@Min(1)
 	@Column(name = "quantity", nullable = false)
-	public Integer qty;
+	public Integer qtyBought;
 
 	@ColumnDefault(value = "'New'")
 //	@Generated(GenerationTime.INSERT) // substituted by @DynamicInsert
@@ -52,11 +52,11 @@ public class Item extends PanacheEntity {
 
 	@Column(length = 1000)
 	public String description;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	public Category category;
 
-	@ManyToOne( fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	public Supplier supplier;
 
 //  should be generated and mapped on the assignment and transfer table

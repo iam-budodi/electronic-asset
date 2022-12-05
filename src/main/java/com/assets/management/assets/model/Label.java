@@ -18,20 +18,18 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 @Table(name = "labels")
 public class Label extends PanacheEntity {
 
-	@NotNull
 	@Size(max = 64)
-	@Column(name = "item_tag", length = 64, nullable = false)
+	@Column(name = "item_tag", length = 64)
 	public String itemTag;
 
 	@NotNull
 	@Size(max = 4000)
-	@Column(name = "item_qr_code", length = 4000, nullable = false)
-	public String itemQrCode;
-	
-//  should be generated and mapped on the assignment and transfer table
-//	@OneToOne(fetch = FetchType.LAZY)
-//	@MapsId
-//	@JoinColumn(name = "item_id")
-//	@JsonIgnore
-//	public Item item;
+	@Column(name = "item_qr_string", length = 4000, nullable = false)
+	public String itemQrString;
+	 
+	@OneToOne(fetch = FetchType.LAZY)
+	@MapsId
+	@JoinColumn(name = "assignment_id")
+	@JsonIgnore
+	public ItemAssignment itemAssignment;
 }

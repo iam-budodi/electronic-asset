@@ -58,7 +58,7 @@ public class ItemService {
 		).orElseThrow(
 				() -> new NotFoundException("Item dont exist")
 				);
-	}
+	} 
 
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public List<PanacheEntityBase> countItemPerSupplier() {
