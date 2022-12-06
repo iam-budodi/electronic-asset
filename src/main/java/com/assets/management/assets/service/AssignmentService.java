@@ -62,20 +62,14 @@ public class AssignmentService {
 	}
 
 	public void unassignItem(@NotNull Long empId, @NotNull String sNumber) {
-//		Employee.findByIdOptional(empId).map(
-//			employee -> {
-//				ItemAssignment asset = ItemAssignment
-//						.find(
-//								"employee.id = ?1 and serialNumber = ?2", 
-//								employee, sNumber)
-//						.firstResult();
-//			} //assignment.employee = (Employee) employee
-//			)
-//	.orElseThrow(() -> new NotFoundException());
-//		if (asset == null)
-//			throw new NotFoundException("Record not found!");
-////		asset.endUser = null;
-//
-//		Panache.getEntityManager().merge(asset);
+		ItemAssignment found = ItemAssignment.find(
+				"employee.id = ?1 and itemSerialNumber = ?2", 
+				empId, sNumber)
+				.firstResult();
+		
+		if (found == null)
+			throw new NotFoundException("Record not found!");
+		
+		found.delete();
 	}
 }

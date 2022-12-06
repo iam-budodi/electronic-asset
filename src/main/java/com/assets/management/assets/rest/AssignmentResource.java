@@ -41,14 +41,18 @@ public class AssignmentResource {
 			@Context UriInfo uriInfo) {
 
 		if (ItemAssignment.checkIfAssigned(itemId))
-			return Response.status(Status.CONFLICT).entity("Item already taken!").build();
+			return Response.status(Status.CONFLICT)
+					.entity("Item already taken!").build();
 
 		try {
 			assignment = assignmentService.assignItem(assignment, employeeId, itemId);
 		} catch (NotFoundException ex) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		URI uri = uriInfo.getAbsolutePathBuilder().path(Long.toString(assignment.id)).build();
+		URI uri = uriInfo
+				.getAbsolutePathBuilder()
+				.path(Long.toString(assignment.id))
+				 .build();
 
 		return Response.created(uri).build();
 	}
@@ -70,9 +74,12 @@ public class AssignmentResource {
 	public Response unassignItem(
 			@PathParam("id") Long empId, 
 			@QueryParam("sn") @NotNull String serialNo) {
+		if (!ItemAssignment.checkIfExists(empId))
+			return Response.status(Status.NOT_FOUND).build();
+		
 		try {
 			assignmentService.unassignItem(empId, serialNo);
-		} catch (IllegalArgumentException | NotFoundException bre) {
+		} catch (NotFoundException ex) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 
