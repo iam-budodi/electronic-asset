@@ -51,8 +51,7 @@ public class ItemResource {
 			item = itemService.addItem(item);
 		} catch (NoResultException | NotFoundException nfe) {
 			return Response.status(Response.Status.NOT_FOUND).build();
-		} catch (NonUniqueResultException | IllegalArgumentException
-				| BadRequestException bre) {
+		} catch (NonUniqueResultException| BadRequestException bre) {
 			return Response
 					.status(Response.Status.BAD_REQUEST)
 					.build();

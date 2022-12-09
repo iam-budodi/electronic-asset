@@ -67,6 +67,7 @@ public class DepartmentResource {
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response createDepartment(
 	        @Valid Department department, @Context UriInfo uriInfo
 	) {
@@ -85,9 +86,10 @@ public class DepartmentResource {
 	) {
 
 		if (!deptId.equals(department.id))
-			return Response.status(Response.Status.CONFLICT).entity(
-			        department
-			).build();
+			return Response
+					.status(Response.Status.CONFLICT)
+					.entity(department)
+					.build();
 
 		try {
 			departmentService.updateDepartment(department, deptId);

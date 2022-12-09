@@ -69,6 +69,7 @@ public class CategoryResource {
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response insertCategory(
 	        @Valid Category category, @Context UriInfo uriInfo) {
 		category = categoryService.createCategory(category);

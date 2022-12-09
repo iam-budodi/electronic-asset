@@ -13,7 +13,6 @@ import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.Item;
 import com.assets.management.assets.model.Supplier;
-import com.assets.management.assets.util.QrCodeClient;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
@@ -26,13 +25,9 @@ public class ItemService {
 	Logger LOG;
 
 
-	// Think about remove this property to assignment and transfer
-	@Inject
-	QrCodeClient qrCodeString;
-
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public List<Item> getAllItems(Integer page, Integer size) {
-		return Item.find("ORDER BY itemName, qty")
+		return Item.find("ORDER BY itemName, qtyBought")
 				.page(page, size)
 				.list();
 	}
@@ -41,10 +36,6 @@ public class ItemService {
 		LOG.info("It got here...");
 		return Supplier.findByIdOptional(item.supplier.id)
 				.map(supplier -> {
-					// should be generated and mapped on the 
-					// assignment and transfer table
-					// item.label.item = item;
-					// item.label.id = item.id;
 					Item.persist(item);
 					return item;
 					}
@@ -56,8 +47,7 @@ public class ItemService {
 		Item.findByIdOptional(itemId).map(
 		        itemFound -> Panache.getEntityManager().merge(item)
 		).orElseThrow(
-				() -> new NotFoundException("Item dont exist")
-				);
+				() -> new NotFoundException("Item dont exist"));
 	} 
 
 	@Transactional(Transactional.TxType.SUPPORTS)

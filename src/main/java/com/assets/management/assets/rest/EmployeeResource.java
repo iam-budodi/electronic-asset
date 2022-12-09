@@ -69,6 +69,7 @@ public class EmployeeResource {
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response createEmployee(
 			@Valid Employee employee, @Context UriInfo uriInfo) {
 		employee = employeeService.addEmployee(employee);

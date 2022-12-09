@@ -28,6 +28,14 @@ public class AssignmentService {
  
 	@Inject
 	QrCodeClient qrCodeClient;
+	
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public List<ItemAssignment> getAllAssignments(Integer page, Integer size) {
+		return ItemAssignment.find("ORDER BY dateAssigned, qtyAssigned")
+				.page(page, size)
+				.list();
+	}
+	
 	public ItemAssignment assignItem(
 			@Valid ItemAssignment assignment, @NotNull Long empId, @NotNull Long itemId) {
 		Employee.findByIdOptional(empId).map(
@@ -72,4 +80,12 @@ public class AssignmentService {
 		
 		found.delete();
 	}
+	
+
+	public void updateAssignment(@Valid ItemAssignment assignment, @NotNull Long assignmentId) {
+		ItemAssignment.findByIdOptional(assignmentId).map(
+		        itemFound -> Panache.getEntityManager().merge(assignment)
+		).orElseThrow(
+				() -> new NotFoundException("Not assigned"));
+	} 
 }
