@@ -25,7 +25,7 @@ public class Label extends PanacheEntity {
 	@NotNull
 	@Size(max = 4000)
 	@Column(name = "item_qr_string", length = 4000, nullable = false)
-	public String itemQrString;
+	public byte[] itemQrString;
 	 
 	@OneToOne(fetch = FetchType.LAZY)
 	@MapsId

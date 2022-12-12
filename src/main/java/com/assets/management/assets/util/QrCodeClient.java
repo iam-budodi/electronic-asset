@@ -17,9 +17,10 @@ public class QrCodeClient {
 	@RestClient
 	QrProxy qrProxy;
 
-	public String formatQrImgToString(String serialNumber) {
+	public byte[] formatQrImgToString(String serialNumber) {
 		QrContent qrContent = ItemAssignment.projectQrContents(serialNumber);
-		byte[] qrCode = qrProxy.createQrString(qrContent);
-		return Base64.getEncoder().encodeToString(qrCode);
+//		byte[] qrCode = qrProxy.createQrString(qrContent);
+//		return Base64.getEncoder().encodeToString(qrCode);
+		return qrProxy.createQrString(qrContent);
 	}
 }

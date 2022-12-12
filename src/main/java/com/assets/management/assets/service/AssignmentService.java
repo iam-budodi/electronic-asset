@@ -15,6 +15,7 @@ import com.assets.management.assets.model.Employee;
 import com.assets.management.assets.model.Item;
 import com.assets.management.assets.model.ItemAssignment;
 import com.assets.management.assets.model.Label;
+import com.assets.management.assets.model.Status;
 import com.assets.management.assets.util.QrCodeClient;
 
 import io.quarkus.hibernate.orm.panache.Panache;
@@ -47,8 +48,9 @@ public class AssignmentService {
 		.orElseThrow(() -> new NotFoundException());
 		
 		Label label = new Label();
-		label.itemQrString = "dummy";
+		label.itemQrString = "dummy".getBytes();
 		assignment.label = label;
+		assignment.item.status = Status.InUse;
 		
 		assignment.label.itemAssignment = assignment;
 		assignment.label.id = assignment.id;
@@ -65,13 +67,14 @@ public class AssignmentService {
 		return ItemAssignment.find(
 				"SELECT i.item "
 				+ "FROM ItemAssignment i "
-				+ "WHERE i.employee.id = ?1", empId)
+				+ "WHERE i.employee.id = ?1 "
+				+ "AND i.item.status <> ?2", empId, Status.Transfered)
 				.list();
 	}
 
 	public void unassignItem(@NotNull Long empId, @NotNull String sNumber) {
 		ItemAssignment found = ItemAssignment.find(
-				"employee.id = ?1 and itemSerialNumber = ?2", 
+				"employee.id = ?1 AND itemSerialNumber = ?2", 
 				empId, sNumber)
 				.firstResult();
 		

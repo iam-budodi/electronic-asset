@@ -24,9 +24,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-
+ 
 import com.assets.management.assets.model.Item;
 import com.assets.management.assets.model.ItemAssignment;
+import com.assets.management.assets.model.Label;
 import com.assets.management.assets.service.AssignmentService;
 
 @Path("/assigns")
@@ -83,12 +84,23 @@ public class AssignmentResource {
 		return Response.ok(items).build();
 	}
 
-
+	@GET
+	@Path("/preview/{id}")
+	@Produces("image/png")
+	public Response qrImagePreview(@PathParam("id") Long itemId){
+		Label label = ItemAssignment.find(
+					"SELECT i.label "
+					+ "FROM ItemAssignment i "
+					+ "WHERE i.item.id = ?1", itemId)
+					.firstResult();
+		return Response.ok(label.itemQrString).build();
+	}
+		
 	@PUT
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateItem(
-			@PathParam("id") @NotNull Long assignmentId, @Valid  ItemAssignment assignment) {
+			@PathParam("id") @NotNull Long assignmentId, @Valid ItemAssignment assignment) {
 		if (!assignmentId.equals(assignment.id))
 			return Response
 					.status(Response.Status.CONFLICT)
