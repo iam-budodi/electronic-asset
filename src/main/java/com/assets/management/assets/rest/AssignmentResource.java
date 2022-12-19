@@ -56,7 +56,7 @@ public class AssignmentResource {
 			@Valid ItemAssignment assignment, 
 			@Context UriInfo uriInfo) {
 
-		if (ItemAssignment.checkIfAssigned(itemId))
+		if (ItemAssignment.isItemAssigned(itemId))
 			return Response.status(Status.CONFLICT)
 					.entity("Item already taken!").build();
 
@@ -77,7 +77,7 @@ public class AssignmentResource {
 	@Path("/{id}/items")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response listEmployeeItems(@PathParam("id") Long empId) {
-		if (!ItemAssignment.checkIfExists(empId))
+		if (!ItemAssignment.isEmployeeExists(empId))
 			return Response.status(Status.NOT_FOUND).build();
 		
 		List<Item> items = assignmentService.getAssignedItems(empId);
@@ -125,7 +125,7 @@ public class AssignmentResource {
 	public Response unassignItem(
 			@PathParam("id") Long empId, 
 			@QueryParam("sn") @NotNull String serialNo) {
-		if (!ItemAssignment.checkIfExists(empId))
+		if (!ItemAssignment.isEmployeeExists(empId))
 			return Response.status(Status.NOT_FOUND).build();
 		
 		try {

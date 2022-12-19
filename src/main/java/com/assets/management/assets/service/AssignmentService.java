@@ -51,6 +51,7 @@ public class AssignmentService {
 		label.itemQrString = "dummy".getBytes();
 		assignment.label = label;
 		assignment.item.status = Status.InUse;
+		assignment.item.transferCount = 0;
 		
 		assignment.label.itemAssignment = assignment;
 		assignment.label.id = assignment.id;

@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
@@ -12,11 +14,16 @@ import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 @Entity
+@DynamicInsert
 @Table(name = "item_assignments")
 public class ItemAssignment extends PanacheEntity {
 
@@ -32,6 +39,12 @@ public class ItemAssignment extends PanacheEntity {
 	@CreationTimestamp
 	@Column(name = "date_assigned", nullable = false)
 	public LocalDateTime dateAssigned;
+	
+
+	@ColumnDefault(value = "'Assigned'")
+	@Enumerated(EnumType.STRING)
+	@Column(name = "assignment_status", nullable = false)
+	public AssignmentStatus status;
 
 	@Column(length = 4000)
 	public String remarks;
@@ -49,15 +62,21 @@ public class ItemAssignment extends PanacheEntity {
 	)
 	public Label label;
 
-	public static Boolean checkIfAssigned(Long itemId) {
+	public static Boolean isItemAssigned(Long itemId) {
 		return find("item.id = ?1", itemId)
 				.firstResultOptional()
 				.isPresent();
 	}
-	public static Boolean checkIfExists(Long empId) {
+	public static Boolean isEmployeeExists(Long empId) {
 		return find("employee.id = ?1", empId)
 				.firstResultOptional()
 				.isPresent();
+	}
+	
+	public static PanacheQuery<PanacheEntityBase> hasItem(Long itemId) {
+		return find(
+			"item.id = ?1 AND item.status <> ?2",
+			itemId, Status.Transfered);
 	}
 
 	public static QrContent projectQrContents(String sn) {

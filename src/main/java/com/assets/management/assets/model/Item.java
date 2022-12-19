@@ -50,6 +50,9 @@ public class Item extends PanacheEntity {
 	@Column(name = "date_purchased")
 	public LocalDate datePurchased;
 
+	@Column(name = "tranfer_count")
+	public Integer transferCount;
+	
 	@Column(length = 1000)
 	public String description;
 
