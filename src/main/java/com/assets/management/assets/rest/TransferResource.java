@@ -30,15 +30,15 @@ public class TransferResource {
 	TransferService transferService;
 	
 	@POST
-	public Response assignItem(
+	public Response transferItem(
 			@QueryParam("item") @NotNull Long itemId, 
-			@QueryParam("to-emp") @NotNull Long transToId,
+			@QueryParam("employee-id") @NotNull Long transToId,
 			@Valid TransferHistory history, 
 			@Context UriInfo uriInfo) {
-
+ 
 		if (!ItemAssignment.isItemAssigned(itemId))
 			return Response.status(Status.NOT_FOUND)
-					.entity("Please assign item to user!").build();
+					.entity("Please assign item to Employee!").build();
 
 		try {
 			history = transferService.transferItem(history, itemId, transToId);
