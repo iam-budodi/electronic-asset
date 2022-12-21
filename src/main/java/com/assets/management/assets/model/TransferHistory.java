@@ -18,7 +18,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 public class TransferHistory extends PanacheEntity {
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@Column(name = "transfer_from_employee")
+	//@Column(name = "transfer_from_employee")
 	public Employee transferedFromEmployee;
 
 	@ManyToOne(fetch = FetchType.LAZY)
