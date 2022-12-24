@@ -31,9 +31,7 @@ public class Item extends PanacheEntity {
 //	@NotNull
 //	@Column(name = "serial_number", length = 32, nullable = false)
 //	public String serialNumber;
-
-	@NotNull
-	public BigDecimal cost;
+   
 
 	@NotNull
 	@Min(1)

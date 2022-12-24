@@ -27,11 +27,10 @@ import io.quarkus.test.junit.QuarkusTest;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DepartmentServiceTest {
 
-	private static final String DEFAULT_NAME        = "Technology";
-	private static final String UPDATED_NAME        = "Technology (updated)";
+	private static final String DEFAULT_NAME = "Technology";
+	private static final String UPDATED_NAME = "Technology (updated)";
 	private static final String DEFAULT_DESCRIPTION = "Technology functions";
 	private static final String UPDATED_DESCRIPTION = "Technology functions (updated)";
-
 	private static long deptId;
 
 	@Inject
@@ -40,7 +39,7 @@ class DepartmentServiceTest {
 	@Test
 	@Order(1)
 	void shouldNotGetUnknownDepartment() {
-		Long                 randomId   = new Random().nextLong();
+		Long randomId = new Random().nextLong();
 		Optional<Department> department = service.findDepartment(randomId);
 		assertFalse(department.isPresent());
 	}
@@ -49,19 +48,28 @@ class DepartmentServiceTest {
 	@Order(2)
 	void shouldThrowExceptionOnInsertingNullDepartmentObject() {
 		Department department = new Department();
-
 		ConstraintViolationException thrown = assertThrows(
-		        ConstraintViolationException.class, () -> {
-			        service.insertDepartment(department);
-		        }
-		);
-
+				ConstraintViolationException.class, 
+				() -> service.insertDepartment(department)); 
 		assertEquals(null, thrown.getCause());
 
 	}
 
 	@Test
 	@Order(3)
+	void shouldThrowExceptionOnInsertingNullDepartmentName() {
+		Department department = new Department();
+		department.name = null;
+		department.description = DEFAULT_DESCRIPTION;
+		ConstraintViolationException thrown = assertThrows(
+				ConstraintViolationException.class, 
+				() -> service.insertDepartment(department)); 
+		assertEquals(null, thrown.getCause());
+
+	}
+
+	@Test
+	@Order(4)
 	void shouldInsertDepartment() {
 		Department department = new Department();
 		department.name = DEFAULT_NAME;
@@ -69,34 +77,33 @@ class DepartmentServiceTest {
 
 		assertFalse(department.isPersistent());
 		department = service.insertDepartment(department);
-
 		deptId = department.id;
 
 		assertNotNull(deptId);
+		// assertTrue(department.isPersistent());
 		assertEquals(DEFAULT_NAME, department.name);
 		assertEquals(DEFAULT_DESCRIPTION, department.description);
 	}
 
 	@Test
-	@Order(4)
+	@Order(5)
 	void shouldThrowExceptionOnNullId() {
-		assertThrows(ConstraintViolationException.class, () -> {
-			service.findDepartment(null);
-		});
+		assertThrows(ConstraintViolationException.class, 
+				() -> service.findDepartment(null));
 	}
 
 	@Test
-	@Order(5)
+	@Order(6)
 	void shouldGetDepartment() {
 		Optional<Department> department = service.findDepartment(deptId);
 		assertTrue(department.isPresent());
 		assertEquals(DEFAULT_NAME, department.get().name);
 		assertEquals(DEFAULT_DESCRIPTION, department.get().description);
 	}
- 
+
 	@Test
-	@Order(6)
-	void shouldThrowEntityNotFoundExceptionUponUpdate() {
+	@Order(7)
+	void shouldThrowNotFoundExceptionUponUpdate() {
 		Department department = new Department();
 		department.id = deptId;
 		department.name = UPDATED_NAME;
@@ -104,25 +111,24 @@ class DepartmentServiceTest {
 
 		Long randomId = new Random().nextLong();
 		assertThrows(NotFoundException.class, () -> {
-			service.updateDepartment(department, randomId); 
-		});  
+			service.updateDepartment(department, randomId);
+		});
 	}
-	
+
 	@Test
-	@Order(7)
+	@Order(8)
 	void shouldThrowConstraintsViolationException() {
 		Department department = new Department();
 		department.id = deptId;
 		department.name = null;
 		department.description = UPDATED_DESCRIPTION;
-		 
-		assertThrows(ConstraintViolationException.class, () -> {
-			service.updateDepartment(department, deptId); 
-		});  
+
+		assertThrows(ConstraintViolationException.class, 
+				() -> service.updateDepartment(department, deptId));
 	}
 
 	@Test
-	@Order(8)
+	@Order(9)
 	void shouldUpdateDepartment() {
 		Department department = new Department();
 		department.id = deptId;
@@ -139,28 +145,29 @@ class DepartmentServiceTest {
 	}
 
 	@Test
-	@Order(9)
+	@Order(10)
 	void shouldThrowNotFoundException() {
 		Long randomId = new Random().nextLong();
-		EntityNotFoundException thrown = assertThrows(EntityNotFoundException.class, () -> {
-			service.deleteDepartment(randomId);
-		}); 
-		
-		assertEquals("Unable to find com.assets.management.assets.model.Department with id " + randomId, thrown.getMessage());
-	}
-
-	@Test
-	@Order(10)
-	void shouldThrowConstraintViolationException() {
-		assertThrows(ConstraintViolationException.class, () -> {
-			service.deleteDepartment(null);
-		});
+		EntityNotFoundException thrown = assertThrows(
+				EntityNotFoundException.class, 
+				() -> service.deleteDepartment(randomId));
+		assertEquals(
+				"Unable to find com.assets.management.assets.model.Department with id " 
+						+ randomId,
+				thrown.getMessage());
 	}
 
 	@Test
 	@Order(11)
+	void shouldThrowConstraintViolationException() {
+		assertThrows(ConstraintViolationException.class, 
+				() -> service.deleteDepartment(null));
+	}
+
+	@Test
+	@Order(12)
 	void shouldDeleteDepartment() {
-		service.deleteDepartment(deptId); 
+		service.deleteDepartment(deptId);
 		Optional<Department> department = service.findDepartment(deptId);
 		assertFalse(department.isPresent());
 	}

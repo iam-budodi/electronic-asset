@@ -5,7 +5,7 @@ import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.CONFLICT;
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static javax.ws.rs.core.Response.Status.OK;
@@ -37,12 +37,10 @@ import io.quarkus.test.junit.QuarkusTest;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestHTTPEndpoint(DepartmentResource.class)
 class DepartmentResourceTest {
-
-	private static final String    DEFAULT_NAME = "Technology";
-	private static final String    UPDATED_NAME = "Technology (updated)";
-	private static final String    DEFAULT_DESCRIPTION = "Technology functions";
-	private static final String    UPDATED_DESCRIPTION = "Technology functions (updated)";
-	
+	private static final String DEFAULT_NAME = "Technology";
+	private static final String UPDATED_NAME = "Technology (updated)";
+	private static final String DEFAULT_DESCRIPTION = "Technology functions";
+	private static final String UPDATED_DESCRIPTION = "Technology functions (updated)";
 	private static String departmentId;
 	
 	@TestHTTPResource
@@ -66,7 +64,6 @@ class DepartmentResourceTest {
 	@Order(2)
 	void shouldNotCreateInvalidDepartment() {
 		final Department department = new Department();
-		// department.id = Long.valueOf(1);
 		department.name = null;
 		department.description = DEFAULT_DESCRIPTION;
 	 
@@ -77,7 +74,7 @@ class DepartmentResourceTest {
 				.when()
 				.post()
 				.then()
-					.statusCode(INTERNAL_SERVER_ERROR.getStatusCode());
+					.statusCode(BAD_REQUEST.getStatusCode());
 		 
 	}
 	
@@ -88,17 +85,16 @@ class DepartmentResourceTest {
 		department.name = DEFAULT_NAME;
 		department.description = DEFAULT_DESCRIPTION;
 		
-		String location =
-				given()
-				.body(department)
-				.header(CONTENT_TYPE, APPLICATION_JSON)
-				.header(ACCEPT, APPLICATION_JSON)
-				.when()
-				.post()
-				.then()
-				.statusCode(Status.CREATED.getStatusCode())
-				.header("location", url + "/1")
-				.extract().header("location");
+		String location = given()
+							.body(department)
+							.header(CONTENT_TYPE, APPLICATION_JSON)
+							.header(ACCEPT, APPLICATION_JSON)
+							.when()
+							.post()
+							.then()
+								.statusCode(Status.CREATED.getStatusCode())
+								.header("location", url + "/1")
+								.extract().header("location");
 		
 		assertTrue(location.contains("departments"));
 		String[] segments = location.split("/");
@@ -122,49 +118,19 @@ class DepartmentResourceTest {
 	
 	@Test
 	@Order(5)
-	void shouldNotGetUnknownDepartment() {
-		Long randomId = new Random().nextLong();
-		
+	void shouldNotQueryUnknownDepartmentName() {
+		String randomName = RandomStringUtils.randomAlphabetic(8);
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
-			.pathParam("id", randomId)
+			.queryParam("name", randomName)
 			.when()
-			.get("/{id}")
+			.get()
 			.then()
 				.statusCode(NOT_FOUND.getStatusCode());
 	}
 	
 	@Test
 	@Order(6)
-	void shouldNotGetDepartmentByUnknownName() {
-		String randomName = RandomStringUtils.randomAlphabetic(8);
-		
-		given()
-			.header(ACCEPT, APPLICATION_JSON)
-			.pathParam("name", randomName)
-			.when()
-			.get("/{name}")
-			.then()
-				.statusCode(NOT_FOUND.getStatusCode());
-	}
-	
-	@Test
-	@Order(7)
-	void shouldGetDepartmentById() {  
-		given()
-			.header(ACCEPT, APPLICATION_JSON)
-			.pathParam("id", departmentId)
-			.when()
-			.get("/{id}")
-			.then()
-				.statusCode(OK.getStatusCode())
-				.body("id", is(Integer.valueOf(departmentId)))
-				.body("name", is(DEFAULT_NAME))
-				.body("description", is(DEFAULT_DESCRIPTION));
-	}
-	
-	@Test
-	@Order(8)
 	void shouldGetDepartmentByName() {  
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
@@ -178,10 +144,50 @@ class DepartmentResourceTest {
 				.body("name", is(DEFAULT_NAME))
 				.body("description", is(DEFAULT_DESCRIPTION));
 	}
-
-		
+	
+	@Test
+	@Order(7)
+	void shouldNotGetUnknownDepartment() {
+		Long randomId = new Random().nextLong();
+		given()
+			.header(ACCEPT, APPLICATION_JSON)
+			.pathParam("id", randomId)
+			.when()
+			.get("/{id}")
+			.then()
+				.statusCode(NOT_FOUND.getStatusCode());
+	}
+	
+	@Test
+	@Order(8)
+	void shouldNotGetDepartmentByUnknownParameter() {
+		Long randomId = new Random().nextLong();
+		given()
+			.header(ACCEPT, APPLICATION_JSON)
+			.pathParam("identifier", randomId)
+			.when()
+			.get("/{identifier}")
+			.then()
+				.statusCode(NOT_FOUND.getStatusCode());
+	}
+	
 	@Test
 	@Order(9)
+	void shouldGetDepartmentById() {  
+		given()
+			.header(ACCEPT, APPLICATION_JSON)
+			.pathParam("id", departmentId)
+			.when()
+			.get("/{id}")
+			.then()
+				.statusCode(OK.getStatusCode())
+				.body("id", is(Integer.valueOf(departmentId)))
+				.body("name", is(DEFAULT_NAME))
+				.body("description", is(DEFAULT_DESCRIPTION));
+	}
+		
+	@Test
+	@Order(10)
 	void shouldCountDepartment() {  
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
@@ -194,8 +200,9 @@ class DepartmentResourceTest {
 	}
 
 	@Test
-	@Order(10)
+	@Order(11)
 	void shouldFailToUpdateDepartment() {
+		Long randomId = new Random().nextLong();
 		final Department department = new Department();
 		department.id = Long.valueOf(departmentId);
 		department.name = UPDATED_NAME;
@@ -205,7 +212,7 @@ class DepartmentResourceTest {
 			.body(department)
 			.header(CONTENT_TYPE, APPLICATION_JSON)
 			.header(ACCEPT, APPLICATION_JSON)
-			.pathParam("id", 2)
+			.pathParam("id", randomId)
 			.when()
 			.put("/{id}")
 			.then()
@@ -213,7 +220,7 @@ class DepartmentResourceTest {
 	}
 	
 	@Test
-	@Order(11)
+	@Order(12)
 	void shouldUpdateDepartment() {
 		final Department department = new Department();
 		department.id = Long.valueOf(departmentId);
@@ -232,11 +239,12 @@ class DepartmentResourceTest {
 	}
  
 	@Test
-	@Order(12)
-	void shouldNotDeleteDepartmentByInvalidId() {  
+	@Order(13)
+	void shouldNotDeleteDepartmentByInvalidId() { 
+		Long randomId = new Random().nextLong(); 
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
-			.pathParam("id", 2)
+			.pathParam("id", randomId)
 			.when()
 			.delete("/{id}")
 			.then()
@@ -244,7 +252,7 @@ class DepartmentResourceTest {
 	}
 
 	@Test
-	@Order(13)
+	@Order(14)
 	void shouldDeleteDepartmentById() {  
 		given()
 			.header(ACCEPT, APPLICATION_JSON)

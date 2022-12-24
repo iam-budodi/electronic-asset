@@ -28,26 +28,20 @@ public class DepartmentService {
 
 	}
 
-	public void updateDepartment(
-	        @Valid Department dept, @NotNull Long deptId
-	) {
-		findDepartment(deptId).map(
-		        foundDept -> Panache.getEntityManager().merge(dept)
-		).orElseThrow(
-				() -> new NotFoundException("Department dont exist")
-				);
+	public void updateDepartment(@Valid Department dept, @NotNull Long deptId) {
+		findDepartment(deptId)
+			.map(foundDept -> Panache.getEntityManager().merge(dept))
+			.orElseThrow(() -> new NotFoundException("Department don't exist"));
 	}
 
 	public void deleteDepartment(@NotNull Long deptId) {
-		Department department = Panache.getEntityManager().getReference(
-		        Department.class, deptId
-		);
-		department.delete();
+		Panache.getEntityManager()
+				.getReference(Department.class, deptId)
+				.delete();
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Optional<Department> findDepartment(@NotNull Long deptId) {
-		LOG.debug("DEPT ID IN SVC : " + deptId);
 		return Department.findByIdOptional(deptId);
 	}
 
