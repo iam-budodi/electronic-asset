@@ -1,7 +1,5 @@
 package com.assets.management.assets.util;
 
-import java.util.Base64;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 

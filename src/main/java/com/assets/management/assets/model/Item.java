@@ -1,6 +1,5 @@
 package com.assets.management.assets.model;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import javax.persistence.Column;
@@ -31,7 +30,6 @@ public class Item extends PanacheEntity {
 //	@NotNull
 //	@Column(name = "serial_number", length = 32, nullable = false)
 //	public String serialNumber;
-   
 
 	@NotNull
 	@Min(1)
@@ -50,7 +48,7 @@ public class Item extends PanacheEntity {
 
 	@Column(name = "tranfer_count")
 	public Integer transferCount;
-	
+
 	@Column(length = 1000)
 	public String description;
 

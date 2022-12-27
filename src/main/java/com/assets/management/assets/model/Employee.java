@@ -34,39 +34,35 @@ public class Employee extends Person {
 
 	public String status;
 
+	@Transient
+	public Integer age;
+	
+	@Transient
+	public Integer timeOfService;
+	
+	@Transient
+	public LocalDate retireAt;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	public Department department;
 
 	@OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	public Address address;
 
-	@Transient
-	public LocalDate endAt;
-
-	// @PostLoad
-	// @PostPersist
-	// @PostUpdate
-	// protected void calculateAge() {
-	// if (dateOfBirth == null) {
-	// age = null;
-	// return;
-	// }
-
-	// age = Period.between(dateOfBirth, LocalDate.now()).getYears();
-	// }
-
 	@PostLoad
 	@PostPersist
 	@PostUpdate
-	protected void retireDate() {
+	protected void calculateAgeAndRetireDate() {
 		if (hireDate == null) {
-			endAt = null;
+			retireAt = null;
+			return;
+		} else if (dateOfBirth == null) {
+			age = null;
 			return;
 		}
-
-		Period timeOfService = 
-				Period
-					.between(hireDate, LocalDate.now());
-		endAt = hireDate.plus(timeOfService);
+		
+		timeOfService = Period.between(hireDate, LocalDate.now()).getYears();
+		age = Period.between(dateOfBirth, LocalDate.now()).getYears();
+		retireAt = LocalDate.now().plusYears(60 - age);
 	}
 }
