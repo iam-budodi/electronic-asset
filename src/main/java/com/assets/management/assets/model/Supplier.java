@@ -23,22 +23,24 @@ public class Supplier extends PanacheEntity {
 
 	@NotNull
 	@Size(min = 2, max = 64)
-	@Pattern(regexp = "^[\\\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
+	@Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
 	@Column(name = "company_name", length = 64, nullable = false)
 	public String name;
 	
 	@NotNull
 	@Email
-	@Pattern(regexp = "^(?=.{1,64}@)[\\\\p{L}0-9_-]+(\\\\.[\\\\p{L}0-9_-]+)*@[^-][\\\\p{L}0-9-]+(\\\\.[\\\\p{L}0-9-]+)*(\\\\.[\\\\p{L}]{2,})$", message = "one or more character in not valid for proper email")
+	@Pattern(regexp = "^(?=.{1,64}@)[\\p{L}0-9_-]+(\\.[\\p{L}0-9_-]+)*@[^-][\\p{L}0-9-]+(\\.[\\p{L}0-9-]+)*(\\.[\\p{L}]{2,})$", message = "one or more character in not valid for proper email")
 	@Column(name = "company_email", nullable = false)
 	public String email;
 	
+	// ^((\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3}$ this works without + sign
 	@NotNull
-	@Column(name = "company_phone", length = 64, nullable = false)
+	@Pattern(regexp = "^(((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3}$", message = "must any of the following format (255) 744 608 510, (255) 744 608-510, (255) 744-608-510, (255)-744-608-510, +(255)-744-608-510, 0744 608 510, 0744-608-510, 0744608510")
+	@Column(name = "company_phone", length = 20, nullable = false)
 	public String phone;
 	
-	@NotNull
-	@Column(name = "company_website", length = 64, nullable = false)
+	//@NotNull
+	@Column(name = "company_website")
 	public String website;
 	
 	@NotNull
@@ -48,7 +50,7 @@ public class Supplier extends PanacheEntity {
 
 	@NotNull
 	@Column(length = 500, nullable = false)
-	@Pattern(regexp = "^[\\\\p{L} .'-?!;,]+$", message = "should include only letters, ' , ?, !, ; and - special characters")
+	@Pattern(regexp = "^[\\p{L} .'-?!;,]+$", message = "should include only letters, ' , ?, !, ; and - special characters")
 	public String description;
 
 	@CreationTimestamp
@@ -62,10 +64,10 @@ public class Supplier extends PanacheEntity {
 
 	@NotNull
 	@Column(name = "registered_by", length = 64, nullable = false)
-	@Pattern(regexp = "^[\\\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
+	@Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
 	public String registeredBy;
 
 	@Column(name = "updated_by")
-	@Pattern(regexp = "^[\\\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
+	@Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
 	public String updatedBy;
 }

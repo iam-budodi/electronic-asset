@@ -26,7 +26,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import com.assets.management.assets.model.Item;
 import com.assets.management.assets.model.Supplier;
 import com.assets.management.assets.service.SupplierService;
 
@@ -42,7 +41,7 @@ public class SupplierResource {
 			@QueryParam("page") @DefaultValue("0") Integer index,
 			@QueryParam("size") @DefaultValue("15") Integer size) {
 		List<Supplier> suppliers = 
-				supplierService.getAll(index, size);
+				supplierService.listSuppliers(index, size);
 		return Response.ok(suppliers).build();
 	}
 
@@ -52,7 +51,7 @@ public class SupplierResource {
 	public Response insertSupplier(
 			@Valid Supplier supplier, @Context UriInfo uriInfo) {
 		try {
-			supplier = supplierService.createVendor(supplier);
+			supplier = supplierService.createSupplier(supplier);
 		} catch (IllegalArgumentException ex) {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
@@ -98,7 +97,7 @@ public class SupplierResource {
 					.build();
 
 		try {
-			supplierService.updateById(sp, id);
+			supplierService.updateSupplier(sp, id);
 		} catch (NotFoundException | NoResultException enf) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
@@ -111,23 +110,23 @@ public class SupplierResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response delete(@PathParam("id") @NotNull Long suppId) {
 		try {
-			supplierService.deleteById(suppId);
+			supplierService.deleteSupplier(suppId);
 		} catch (EntityNotFoundException nfe) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 		return Response.noContent().build();
 	}
 
-	@GET
-	@Path("/{id}/items")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response listAllSupplierItems(
-			@PathParam("id") Long supplierId,
-			@QueryParam("page") @DefaultValue("0") Integer pIndex,
-			@QueryParam("size") @DefaultValue("15") Integer pSize) {
-		List<Item> items = supplierService
-				.getItems(supplierId, pIndex, pSize);
-
-		return Response.ok(items).build();
-	}
+//	@GET
+//	@Path("/{id}/items")
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public Response listAllSupplierItems(
+//			@PathParam("id") Long supplierId,
+//			@QueryParam("page") @DefaultValue("0") Integer pIndex,
+//			@QueryParam("size") @DefaultValue("15") Integer pSize) {
+//		List<Item> items = supplierService
+//				.getItems(supplierId, pIndex, pSize);
+//
+//		return Response.ok(items).build();
+//	}
 }
