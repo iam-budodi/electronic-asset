@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -18,7 +19,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 @Entity
-@Table(name = "suppliers")
+@Table(name = "suppliers", uniqueConstraints = {
+		@UniqueConstraint(name = "uniqueEmailandPhone", 
+				columnNames = { "company_email", "company_phone" }) 
+		})
 public class Supplier extends PanacheEntity {
 
 	@NotNull
@@ -26,23 +30,27 @@ public class Supplier extends PanacheEntity {
 	@Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
 	@Column(name = "company_name", length = 64, nullable = false)
 	public String name;
-	
+
 	@NotNull
 	@Email
-	@Pattern(regexp = "^(?=.{1,64}@)[\\p{L}0-9_-]+(\\.[\\p{L}0-9_-]+)*@[^-][\\p{L}0-9-]+(\\.[\\p{L}0-9-]+)*(\\.[\\p{L}]{2,})$", message = "one or more character in not valid for proper email")
+	@Pattern(
+			regexp = "^(?=.{1,64}@)[\\p{L}0-9_-]+(\\.[\\p{L}0-9_-]+)*@[^-][\\p{L}0-9-]+(\\.[\\p{L}0-9-]+)*(\\.[\\p{L}]{2,})$", 
+			message = "one or more character in not valid for proper email")
 	@Column(name = "company_email", nullable = false)
 	public String email;
-	
-	// ^((\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3}$ this works without + sign
+
+	// ^(((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3}$
 	@NotNull
-	@Pattern(regexp = "^(((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3}$", message = "must any of the following format (255) 744 608 510, (255) 744 608-510, (255) 744-608-510, (255)-744-608-510, +(255)-744-608-510, 0744 608 510, 0744-608-510, 0744608510")
+	@Pattern(regexp = "^[((((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3})]{10,18}$", 
+	message = "must any of the following format (255) 744 608 510, (255) 744 608-510, (255) 744-608-510, (255)-744-608-510, "
+			+ "+(255)-744-608-510, 0744 608 510, 0744-608-510, 0744608510 and length btn 10 to 18 characters including space")
 	@Column(name = "company_phone", length = 20, nullable = false)
 	public String phone;
-	
-	//@NotNull
+
+	// @NotNull
 	@Column(name = "company_website")
 	public String website;
-	
+
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "company_type", nullable = false)
@@ -50,13 +58,13 @@ public class Supplier extends PanacheEntity {
 
 	@NotNull
 	@Column(length = 500, nullable = false)
-	@Pattern(regexp = "^[\\p{L} .'-?!;,]+$", message = "should include only letters, ' , ?, !, ; and - special characters")
+	@Pattern(regexp = "^[\\p{L} .'-?!;,]+$", 
+	message = "should include only letters, ' , ?, !, ; and - special characters")
 	public String description;
 
 	@CreationTimestamp
 	@Column(name = "registered_at")
 	public LocalDate registeredAt;
-	
 
 	@UpdateTimestamp
 	@Column(name = "updated_at")

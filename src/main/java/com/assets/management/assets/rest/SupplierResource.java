@@ -31,7 +31,7 @@ import com.assets.management.assets.service.SupplierService;
 
 @Path("/suppliers")
 public class SupplierResource {
-	  
+
 	@Inject
 	SupplierService supplierService;
 
@@ -40,27 +40,30 @@ public class SupplierResource {
 	public Response listAll(
 			@QueryParam("page") @DefaultValue("0") Integer index,
 			@QueryParam("size") @DefaultValue("15") Integer size) {
-		List<Supplier> suppliers = 
-				supplierService.listSuppliers(index, size);
+		List<Supplier> suppliers = supplierService.listSuppliers(index, size);
 		return Response.ok(suppliers).build();
+	}
+
+	@GET
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response findSupplier(@PathParam("id") @NotNull Long id) {
+		return supplierService
+				.findSupplier(id)
+				.map(supplier -> Response.ok(supplier).build())
+				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
 
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response insertSupplier(
-			@Valid Supplier supplier, @Context UriInfo uriInfo) {
-		try {
-			supplier = supplierService.createSupplier(supplier);
-		} catch (IllegalArgumentException ex) {
-			return Response.status(Status.BAD_REQUEST).build();
-		}
-
-		URI uri = uriInfo
+	public Response createSupplier(@Valid Supplier supplier, @Context UriInfo uriInfo) {
+		supplier = supplierService.createSupplier(supplier);
+		URI supplierUri = uriInfo
 				.getAbsolutePathBuilder()
 				.path(Long.toString(supplier.id))
 				.build();
-		return Response.created(uri).build();
+		return Response.created(supplierUri).build();
 	}
 
 	@GET
@@ -71,33 +74,15 @@ public class SupplierResource {
 		return Response.ok(Supplier.count()).build();
 	}
 
-	@GET
-	@Path("/{id}")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Transactional(Transactional.TxType.SUPPORTS)
-	public Response findSupplier(@PathParam("id") @NotNull Long id) {
-		return Supplier.findByIdOptional(id).map(
-				supplier -> Response.ok(supplier).build()
-				)
-				.orElseGet(() -> Response
-						.status(Status.NOT_FOUND)
-						.build()
-						);
-	}
-
 	@PUT
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateSupplier(
-			@PathParam("id") @NotNull Long id, @Valid Supplier sp) {
-		if (!id.equals(sp.id))
-			return Response
-					.status(Response.Status.CONFLICT)
-					.entity(sp)
-					.build();
+	public Response updateSupplier(@PathParam("id") @NotNull Long id, @Valid Supplier supplier) {
+		if (!id.equals(supplier.id))
+			return Response.status(Response.Status.CONFLICT).entity(supplier).build();
 
 		try {
-			supplierService.updateSupplier(sp, id);
+			supplierService.updateSupplier(supplier, id);
 		} catch (NotFoundException | NoResultException enf) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}

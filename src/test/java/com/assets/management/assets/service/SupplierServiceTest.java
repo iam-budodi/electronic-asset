@@ -1,5 +1,7 @@
 package com.assets.management.assets.service;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -49,9 +51,11 @@ class SupplierServiceTest {
 
 	@Test
 	@Order(1)
-	void shouldFetchEmptyList() {
+	void shouldFetchOrReturnEmptySupplierList() {
+		Long size = Supplier.count();
 		List<Supplier> suppliers = supplierService.listSuppliers(DEFAULT_PAGE_INDEX, DEFAULT_PAGE_SIZE);
-		assertTrue(suppliers.isEmpty());
+//		assertEquals(size, Long.valueOf(suppliers.size()));
+		assertThat(String.valueOf(size), is(String.valueOf(suppliers.size())));
 	}
 	
 	@Test
@@ -90,8 +94,9 @@ class SupplierServiceTest {
 	@Test
 	@Order(4)
 	void shouldFetchSupplierList() {
+		final int size = Supplier.listAll().size();
 		List<Supplier> suppliers = supplierService.listSuppliers(DEFAULT_PAGE_INDEX, DEFAULT_PAGE_SIZE);
-		assertEquals(1, suppliers.size());
+		assertEquals(size, suppliers.size());
 	}
 
 	@Test
@@ -152,7 +157,6 @@ class SupplierServiceTest {
 
 	}
 	
-
 	@Test
 	@Order(9)
 	void shouldThrowExceptionOnSupplyingNullValuesForRequiredFields() {

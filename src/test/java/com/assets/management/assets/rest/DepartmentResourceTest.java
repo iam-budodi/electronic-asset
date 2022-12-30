@@ -10,7 +10,6 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,9 +41,9 @@ class DepartmentResourceTest {
 	private static final String UPDATED_DESCRIPTION = "Technology functions (updated)";
 	private static String departmentId;
 	
-	@TestHTTPResource
+	@TestHTTPResource("count")
 	@TestHTTPEndpoint(DepartmentResource.class)
-	URL url;
+	URL countEndpoint;
 	
 	@Test
 	@Order(1)
@@ -188,15 +187,16 @@ class DepartmentResourceTest {
 		
 	@Test
 	@Order(10)
-	void shouldCountDepartment() {  
+	void shouldCountDepartment() {   
+		final int count = Department.listAll().size();
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
 			.when()
-			.get()
+			.get(countEndpoint)
 			.then()
 				.statusCode(OK.getStatusCode())
 				.contentType(APPLICATION_JSON)
-				.body(containsString(departmentId));
+				.body(is(String.valueOf(count)));
 	}
 
 	@Test
