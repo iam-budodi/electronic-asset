@@ -87,6 +87,7 @@ class SupplierTest {
 		supplier.registeredBy = UPDATED_REGISTERED_BY;
 		supplier.supplierType = SupplierType.WHOLESELLER;
 		supplier.description = UPDATED_DESCRIPTION;
+		
 		Panache.getEntityManager().merge(supplier); // this is not necessary can be commented out
 		assertFalse(DEFAULT_NAME.equals(supplier.name));
 		assertTrue(UPDATED_NAME.equals(supplier.name));

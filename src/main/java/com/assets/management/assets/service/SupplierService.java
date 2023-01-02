@@ -18,11 +18,14 @@ import io.quarkus.hibernate.orm.panache.Panache;
 public class SupplierService {
 
 	public Supplier createSupplier(@Valid Supplier supplier) {
+		supplier.address.supplier = supplier;
+		supplier.address.id = supplier.id;
 		Supplier.persist(supplier);
 		return supplier;
 	}
 
 	public void updateSupplier(@Valid Supplier supplier, @NotNull Long supplierId) {
+		supplier.address = null;
 		Supplier
 			.findByIdOptional(supplierId)
 			.map(found -> Panache.getEntityManager().merge(supplier))

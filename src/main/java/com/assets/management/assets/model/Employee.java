@@ -2,26 +2,48 @@ package com.assets.management.assets.model;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
+import io.quarkus.panache.common.Parameters;
+
 @Entity
-@Table(name = "employees")
+@Table(
+		name = "employees", 
+		uniqueConstraints = {
+				@UniqueConstraint(
+						name = "uniqueEmailPhoneAndWorkId", 
+						columnNames = { "email_address", "phone_number",  }) 
+		})
+@NamedQueries({
+	@NamedQuery(
+			name = "Employee.getEmailOrPhone", 
+			query = "FROM Employee WHERE email = :email OR mobile = :mobile")
+})
 public class Employee extends Person {
 
-	@NotNull
-	@Column(name = "work_id")
+//	@NotNull
+	@Column(name = "work_id", unique = true)
 	public String workId;
 
 	@NotNull
@@ -29,25 +51,37 @@ public class Employee extends Person {
 	public LocalDate dateOfBirth;
 
 	@NotNull
-	@Column(name = "hire_date")
+	@Column(name = "hire_date", nullable = false)
 	public LocalDate hireDate;
 
-	public String status;
+	@NotNull
+	@ElementCollection
+	@Enumerated(EnumType.STRING)
+	@Column(name = "employment_status", nullable = false)
+	public Set<EmploymentStatus> status;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+			name = "department_fk", 
+			foreignKey = @ForeignKey(
+					name = "employee_department_fk_constraint", 
+					foreignKeyDefinition = ""))
+	public Department department;
+	
+	@OneToOne(
+			mappedBy = "employee", 
+			cascade = CascadeType.ALL, 
+			fetch = FetchType.LAZY)
+	public Address address;
 
 	@Transient
 	public Integer age;
 	
 	@Transient
 	public Integer timeOfService;
-	
+
 	@Transient
 	public LocalDate retireAt;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	public Department department;
-
-	@OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	public Address address;
 
 	@PostLoad
 	@PostPersist
@@ -60,9 +94,24 @@ public class Employee extends Person {
 			age = null;
 			return;
 		}
-		
+
 		timeOfService = Period.between(hireDate, LocalDate.now()).getYears();
 		age = Period.between(dateOfBirth, LocalDate.now()).getYears();
-		retireAt = LocalDate.now().plusYears(60 - age);
+		retireAt = LocalDate.now().plusYears(60 - (LocalDate.now().getYear() - dateOfBirth.getYear()));
+	}
+
+	public static boolean checkByEmailAndPhone(String email, String mobile) {
+		return find(
+				"#Employee.getEmailOrPhone", 
+				Parameters.with("email", email).and("mobile", mobile).map())
+				.firstResultOptional()
+				.isPresent();
+	}
+	
+	@Override
+	public String toString() {
+		return "Employee [workId=" + workId + ", id=" + id +  ", dateOfBirth=" + dateOfBirth + ", hireDate=" + hireDate + ", status="
+				+ status + ", department=" + department + ", address=" + address + ", age=" + age + ", timeOfService="
+				+ timeOfService + ", retireAt=" + retireAt + "]";
 	}
 }

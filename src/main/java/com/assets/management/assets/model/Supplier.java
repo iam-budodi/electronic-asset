@@ -1,11 +1,14 @@
 package com.assets.management.assets.model;
 
-import java.time.LocalDate;
-
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
@@ -13,17 +16,22 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.panache.common.Parameters;
 
 @Entity
-@Table(name = "suppliers", uniqueConstraints = {
-		@UniqueConstraint(name = "uniqueEmailandPhone", 
-				columnNames = { "company_email", "company_phone" }) 
+@Table(
+		name = "suppliers", 
+		uniqueConstraints = {
+				@UniqueConstraint(
+						name = "uniqueEmailandPhone", 
+						columnNames = { "company_email", "company_phone" }) 
 		})
-public class Supplier extends PanacheEntity {
+@NamedQueries({
+	@NamedQuery(
+			name = "Supplier.getEmailOrPhone", 
+			query = "FROM Supplier WHERE email = :email OR phone = :phone")
+})
+public class Supplier extends BaseEntity {
 
 	@NotNull
 	@Size(min = 2, max = 64)
@@ -41,10 +49,11 @@ public class Supplier extends PanacheEntity {
 
 	// ^(((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3}$
 	@NotNull
-	@Pattern(regexp = "^[((((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3})]{10,18}$", 
-	message = "must any of the following format (255) 744 608 510, (255) 744 608-510, (255) 744-608-510, (255)-744-608-510, "
+	@Pattern(
+			regexp = "^[((((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3})]{10,18}$", 
+			message = "must any of the following format (255) 744 608 510, (255) 744 608-510, (255) 744-608-510, (255)-744-608-510, "
 			+ "+(255)-744-608-510, 0744 608 510, 0744-608-510, 0744608510 and length btn 10 to 18 characters including space")
-	@Column(name = "company_phone", length = 20, nullable = false)
+	@Column(name = "company_phone", length = 18, nullable = false)
 	public String phone;
 
 	// @NotNull
@@ -58,24 +67,19 @@ public class Supplier extends PanacheEntity {
 
 	@NotNull
 	@Column(length = 500, nullable = false)
-	@Pattern(regexp = "^[\\p{L} .'-?!;,]+$", 
-	message = "should include only letters, ' , ?, !, ; and - special characters")
+	@Pattern(
+			regexp = "^[\\p{L} .'-?!;,]+$", 
+			message = "should include only letters, ' , ?, !, ; and - special characters")
 	public String description;
-
-	@CreationTimestamp
-	@Column(name = "registered_at")
-	public LocalDate registeredAt;
-
-	@UpdateTimestamp
-	@Column(name = "updated_at")
-	public LocalDate updatedAt;
-
-	@NotNull
-	@Column(name = "registered_by", length = 64, nullable = false)
-	@Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
-	public String registeredBy;
-
-	@Column(name = "updated_by")
-	@Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
-	public String updatedBy;
+	
+	@OneToOne(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	public Address address;
+	
+	public static boolean checkByEmailAndPhone(String email, String phone) {
+		return find(
+				"#Supplier.getEmailOrPhone", 
+				Parameters.with("email", email).and("phone", phone).map())
+				.firstResultOptional()
+				.isPresent();
+	}
 }

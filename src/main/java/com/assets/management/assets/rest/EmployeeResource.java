@@ -27,6 +27,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.jboss.logging.Logger;
 
+import com.assets.management.assets.model.Department;
 import com.assets.management.assets.model.Employee;
 import com.assets.management.assets.service.EmployeeService;
 
@@ -44,8 +45,7 @@ public class EmployeeResource {
 	public Response listEmployees(
 			@QueryParam("page") @DefaultValue("0") Integer pageIndex,
 			@QueryParam("size") @DefaultValue("15") Integer pageSize) {
-		List<Employee> employees = employeeService
-				.listEmployees(pageIndex, pageSize);
+		List<Employee> employees = employeeService.listEmployees(pageIndex, pageSize);
 		return Response.ok(employees).build();
 	}
 
@@ -54,8 +54,9 @@ public class EmployeeResource {
 	@Transactional(Transactional.TxType.SUPPORTS)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response findEmployee(@PathParam("id") @NotNull Long empId) {
-		return Employee.findByIdOptional(empId).map(
-				employee -> Response.ok(employee).build())
+		return Employee
+				.findByIdOptional(empId)
+				.map(employee -> Response.ok(employee).build())
 				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
 
@@ -70,25 +71,25 @@ public class EmployeeResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createEmployee(
-			@Valid Employee employee, @Context UriInfo uriInfo) {
+	public Response createEmployee(@Valid Employee employee, @Context UriInfo uriInfo) {
+		if (employee.address == null || employee.department == null)
+			return Response.status(Status.BAD_REQUEST).build();
+		else if (Employee.checkByEmailAndPhone(employee.email, employee.mobile))
+			return Response.status(Status.CONFLICT).entity("Email or Phone number is already taken").build();
+		else if (!Department.findByIdOptional(employee.department.id).isPresent())
+			return Response.status(Status.NOT_FOUND).entity("Department dont exists").build();
+ 
 		employee = employeeService.addEmployee(employee);
-		URI employeeUri = uriInfo
-				.getAbsolutePathBuilder()
-				.path(Long.toString(employee.id))
-				.build();
-
+		URI employeeUri = uriInfo.getAbsolutePathBuilder().path(Long.toString(employee.id)).build();
 		return Response.created(employeeUri).build();
 	}
 
 	@PUT
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateEmployee(
-			@PathParam("id") @NotNull Long empId, @Valid Employee employee) {
-		if (!empId.equals(employee.id))
-			return Response.status(Response.Status.CONFLICT).entity(employee)
-					.build();
+	public Response updateEmployee(@PathParam("id") @NotNull Long empId, @Valid Employee employee) {
+		if (!empId.equals(employee.id)) return Response.status(Response.Status.CONFLICT).entity(employee).build();
+		else 	if (employee.department == null) return Response.status(Status.BAD_REQUEST).build();
 
 		try {
 			employeeService.updateById(employee, empId);
@@ -108,12 +109,5 @@ public class EmployeeResource {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 		return Response.noContent().build();
-	}
-
-	// TODO: make it delete multiple selected employees object
-	@DELETE
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response deleteAllEndUsers() {
-		return Response.ok(employeeService.deleteAll()).build();
 	}
 }

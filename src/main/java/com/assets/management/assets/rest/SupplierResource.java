@@ -58,12 +58,13 @@ public class SupplierResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createSupplier(@Valid Supplier supplier, @Context UriInfo uriInfo) {
-		supplier = supplierService.createSupplier(supplier);
-		URI supplierUri = uriInfo
-				.getAbsolutePathBuilder()
-				.path(Long.toString(supplier.id))
-				.build();
-		return Response.created(supplierUri).build();
+		if (supplier.address == null) return Response.status(Status.BAD_REQUEST).build();
+		if (Supplier.checkByEmailAndPhone(supplier.email, supplier.phone))
+			return Response.status(Status.CONFLICT).entity("Email or Phone number is already taken").build();
+				
+		supplierService.createSupplier(supplier);
+		URI supplierURI =  uriInfo.getAbsolutePathBuilder().path(Long.toString(supplier.id)).build();
+		return 	Response.created(supplierURI).build();
 	}
 
 	@GET

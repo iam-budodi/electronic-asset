@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import com.assets.management.assets.model.Address;
 import com.assets.management.assets.model.Supplier;
 import com.assets.management.assets.model.SupplierType;
 
@@ -41,7 +42,13 @@ class SupplierServiceTest {
 	private static final String UPDATED_REGISTERED_BY = "Japhet - updated";
 	private static final String UPDATED_DESCRIPTION = "Technology associates (updated)";
 	
-	
+	private static final String DEFAULT_STREET = "Mikocheni";
+	private static final String DEFAULT_WARD = "Msasani";
+	private static final String DEFAULT_DISTRICT = "Kinondoni";
+	private static final String DEFAULT_CITY = "Dar es Salaam";
+	private static final String DEFAULT_POSTAL_CODE = "14110";
+	private static final String DEFAULT_COUNTRY = "Tanzania";
+		
 	private static final Integer DEFAULT_PAGE_INDEX = 0;
 	private static final Integer DEFAULT_PAGE_SIZE = 15;
 	private static Long supplierId;
@@ -69,6 +76,14 @@ class SupplierServiceTest {
 	@Test
 	@Order(3)
 	void shouldCreateSupplier() {
+		Address address = new Address();
+		address.street = DEFAULT_STREET;
+		address.ward = DEFAULT_WARD;
+		address.district = DEFAULT_DISTRICT;
+		address.city = DEFAULT_CITY;
+		address.postalCode = DEFAULT_POSTAL_CODE;
+		address.country = DEFAULT_COUNTRY;
+		
 		Supplier supplier = new Supplier();
 		supplier.name = DEFAULT_NAME;
 		supplier.email = DEFAULT_EMAIL;
@@ -76,6 +91,7 @@ class SupplierServiceTest {
 		supplier.registeredBy = DEFAULT_REGISTERED_BY;
 		supplier.supplierType = SupplierType.RETAILER;
 		supplier.description = DEFAULT_DESCRIPTION;
+		supplier.address = address;
 
 		assertFalse(supplier.isPersistent());
 		supplier = supplierService.createSupplier(supplier);
@@ -115,6 +131,14 @@ class SupplierServiceTest {
 	@Test
 	@Order(6)
 	void shouldUpdateSupplier() {
+		Address address = new Address();
+		address.street = DEFAULT_STREET;
+		address.ward = DEFAULT_WARD;
+		address.district = DEFAULT_DISTRICT;
+		address.city = DEFAULT_CITY;
+		address.postalCode = DEFAULT_POSTAL_CODE;
+		address.country = DEFAULT_COUNTRY;
+		
 		Supplier supplier = new Supplier();
 		supplier.id = supplierId;
 		supplier.name = UPDATED_NAME;
@@ -123,6 +147,7 @@ class SupplierServiceTest {
 		supplier.registeredBy = UPDATED_REGISTERED_BY;
 		supplier.supplierType = SupplierType.WHOLESELLER;
 		supplier.description = UPDATED_DESCRIPTION;
+		supplier.address = address;
 		
 		supplierService.updateSupplier(supplier, supplierId);
 
