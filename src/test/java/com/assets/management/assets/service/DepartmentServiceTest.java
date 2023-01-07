@@ -28,9 +28,9 @@ import io.quarkus.test.junit.QuarkusTest;
 class DepartmentServiceTest {
 
 	private static final String DEFAULT_NAME = "Technology";
-	private static final String UPDATED_NAME = "Technology (updated)";
+	private static final String UPDATED_NAME = "Technology - updated";
 	private static final String DEFAULT_DESCRIPTION = "Technology functions";
-	private static final String UPDATED_DESCRIPTION = "Technology functions (updated)";
+	private static final String UPDATED_DESCRIPTION = "Technology functions - updated";
 	private static long deptId;
 
 	@Inject

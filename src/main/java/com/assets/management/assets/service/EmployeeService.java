@@ -30,11 +30,11 @@ public class EmployeeService {
 	Logger LOG;
 
 	public Employee addEmployee(@Valid Employee employee) {
+		// delete the 4 lines below 
 		Long employeeId;
 		Employee emp = Employee.find("FROM Employee WHERE id = (SELECT MAX(id) FROM Employee)").firstResult();
 		if (emp == null) employeeId = 1L;
 		else employeeId = emp.id;
-		LOG.info("The Latest Record: " + emp);
 		employee.workId = workIdGenerator.generateNumber(employeeId);
 		employee.address.employee = employee;
 		employee.address.id = employee.id;
@@ -49,14 +49,14 @@ public class EmployeeService {
 				.list();
 	}
 
-	public void updateById(@Valid Employee employee, @NotNull Long empId) {
+	public void updateEmployee(@Valid Employee employee, @NotNull Long empId) {
 		employee.address = null;
 		Employee.findByIdOptional(empId)
 			.map(found -> Panache.getEntityManager().merge(employee))
 			.orElseThrow(() -> new NotFoundException("Employee dont exist"));
 	}
 
-	public void deleteById(@NotNull Long empId) {
+	public void deleteEmployee(@NotNull Long empId) {
 		Panache.getEntityManager()
 			.getReference(Employee.class, empId)
 			.delete();

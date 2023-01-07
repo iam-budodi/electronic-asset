@@ -1,5 +1,7 @@
 package com.assets.management.assets.rest;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+
 import java.net.URI;
 
 import javax.inject.Inject;
@@ -27,7 +29,11 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.Department;
+import com.assets.management.assets.model.Employee;
 import com.assets.management.assets.service.DepartmentService;
+
+import io.quarkus.panache.common.Parameters;
+import io.quarkus.panache.common.Sort;
 
 @Path("/departments")
 public class DepartmentResource {
@@ -71,13 +77,15 @@ public class DepartmentResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createDepartment(
-			@Valid Department department, @Context UriInfo uriInfo) {
-		Department dept = departmentService.insertDepartment(department);
-		URI deptUri = uriInfo
-				.getAbsolutePathBuilder()
-				.path(Long.toString(dept.id))
-				.build();
+	public Response createDepartment(@Valid Department department, @Context UriInfo uriInfo) {
+		boolean exists = Department.find(
+				"#Department.getName", Parameters.with("name", department.name)
+				.map()).firstResultOptional()
+				.isPresent();
+
+		if (exists) return Response.status(Status.CONFLICT).entity("Department already exists").build();
+		department = departmentService.insertDepartment(department);
+		URI deptUri = uriInfo.getAbsolutePathBuilder().path(Long.toString(department.id)).build();
 		return Response.created(deptUri).build();
 	}
 
@@ -101,12 +109,43 @@ public class DepartmentResource {
 
 	@DELETE
 	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteDepartment(@PathParam("id") @NotNull Long id) {
 		try {
 			departmentService.deleteDepartment(id);
 		} catch (EntityNotFoundException nfe) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
+		return Response.noContent().build();
+	}
+	
+
+	@GET
+	@Path("/{id}/employees")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public Response listAllEmployeeFromDepartment(
+			@PathParam("id") @NotNull Long departmentId, @QueryParam("workid") String workId) {
+		if (workId == null)
+			return Response.ok(Employee.list("department.id = ?1", Sort.by("firstName").and("lastName"), departmentId)).build();
+
+		// if it fails try position ?1 parameter instead of named param :workId
+		return Employee.find("workId LIKE :workId", Parameters.with("workId", "%" + workId + "%")).firstResultOptional()
+				.map(employee -> Response.ok(employee).build())
+				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
+	}
+
+	@DELETE
+	@Path("/{id}/employee")
+	@Transactional(Transactional.TxType.REQUIRED)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteEmployeeFromDepartment(@PathParam("id") @NotNull Long departmentId,
+			@QueryParam("empid") Long employeeId) {
+		if (employeeId == null)
+			return Response.status(BAD_REQUEST).entity("Specify identity of the employee to be deleted").build();
+
+		boolean deleted = Employee.deleteById(employeeId);
+		if (!deleted) return Response.status(Status.NOT_FOUND).build();
 		return Response.noContent().build();
 	}
 }

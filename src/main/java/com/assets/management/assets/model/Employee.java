@@ -32,8 +32,11 @@ import io.quarkus.panache.common.Parameters;
 		name = "employees", 
 		uniqueConstraints = {
 				@UniqueConstraint(
-						name = "uniqueEmailPhoneAndWorkId", 
-						columnNames = { "email_address", "phone_number",  }) 
+						name = "unique_email_phone", 
+						columnNames = { "email_address", "phone_number" }),
+				@UniqueConstraint(
+						name = "unique_workid", 
+						columnNames = { "work_id" }) 
 		})
 @NamedQueries({
 	@NamedQuery(
@@ -41,9 +44,9 @@ import io.quarkus.panache.common.Parameters;
 			query = "FROM Employee WHERE email = :email OR mobile = :mobile")
 })
 public class Employee extends Person {
-
+ 
 //	@NotNull
-	@Column(name = "work_id", unique = true)
+	@Column(name = "work_id")
 	public String workId;
 
 	@NotNull
@@ -70,6 +73,7 @@ public class Employee extends Person {
 	
 	@OneToOne(
 			mappedBy = "employee", 
+			orphanRemoval = true,
 			cascade = CascadeType.ALL, 
 			fetch = FetchType.LAZY)
 	public Address address;
@@ -106,12 +110,5 @@ public class Employee extends Person {
 				Parameters.with("email", email).and("mobile", mobile).map())
 				.firstResultOptional()
 				.isPresent();
-	}
-	
-	@Override
-	public String toString() {
-		return "Employee [workId=" + workId + ", id=" + id +  ", dateOfBirth=" + dateOfBirth + ", hireDate=" + hireDate + ", status="
-				+ status + ", department=" + department + ", address=" + address + ", age=" + age + ", timeOfService="
-				+ timeOfService + ", retireAt=" + retireAt + "]";
 	}
 }

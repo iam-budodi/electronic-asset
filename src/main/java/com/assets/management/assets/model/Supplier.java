@@ -72,7 +72,11 @@ public class Supplier extends BaseEntity {
 			message = "should include only letters, ' , ?, !, ; and - special characters")
 	public String description;
 	
-	@OneToOne(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToOne(
+			mappedBy = "supplier", 
+			orphanRemoval = true,
+			cascade = CascadeType.ALL, 
+			fetch = FetchType.LAZY)
 	public Address address;
 	
 	public static boolean checkByEmailAndPhone(String email, String phone) {

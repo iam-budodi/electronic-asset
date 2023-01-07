@@ -92,7 +92,7 @@ public class EmployeeResource {
 		else 	if (employee.department == null) return Response.status(Status.BAD_REQUEST).build();
 
 		try {
-			employeeService.updateById(employee, empId);
+			employeeService.updateEmployee(employee, empId);
 		} catch (EntityNotFoundException | NoResultException enf) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
@@ -104,7 +104,7 @@ public class EmployeeResource {
 	@Path("/{id}")
 	public Response deleteEmployee(@PathParam("id") @NotNull Long empId) {
 		try {
-			employeeService.deleteById(empId);
+			employeeService.deleteEmployee(empId);
 		} catch (EntityNotFoundException nfe) {
 			return Response.status(Status.NOT_FOUND).build();
 		}

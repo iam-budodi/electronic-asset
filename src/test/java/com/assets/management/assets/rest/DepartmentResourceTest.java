@@ -36,9 +36,9 @@ import io.quarkus.test.junit.QuarkusTest;
 @TestHTTPEndpoint(DepartmentResource.class)
 class DepartmentResourceTest {
 	private static final String DEFAULT_NAME = "Technology";
-	private static final String UPDATED_NAME = "Technology (updated)";
+	private static final String UPDATED_NAME = "Technology - updated";
 	private static final String DEFAULT_DESCRIPTION = "Technology functions";
-	private static final String UPDATED_DESCRIPTION = "Technology functions (updated)";
+	private static final String UPDATED_DESCRIPTION = "Technology functions - updated";
 	private static String departmentId;
 	
 	@TestHTTPResource("count")
@@ -47,14 +47,15 @@ class DepartmentResourceTest {
 	
 	@Test
 	@Order(1)
-	void shouldNotFindDepartments() {
+	void shouldOrShouldNotFindDepartments() {
+		final int size = Department.listAll().size();		
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
 			.when()
 			.get()
 			.then()
 			 	.statusCode(Status.OK.getStatusCode())
-			 	.body("isEmpty()", is(true))
+			 	.body("size()", is(size))
 				.contentType(APPLICATION_JSON); 
 	}
 	
@@ -105,13 +106,14 @@ class DepartmentResourceTest {
 	@Test
 	@Order(4)
 	void shouldFindDepartments() {
+		final int size = Department.listAll().size();
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
 			.when()
 			.get()
 			.then()
 			 	.statusCode(OK.getStatusCode())
-			 	.body("", hasSize(1))
+			 	.body("", hasSize(size))
 				.contentType(APPLICATION_JSON); 
 	}
 	
@@ -253,13 +255,25 @@ class DepartmentResourceTest {
 
 	@Test
 	@Order(14)
-	void shouldDeleteDepartmentById() {  
+	void shouldFetchEmployeesFromDepartment() {  
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
 			.pathParam("id", departmentId)
 			.when()
-			.delete("/{id}")
+			.get("/{id}/employees")
 			.then()
-				.statusCode(NO_CONTENT.getStatusCode());
+				.statusCode(OK.getStatusCode());
+	}
+	
+	@Test
+	@Order(15)
+	void shouldDeleteDepartmentById() {  
+		given()
+		.header(ACCEPT, APPLICATION_JSON)
+		.pathParam("id", departmentId)
+		.when()
+		.delete("/{id}")
+		.then()
+		.statusCode(NO_CONTENT.getStatusCode());
 	}
 }

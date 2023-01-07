@@ -24,7 +24,7 @@ import io.quarkus.test.junit.QuarkusTest;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DepartmentTest {
 	private static final String DEFAULT_NAME = "Technology";
-	private static final String UPDATED_NAME = "Technology (updated)";
+	private static final String UPDATED_NAME = "Technology - updated";
 	private static final String DEFAULT_DESCRIPTION = "Technology functions";
 	private static Long deptId;
 
