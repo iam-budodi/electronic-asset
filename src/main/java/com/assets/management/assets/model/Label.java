@@ -1,5 +1,6 @@
 package com.assets.management.assets.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -26,6 +27,13 @@ public class Label extends PanacheEntity {
 	@Size(max = 4000)
 	@Column(name = "item_qr_string", length = 4000, nullable = false)
 	public byte[] itemQrString;
+	
+	@OneToOne(
+			mappedBy = "label", 
+			orphanRemoval = true,
+			cascade = CascadeType.ALL, 
+			fetch = FetchType.LAZY)
+	public Computer computer;
 	 
 	@OneToOne(fetch = FetchType.LAZY)
 	@MapsId

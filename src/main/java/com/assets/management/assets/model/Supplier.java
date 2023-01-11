@@ -25,12 +25,14 @@ import io.quarkus.panache.common.Parameters;
 				@UniqueConstraint(
 						name = "uniqueEmailandPhone", 
 						columnNames = { "company_email", "company_phone" }) 
-		})
+		}
+	)
 @NamedQueries({
 	@NamedQuery(
 			name = "Supplier.getEmailOrPhone", 
 			query = "FROM Supplier WHERE email = :email OR phone = :phone")
-})
+	}
+)
 public class Supplier extends BaseEntity {
 
 	@NotNull
@@ -78,6 +80,13 @@ public class Supplier extends BaseEntity {
 			cascade = CascadeType.ALL, 
 			fetch = FetchType.LAZY)
 	public Address address;
+//	
+//	@OneToOne(
+//			mappedBy = "supplier", 
+//			orphanRemoval = true,
+//			cascade = CascadeType.ALL, 
+//			fetch = FetchType.LAZY)
+//	public Purchase purchase;
 	
 	public static boolean checkByEmailAndPhone(String email, String phone) {
 		return find(

@@ -67,7 +67,8 @@ public class Address extends PanacheEntity {
 //	@MapsId
 	@JsonIgnore
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "supplier_id", 
+	@JoinColumn(
+			name = "supplier_fk", 
 			foreignKey = @ForeignKey(
 					name = "supplier_address_fk_constraint", 
 					foreignKeyDefinition = ""))
