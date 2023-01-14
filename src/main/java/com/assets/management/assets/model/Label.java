@@ -28,6 +28,7 @@ public class Label extends PanacheEntity {
 	@Column(name = "item_qr_string", length = 4000, nullable = false)
 	public byte[] itemQrString;
 	
+	@JsonIgnore
 	@OneToOne(
 			mappedBy = "label", 
 			orphanRemoval = true,

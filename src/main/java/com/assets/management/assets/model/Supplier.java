@@ -1,5 +1,7 @@
 package com.assets.management.assets.model;
 
+import java.util.Optional;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,6 +17,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.quarkus.panache.common.Parameters;
 
@@ -80,19 +84,19 @@ public class Supplier extends BaseEntity {
 			cascade = CascadeType.ALL, 
 			fetch = FetchType.LAZY)
 	public Address address;
-//	
-//	@OneToOne(
-//			mappedBy = "supplier", 
-//			orphanRemoval = true,
-//			cascade = CascadeType.ALL, 
-//			fetch = FetchType.LAZY)
-//	public Purchase purchase;
+
+	@JsonIgnore	
+	@OneToOne(
+			mappedBy = "supplier", 
+			orphanRemoval = true,
+			cascade = CascadeType.ALL, 
+			fetch = FetchType.LAZY)
+	public Purchase purchase;
 	
-	public static boolean checkByEmailAndPhone(String email, String phone) {
+	public static Optional<Supplier> findByEmailAndPhone(String email, String phone) {
 		return find(
 				"#Supplier.getEmailOrPhone", 
 				Parameters.with("email", email).and("phone", phone).map())
-				.firstResultOptional()
-				.isPresent();
+				.firstResultOptional();
 	}
 }

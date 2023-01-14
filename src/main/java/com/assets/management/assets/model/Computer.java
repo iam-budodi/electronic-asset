@@ -20,8 +20,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.panache.common.Parameters;
 
@@ -99,7 +97,7 @@ public class Computer extends PanacheEntity {
 	public Category category;
  
 //	@MapsId
-	@JsonIgnore
+//	@JsonIgnore
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
 			name = "label_fk", 
@@ -110,9 +108,9 @@ public class Computer extends PanacheEntity {
 
 	@NotNull
 	@JoinColumn(
-			name = "purchase_date", 
+			name = "invoice_number", 
 			nullable = false,
-			referencedColumnName = "purchase_date",
+			referencedColumnName = "invoice_number",
 			foreignKey = @ForeignKey(
 					name = "device_purchase_fk_constraint", 
 					foreignKeyDefinition = ""))
