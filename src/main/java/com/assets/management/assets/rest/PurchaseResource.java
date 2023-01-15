@@ -40,7 +40,8 @@ public class PurchaseResource {
 			@QueryParam("page") @DefaultValue("0") Integer pageIndex,
 			@QueryParam("size") @DefaultValue("15") Integer pageSize) {
 		List<Purchase> purchases = Purchase.find("SELECT DISTINCT p FROM Purchase p "
-				+ "LEFT JOIN FETCH p.supplier "
+				+ "LEFT JOIN FETCH p.supplier s "
+				+ "LEFT JOIN FETCH s.address "
 				+ "ORDER BY p.purchaseDate, p.purchaseQty DESC")
 				.page(pageIndex, pageSize).list();
 		return Response.ok(purchases).build();
@@ -51,6 +52,7 @@ public class PurchaseResource {
 		boolean isDuplicate =  Purchase.findByInvoice(purchase.invoiceNumber).isPresent();
 		if (isDuplicate)  return Response.status(Status.CONFLICT).entity("Purchase record already exists!").build();
 		else if (purchase.supplier != null) {
+			if (purchase.supplier.id == null) return Response.status(Status.BAD_REQUEST).entity("Invalid supplier").build();
 			boolean isSupplier = Supplier.findByIdOptional(purchase.supplier.id ).isPresent();
 			if (!isSupplier) 
 				return Response.status(Status.BAD_REQUEST).entity("Make sure there's supplier record for this purchase").build();	
@@ -66,13 +68,27 @@ public class PurchaseResource {
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Response findPurchaseById(@PathParam("id") @NotNull Long purchaseId) {
 		return Purchase.find("SELECT DISTINCT p FROM Purchase p "
-				+ "LEFT JOIN FETCH p.supplier "
+				+ "LEFT JOIN FETCH p.supplier s"
+				+ "LEFT JOIN FETCH s.address "
 				+ "WHERE p.id = :id ", 
 				Parameters.with("id", purchaseId))
 				.firstResultOptional()
 				.map(purchase -> Response.ok(purchase).build())
 				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
+	
+// TODO: retrieve assets associated by Purchase
+//	@GET
+//	@Path("/assets")
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public Response listAllPurchasedAssets(@QueryParam("invoice") String invoiceNumber,
+//			@QueryParam("page") @DefaultValue("0") Integer pIndex,
+//			@QueryParam("size") @DefaultValue("15") Integer pSize) {
+////		List<Item> items = supplierService.getItems(supplierId, pIndex, pSize);
+//		// SELECT * FROM Purchase p INNER JOIN Computer c ON p.invoiceNumber =  c.invoiceNumber
+//
+//		return Response.ok().build();
+//	}
 	
 	@PUT
 	@Path("/{id: \\d+}")

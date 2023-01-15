@@ -31,6 +31,8 @@ import com.assets.management.assets.model.Department;
 import com.assets.management.assets.model.Employee;
 import com.assets.management.assets.service.EmployeeService;
 
+import io.quarkus.panache.common.Parameters;
+
 @Path("/employees")
 public class EmployeeResource {
 
@@ -54,8 +56,12 @@ public class EmployeeResource {
 	@Transactional(Transactional.TxType.SUPPORTS)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response findEmployee(@PathParam("id") @NotNull Long empId) {
-		return Employee
-				.findByIdOptional(empId)
+		return Employee.find("FROM Employee e "
+				+ "LEFT JOIN FETCH e.department "
+				+ "LEFT JOIN FETCH e.address "
+				+ "WHERE e.id = :id ", 
+				Parameters.with("id", empId))
+				.firstResultOptional()
 				.map(employee -> Response.ok(employee).build())
 				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}

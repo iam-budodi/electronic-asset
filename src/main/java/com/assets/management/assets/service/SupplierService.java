@@ -12,6 +12,7 @@ import javax.ws.rs.NotFoundException;
 import com.assets.management.assets.model.Supplier;
 
 import io.quarkus.hibernate.orm.panache.Panache;
+import io.quarkus.panache.common.Parameters;
 
 @ApplicationScoped
 @Transactional(Transactional.TxType.REQUIRED)
@@ -41,19 +42,21 @@ public class SupplierService {
 
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public List<Supplier> listSuppliers(Integer index, Integer size) {
-//		return Supplier.find("FROM Supplier s " + "ORDER BY title").page(index, size).list();
-		return Supplier
-				.find("ORDER BY name")
+		return Supplier.find("FROM Supplier s "
+				+ "LEFT JOIN FETCH s.address "
+				+ "LEFT JOIN FETCH s.purchase "
+				+ "ORDER BY s.name")
 				.page(index, size)
 				.list();
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Optional<Supplier> findSupplier(@NotNull Long supplierId) {
-		return Supplier.findByIdOptional(supplierId);
-//		return Item
-//				.find("supplier.id = ?1", supplierId)
-//				.page(index, size)
-//				.list();
+		return Supplier.find("FROM Supplier s "
+				+ "LEFT JOIN FETCH s.address "
+				+ "LEFT JOIN FETCH s.purchase "
+				+ "WHERE s.id = :supplierId", 
+				Parameters.with("supplierId", supplierId))
+				.firstResultOptional();
 	}
 }

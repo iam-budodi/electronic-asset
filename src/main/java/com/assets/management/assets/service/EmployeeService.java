@@ -44,7 +44,9 @@ public class EmployeeService {
 
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public List<Employee> listEmployees(Integer page, Integer size) {
-		return Employee.find("FROM Employee", Sort.by("firstName").and("lastName"))
+		return Employee.find("FROM Employee e "
+				+ "LEFT JOIN FETCH e.department d "
+				+ "LEFT JOIN FETCH e.address ", Sort.by("d.name").and("e.hireDate").and("e.firstName").and("e.lastName"))
 				.page(page, size)
 				.list();
 	}

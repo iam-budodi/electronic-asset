@@ -47,6 +47,8 @@ public class ComputerResource {
 				+ "LEFT JOIN FETCH c.category "
 				+ "LEFT JOIN FETCH c.label "
 				+ "LEFT JOIN FETCH c.purchase p "
+				+ "LEFT JOIN FETCH p.supplier s"
+				+ "LEFT JOIN FETCH s.address "
 				+ "ORDER BY p.purchaseDate")
 				.page(pageIndex, pageSize).list();
 		return Response.ok(computers).build();
@@ -54,6 +56,11 @@ public class ComputerResource {
 	
 	@POST
 	public Response createComputer(@Valid Computer computer, @Context UriInfo uriInfo) {
+//		computer.purchase.id != null && !Computer.findByIdOptional(computer.purchase.id).isPresent() 
+//				? Response.status(Status.NOT_FOUND).entity("Make sure there's purchase record for the item").build();
+//						: Computer.checkSerialNumber(computer.serialNumber ? Response.status(Status.CONFLICT).entity("Duplicate is not allow!").build();
+		
+		// TODO: Test for null Id
 		boolean exists =  Computer.findByIdOptional(computer.purchase.id).isPresent();
 		if (Computer.checkSerialNumber(computer.serialNumber))
 			return Response.status(Status.CONFLICT).entity("Duplicate is not allow!").build();
@@ -72,7 +79,9 @@ public class ComputerResource {
 		return Computer.find("SELECT DISTINCT c FROM Computer c "
 				+ "LEFT JOIN FETCH c.category "
 				+ "LEFT JOIN FETCH c.label "
-				+ "LEFT JOIN FETCH c.purchase "
+				+ "LEFT JOIN FETCH c.purchase p"
+				+ "LEFT JOIN FETCH p.supplier s"
+				+ "LEFT JOIN FETCH s.address "
 				+ "WHERE c.id = :id", 
 				Parameters.with("id", computerId))
 				.firstResultOptional()
