@@ -22,11 +22,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import com.assets.management.assets.model.Computer;
 import com.assets.management.assets.model.Purchase;
 import com.assets.management.assets.model.Supplier;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.panache.common.Parameters;
+import io.quarkus.panache.common.Sort;
 
 @Path("/purchases")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -68,7 +70,7 @@ public class PurchaseResource {
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Response findPurchaseById(@PathParam("id") @NotNull Long purchaseId) {
 		return Purchase.find("SELECT DISTINCT p FROM Purchase p "
-				+ "LEFT JOIN FETCH p.supplier s"
+				+ "LEFT JOIN FETCH p.supplier s "
 				+ "LEFT JOIN FETCH s.address "
 				+ "WHERE p.id = :id ", 
 				Parameters.with("id", purchaseId))
@@ -77,18 +79,27 @@ public class PurchaseResource {
 				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
 	
-// TODO: retrieve assets associated by Purchase
-//	@GET
-//	@Path("/assets")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response listAllPurchasedAssets(@QueryParam("invoice") String invoiceNumber,
-//			@QueryParam("page") @DefaultValue("0") Integer pIndex,
-//			@QueryParam("size") @DefaultValue("15") Integer pSize) {
-////		List<Item> items = supplierService.getItems(supplierId, pIndex, pSize);
-//		// SELECT * FROM Purchase p INNER JOIN Computer c ON p.invoiceNumber =  c.invoiceNumber
-//
-//		return Response.ok().build();
-//	}
+	@GET
+	@Path("/computers")
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public Response listAllPurchasedComputer(
+			@QueryParam("invoice") @NotNull String invoiceNumber,
+			@QueryParam("page") @DefaultValue("0") Integer pIndex,
+			@QueryParam("size") @DefaultValue("15") Integer pSize) {
+
+		List<Computer> computers = Computer.find("SELECT DISTINCT c FROM Computer c "
+				+ "LEFT JOIN FETCH c.category cg "
+				+ "LEFT JOIN FETCH c.label "
+				+ "LEFT JOIN FETCH c.purchase p "
+				+ "LEFT JOIN FETCH p.supplier s "
+				+ "LEFT JOIN FETCH s.address "
+				+ "WHERE p.invoiceNumber = :invoiceNumber", 
+				Sort.by("p.purchaseDate").and("cg.name").and("c.brand"), 
+				Parameters.with("invoiceNumber", invoiceNumber))
+//				+ "ORDER BY p.purchaseDate")
+				.page(pIndex, pSize).list();
+		return Response.ok(computers).build();
+	}
 	
 	@PUT
 	@Path("/{id: \\d+}")

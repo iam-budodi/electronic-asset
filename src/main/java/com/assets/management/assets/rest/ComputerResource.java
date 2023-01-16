@@ -23,7 +23,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.jboss.logging.Logger;
+
 import com.assets.management.assets.model.Computer;
+import com.assets.management.assets.model.Purchase;
 import com.assets.management.assets.service.ComputerService;
 
 import io.quarkus.hibernate.orm.panache.Panache;
@@ -34,6 +37,9 @@ import io.quarkus.panache.common.Parameters;
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional(Transactional.TxType.REQUIRED)
 public class ComputerResource {
+	
+	@Inject
+	Logger LOG;
 	
 	@Inject
 	ComputerService computerService;
@@ -47,7 +53,7 @@ public class ComputerResource {
 				+ "LEFT JOIN FETCH c.category "
 				+ "LEFT JOIN FETCH c.label "
 				+ "LEFT JOIN FETCH c.purchase p "
-				+ "LEFT JOIN FETCH p.supplier s"
+				+ "LEFT JOIN FETCH p.supplier s "
 				+ "LEFT JOIN FETCH s.address "
 				+ "ORDER BY p.purchaseDate")
 				.page(pageIndex, pageSize).list();
@@ -56,12 +62,9 @@ public class ComputerResource {
 	
 	@POST
 	public Response createComputer(@Valid Computer computer, @Context UriInfo uriInfo) {
-//		computer.purchase.id != null && !Computer.findByIdOptional(computer.purchase.id).isPresent() 
-//				? Response.status(Status.NOT_FOUND).entity("Make sure there's purchase record for the item").build();
-//						: Computer.checkSerialNumber(computer.serialNumber ? Response.status(Status.CONFLICT).entity("Duplicate is not allow!").build();
-		
-		// TODO: Test for null Id
-		boolean exists =  Computer.findByIdOptional(computer.purchase.id).isPresent();
+		LOG.info("CHECKING FOR PURCHASE OBJ: " + computer.purchase.id);
+		if (computer.purchase.id == null) return Response.status(Status.BAD_REQUEST).entity("Invalid purchase details").build();
+		boolean exists =  Purchase.findByIdOptional(computer.purchase.id).isPresent();
 		if (Computer.checkSerialNumber(computer.serialNumber))
 			return Response.status(Status.CONFLICT).entity("Duplicate is not allow!").build();
 		else if (!exists) 
@@ -79,8 +82,8 @@ public class ComputerResource {
 		return Computer.find("SELECT DISTINCT c FROM Computer c "
 				+ "LEFT JOIN FETCH c.category "
 				+ "LEFT JOIN FETCH c.label "
-				+ "LEFT JOIN FETCH c.purchase p"
-				+ "LEFT JOIN FETCH p.supplier s"
+				+ "LEFT JOIN FETCH c.purchase p " 
+				+ "LEFT JOIN FETCH p.supplier s "
 				+ "LEFT JOIN FETCH s.address "
 				+ "WHERE c.id = :id", 
 				Parameters.with("id", computerId))
