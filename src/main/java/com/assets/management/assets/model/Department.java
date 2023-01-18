@@ -14,6 +14,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 
 @Entity
@@ -28,7 +29,7 @@ import io.quarkus.panache.common.Sort;
 @NamedQueries({
 	@NamedQuery(
 			name = "Department.getName", 
-			query = "FROM Department WHERE name = :name")
+			query = "FROM Department WHERE LOWER(name) = :name")
 })
 public class Department extends PanacheEntity {
 
@@ -48,7 +49,10 @@ public class Department extends PanacheEntity {
 	}
 
 	public static Optional<Department> findByName(String name) {
-		return find("LOWER(name)", name.toLowerCase())
+//		return find("LOWER(name)", name.toLowerCase())
+//				.firstResultOptional();
+//	}
+		return find("#Department.getName", Parameters.with("name", name.toLowerCase()))
 				.firstResultOptional();
 	}
 }

@@ -44,7 +44,6 @@ public class SupplierService {
 	public List<Supplier> listSuppliers(Integer index, Integer size) {
 		return Supplier.find("FROM Supplier s "
 				+ "LEFT JOIN FETCH s.address "
-				+ "LEFT JOIN FETCH s.purchase "
 				+ "ORDER BY s.name")
 				.page(index, size)
 				.list();
@@ -54,7 +53,6 @@ public class SupplierService {
 	public Optional<Supplier> findSupplier(@NotNull Long supplierId) {
 		return Supplier.find("FROM Supplier s "
 				+ "LEFT JOIN FETCH s.address "
-				+ "LEFT JOIN FETCH s.purchase "
 				+ "WHERE s.id = :supplierId", 
 				Parameters.with("supplierId", supplierId))
 				.firstResultOptional();

@@ -29,9 +29,9 @@ public class DepartmentService {
 	}
 
 	public void updateDepartment(@Valid Department dept, @NotNull Long deptId) {
-		findDepartment(deptId)
-			.map(foundDept -> Panache.getEntityManager().merge(dept))
-			.orElseThrow(() -> new NotFoundException("Department don't exist"));
+		findDepartment(deptId).map(
+				foundDept -> Panache.getEntityManager().merge(dept))
+		.orElseThrow(() -> new NotFoundException("Department don't exist"));
 	}
 
 	public void deleteDepartment(@NotNull Long deptId) {

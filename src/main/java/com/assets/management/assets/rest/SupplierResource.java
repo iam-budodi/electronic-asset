@@ -104,16 +104,4 @@ public class SupplierResource {
 		return Response.noContent().build();
 	}
 
-//	@GET
-//	@Path("/{id}/items")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response listAllSupplierItems(
-//			@PathParam("id") Long supplierId,
-//			@QueryParam("page") @DefaultValue("0") Integer pIndex,
-//			@QueryParam("size") @DefaultValue("15") Integer pSize) {
-//		List<Item> items = supplierService
-//				.getItems(supplierId, pIndex, pSize);
-//
-//		return Response.ok(items).build();
-//	}
 }

@@ -45,20 +45,20 @@ class DepartmentResourceTest {
 	@TestHTTPEndpoint(DepartmentResource.class)
 	URL countEndpoint;
 	
-//	@Test
-//	@Order(1)
-//	void shouldOrShouldNotFindDepartments() {
-//		final int size = Department.listAll().size();		
-//		given()
-//			.header(ACCEPT, APPLICATION_JSON)
-//			.when()
-//			.get()
-//			.then()
-//			 	.statusCode(Status.OK.getStatusCode())
-//			 	.body("", hasSize(size))
-////			 	.body("size()", is(size))
-//				.contentType(APPLICATION_JSON); 
-//	}
+	@Test
+	@Order(1)
+	void shouldOrShouldNotFindDepartments() {
+		final int size = Department.listAll().size();		
+		given()
+			.header(ACCEPT, APPLICATION_JSON)
+			.when()
+			.get()
+			.then()
+			 	.statusCode(Status.OK.getStatusCode())
+			 	.body("", hasSize(size))
+//			 	.body("size()", is(size)) // this works uncomment when troubled
+				.contentType(APPLICATION_JSON); 
+	}
 	
 	@Test
 	@Order(2)

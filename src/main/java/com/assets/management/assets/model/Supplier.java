@@ -18,8 +18,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import io.quarkus.panache.common.Parameters;
 
 @Entity
@@ -84,14 +82,14 @@ public class Supplier extends BaseEntity {
 			cascade = CascadeType.ALL, 
 			fetch = FetchType.LAZY)
 	public Address address;
-
-	@JsonIgnore	
-	@OneToOne(
-			mappedBy = "supplier", 
-			orphanRemoval = true,
-			cascade = CascadeType.ALL, 
-			fetch = FetchType.LAZY)
-	public Purchase purchase;
+//
+//	@JsonIgnore	
+//	@OneToOne(
+//			mappedBy = "supplier", 
+//			orphanRemoval = true,
+//			cascade = CascadeType.ALL, 
+//			fetch = FetchType.LAZY)
+//	public Purchase purchase;
 	
 	public static Optional<Supplier> findByEmailAndPhone(String email, String phone) {
 		return find(
