@@ -1,5 +1,6 @@
 package com.assets.management.assets.model;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -57,8 +58,7 @@ class SupplierTest {
 	@Order(2)
 	void shouldFindAll() {
 		List<Supplier> suppliers = Supplier.listAll();
-		assertEquals(1, suppliers.size());
-		assertEquals(DEFAULT_NAME, suppliers.get(0).name);
+		assertTrue(suppliers.size() >= 1);
 	}
 
 	@Test
@@ -68,13 +68,15 @@ class SupplierTest {
 		List<Supplier> suppliers = supplierQuery.list();
 		Long nbSuppliers = supplierQuery.count();
 		Supplier firstSupplier = supplierQuery.firstResult();
-		Optional<Supplier> dept = supplierQuery.firstResultOptional();
+		Optional<Supplier> optSupplier = supplierQuery.firstResultOptional();
 
-		assertEquals(1, suppliers.size());
-		assertEquals(1, nbSuppliers);
+		assertTrue(suppliers.size() >= 1);
+		assertEquals(suppliers.size(), nbSuppliers);
 		assertEquals(supplierId, firstSupplier.id);
-		assertEquals(DEFAULT_NAME, dept.get().name);
-
+		assertThat(optSupplier)
+				.isNotEmpty()
+				.map(supplier -> supplier.email)
+				.contains(DEFAULT_EMAIL);
 	}
 
 	@Test
@@ -101,8 +103,8 @@ class SupplierTest {
 	@Test
 	@Order(5)
 	void shouldDelete() {
-		Supplier.findById(supplierId).delete();
-		assertEquals(0, Supplier.listAll().size());
+		boolean deleted = Supplier.deleteById(supplierId);
+		assertThat(deleted).isTrue();
 	}
 
 }

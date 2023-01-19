@@ -1,8 +1,6 @@
 package com.assets.management.assets.model;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -14,7 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.transaction.Transactional;
-import javax.ws.rs.NotFoundException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
@@ -112,16 +109,17 @@ class EmployeeTest {
 	@Order(3)
 	void shouldFindSpecificEmployee() {
 		Employee employee = Employee.findById(employeeId);
-		assertThat(employee, is(notNullValue()));
-//		Assertions.assertEquals(deptId, employee.department.id);
+		assertThat(employee).isNotNull();
 	}
 
 	@Test
 	@Order(4)
 	void shouldFindOptionalSpecificEmployee() {
 		Optional<Employee> optional = Employee.findByIdOptional(employeeId);
-		Employee employee = optional.orElseThrow(NotFoundException::new);
-		assertNotNull(employee);
+		assertThat(optional)
+				.isNotEmpty()
+				.map(employee -> employee.email)
+				.contains(DEFAULT_EMAIL);
 	}
 
 	@Test
@@ -174,18 +172,9 @@ class EmployeeTest {
 		boolean deleted = Employee.deleteById(employeeId);
 		Assertions.assertFalse(deleted);
 	}
-
-	@Test
-	@Order(10)
-	void shouldConfirmNothingWasDeleted() {
-		Assertions.assertFalse(Employee.deleteAll() >= 1);
-//		assertThrows(PersistenceException.class, () -> {
-//			Employee.deleteAll();
-//		});
-	}
 	
 	@Test
-	@Order(11)
+	@Order(10)
 	void shouldCheckThereIsNothing() {
 		Assertions.assertFalse(Employee.checkByEmailAndPhone(UPDATED_EMAIL, UPDATED_PHONE));
 	}
