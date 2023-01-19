@@ -48,7 +48,7 @@ class DepartmentResourceTest {
 	@Test
 	@Order(1)
 	void shouldOrShouldNotFindDepartments() {
-		final int size = Department.listAll().size();		
+		int size = Department.listAll().size();		
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
 			.when()
@@ -63,7 +63,7 @@ class DepartmentResourceTest {
 	@Test
 	@Order(2)
 	void shouldNotCreateInvalidDepartment() {
-		final Department department = new Department();
+		Department department = new Department();
 		department.name = null;
 		department.description = DEFAULT_DESCRIPTION;
 	 
@@ -81,7 +81,7 @@ class DepartmentResourceTest {
 	@Test
 	@Order(3)
 	void shouldCreateDepartment() {
-		final Department department = new Department();
+		Department department = new Department();
 		department.name = DEFAULT_NAME;
 		department.description = DEFAULT_DESCRIPTION;
 		
@@ -107,7 +107,7 @@ class DepartmentResourceTest {
 	@Test
 	@Order(4)
 	void shouldFindDepartments() {
-		final int size = Department.listAll().size();
+		int size = Department.listAll().size();
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
 			.when()
@@ -191,7 +191,7 @@ class DepartmentResourceTest {
 	@Test
 	@Order(10)
 	void shouldCountDepartment() {   
-		final int count = Department.listAll().size();
+		int count = Department.listAll().size();
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
 			.when()
@@ -206,7 +206,7 @@ class DepartmentResourceTest {
 	@Order(11)
 	void shouldFailToUpdateDepartment() {
 		Long randomId = new Random().nextLong();
-		final Department department = new Department();
+		Department department = new Department();
 		department.id = Long.valueOf(departmentId);
 		department.name = UPDATED_NAME;
 		department.description = UPDATED_DESCRIPTION;
@@ -225,7 +225,7 @@ class DepartmentResourceTest {
 	@Test
 	@Order(12)
 	void shouldUpdateDepartment() {
-		final Department department = new Department();
+		Department department = new Department();
 		department.id = Long.valueOf(departmentId);
 		department.name = UPDATED_NAME;
 		department.description = UPDATED_DESCRIPTION;
@@ -270,11 +270,11 @@ class DepartmentResourceTest {
 	@Order(15)
 	void shouldDeleteDepartmentById() {  
 		given()
-		.header(ACCEPT, APPLICATION_JSON)
-		.pathParam("id", departmentId)
-		.when()
-		.delete("/{id}")
-		.then()
-		.statusCode(NO_CONTENT.getStatusCode());
+			.header(ACCEPT, APPLICATION_JSON)
+			.pathParam("id", departmentId)
+			.when()
+			.delete("/{id}")
+			.then()
+				.statusCode(NO_CONTENT.getStatusCode());
 	}
 }
