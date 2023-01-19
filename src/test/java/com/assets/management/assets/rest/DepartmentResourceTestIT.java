@@ -9,14 +9,23 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
+import java.net.URL;
+
 import javax.ws.rs.core.Response.Status;
 
 import org.junit.jupiter.api.Test;
 
+import io.quarkus.test.common.http.TestHTTPEndpoint;
+import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 
 @QuarkusIntegrationTest
 class DepartmentResourceTestIT extends DepartmentResourceTest {
+
+	@TestHTTPResource("count")
+	@TestHTTPEndpoint(DepartmentResource.class)
+	URL countEndpoint;
+	
 	@Test
 	@Override
 	void shouldOrShouldNotFindDepartments() {	
