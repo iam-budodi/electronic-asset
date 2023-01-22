@@ -1,5 +1,6 @@
 package com.assets.management.assets.model;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -13,6 +14,7 @@ import java.util.Set;
 
 import javax.transaction.Transactional;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -109,7 +111,11 @@ class EmployeeTest {
 	@Order(3)
 	void shouldFindSpecificEmployee() {
 		Employee employee = Employee.findById(employeeId);
-		assertThat(employee).isNotNull();
+		assertThat(employee)
+				.extracting("email", as(InstanceOfAssertFactories.STRING))
+				.contains(DEFAULT_EMAIL)
+				.isNotEmpty()
+				.isNotNull();
 	}
 
 	@Test

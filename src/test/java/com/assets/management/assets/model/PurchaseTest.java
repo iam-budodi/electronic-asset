@@ -1,11 +1,13 @@
 package com.assets.management.assets.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.MonthDay;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import io.quarkus.hibernate.orm.panache.Panache;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
@@ -26,24 +27,23 @@ import io.quarkus.test.junit.QuarkusTest;
 class PurchaseTest {
 	private static final LocalDate PURCHASE_DATE = LocalDate.of(2022, Month.JANUARY, 19);
 	private static final Integer PURCHASE_QUANTITY = 5;
-	private static final BigDecimal PERCHASE_PRICE = BigDecimal.valueOf(1850000);
+	private static final BigDecimal PURCHASE_PRICE = BigDecimal.valueOf(1850000).setScale(2, RoundingMode.HALF_UP);
 	private static final String INVOICE_NUMBER = "UBX-123456PLC";
 	
-	private static final LocalDate UPDATED_PURCHASE_DATE = LocalDate.of(2023, Month.JANUARY, 25);
+	private static final LocalDate UPDATED_PURCHASE_DATE = LocalDate.of(2023, Month.JANUARY, 20);
 	private static final Integer UPDATED_PURCHASE_QUANTITY = 6;
-	private static final BigDecimal UPDATED_PERCHASE_PRICE = BigDecimal.valueOf(1800000);
+	private static final BigDecimal UPDATED_PURCHASE_PRICE = PURCHASE_PRICE;
 	private static final String UPDATED_INVOICE_NUMBER = "UBX-123456PLC - Updated";
 	
 	private static Long purchaseId;
 
-
 	@Test
 	@Order(1)
-	void shouldPersistSupplier() {
+	void shouldAddPurchase() {
 		Purchase purchase = new Purchase();
 		purchase.purchaseDate = PURCHASE_DATE;
 		purchase.purchaseQty = PURCHASE_QUANTITY;
-		purchase.purchasePrice = PERCHASE_PRICE;
+		purchase.purchasePrice = PURCHASE_PRICE;
 		purchase.invoiceNumber = INVOICE_NUMBER;
 		Purchase.persist(purchase);
 
@@ -53,55 +53,82 @@ class PurchaseTest {
 		purchaseId = purchase.id;
 	}
 
-//	@Test
-//	@Order(2)
-//	void shouldFindAll() {
-//		List<Purchase> purchase = Purchase.listAll();
-//		assertEquals(1, suppliers.size());
-//		assertEquals(DEFAULT_NAME, suppliers.get(0).name);
-//	}
+	@Test
+	@Order(2)
+	void shouldlistAll() {
+		List<Purchase> purchases = Purchase.listAll();
+		assertThat(purchases)
+				.hasSizeGreaterThanOrEqualTo(1)
+				.filteredOn(purchase -> purchase.invoiceNumber.contains(INVOICE_NUMBER))
+				.hasSize(1);
+	}
 
-//	@Test
-//	@Order(3)
-//	void shouldFindSupplier() {
-//		PanacheQuery<Supplier> supplierQuery = Supplier.find("from Supplier sp");
-//		List<Supplier> suppliers = supplierQuery.list();
-//		Long nbSuppliers = supplierQuery.count();
-//		Supplier firstSupplier = supplierQuery.firstResult();
-//		Optional<Supplier> dept = supplierQuery.firstResultOptional();
-//
-//		assertEquals(1, suppliers.size());
-//		assertEquals(1, nbSuppliers);
-//		assertEquals(supplierId, firstSupplier.id);
-//		assertEquals(DEFAULT_NAME, dept.get().name);
-//
-//	}
-//
-//	@Test
-//	@Order(4)
-//	void shouldUpdate() {
-//		Supplier supplier = Supplier.findById(supplierId);
-//		supplier.name = UPDATED_NAME;
-//		supplier.email = UPDATED_EMAIL;
-//		supplier.phone = UPDATED_PHONE;
-//		supplier.registeredBy = UPDATED_REGISTERED_BY;
-//		supplier.supplierType = SupplierType.WHOLESELLER;
-//		supplier.description = UPDATED_DESCRIPTION;
-//		
-//		Panache.getEntityManager().merge(supplier); // this is not necessary can be commented out
-//		assertFalse(DEFAULT_NAME.equals(supplier.name));
-//		assertTrue(UPDATED_NAME.equals(supplier.name));
-//		assertEquals(UPDATED_EMAIL, supplier.email);
-//		assertEquals(UPDATED_PHONE, supplier.phone);
-//		assertEquals(UPDATED_REGISTERED_BY, supplier.registeredBy);
-//		assertEquals(SupplierType.WHOLESELLER, supplier.supplierType);
-//		assertEquals(UPDATED_DESCRIPTION, supplier.description);
-//	}
-//	
-//	@Test
-//	@Order(5)
-//	void shouldDelete() {
-//		Supplier.findById(supplierId).delete();
-//		assertEquals(0, Supplier.listAll().size());
-//	}
+	@Test
+	@Order(3)
+	void shouldFindPurchaseById() {
+		Purchase purchase = Purchase.findById(purchaseId);
+		assertThat(purchase.purchaseDate).hasYear(PURCHASE_DATE.getYear())
+																  .hasMonth(PURCHASE_DATE.getMonth())
+																  .hasDayOfMonth(PURCHASE_DATE.getDayOfMonth());
+
+	}
+	
+	@Test
+	@Order(4)
+	void shouldCheckPurchaseByInvoice() {
+		Optional<Purchase> optionalPurchase = Purchase.findByInvoice(INVOICE_NUMBER);
+		assertThat(optionalPurchase)
+					.isNotEmpty()
+					.containsInstanceOf(Purchase.class)
+					.hasValueSatisfying(
+							purchase -> {
+								assertThat(purchase.purchasePrice).isEqualTo(PURCHASE_PRICE);
+								assertThat(purchase.purchaseQty).isEqualTo(PURCHASE_QUANTITY);
+							}
+					);		
+	}
+
+
+	@Test
+	@Order(5)
+	void shouldCountAll() {
+		assertThat(Purchase.count())
+							.isNotNegative()
+							.isNotZero()
+							.isGreaterThanOrEqualTo(1L);
+	}
+
+	@Test
+	@Order(6)
+	void shouldUpdatePurchase() {
+		Purchase purchase = new Purchase();
+		purchase.id = purchaseId;
+		purchase.purchaseDate = UPDATED_PURCHASE_DATE;
+		purchase.purchaseQty = UPDATED_PURCHASE_QUANTITY;
+		purchase.purchasePrice = UPDATED_PURCHASE_PRICE;
+		purchase.invoiceNumber = UPDATED_INVOICE_NUMBER;
+		Panache.getEntityManager().merge(purchase);
+
+		assertThat(purchase)
+					.satisfies(p -> {
+						assertThat(p.purchaseDate).isEqualTo(UPDATED_PURCHASE_DATE);
+						assertThat(p.purchaseQty).isEqualTo(UPDATED_PURCHASE_QUANTITY);
+						assertThat(p.purchasePrice).isEqualTo(UPDATED_PURCHASE_PRICE);
+						assertThat(p.invoiceNumber).isEqualTo(UPDATED_INVOICE_NUMBER);
+						}
+					);
+	}
+	
+	@Test
+	@Order(7)
+	void shouldDelete() {
+		assertThat(Purchase.deleteById(purchaseId)).isTrue();
+	}
+	
+	@Test
+	@Order(8)
+	void shouldNotRetrieveDeletedRecord() {
+		List<Purchase> purchases = Purchase.listAll();
+		assertThat(purchases).extracting("id").doesNotContain(purchaseId);
+	}
 }

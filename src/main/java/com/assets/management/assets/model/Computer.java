@@ -72,17 +72,17 @@ public class Computer extends PanacheEntity {
 	@Column(name = "computer_storage", nullable = false)
 	public Integer storage;
 
-	@Column(name = "operating_system", nullable = false)
+	@Column(name = "operating_system")
 	public String operatingSystem;
 
 	@NotNull
 	@Column(name = "display_size", nullable = false)
 	public Double displaySize;
 
-	@Column(name = "graphics_card", nullable = false)
+	@Column(name = "graphics_card")
 	public Integer graphicsCard;
 
-	@NotNull
+//	@NotNull
 	@ElementCollection
 	@Enumerated(EnumType.STRING)
 	@Column(name = "peripherals", nullable = false)
