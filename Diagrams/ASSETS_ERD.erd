@@ -1,0 +1,906 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram version="1" name="ASSETS_ERD.erd">
+	<entities>
+		<data-source id="postgres-jdbc-185de631867-685b9b9013711f78">
+			<entity id="1" name="_pg_foreign_data_wrappers" fq-name="information_schema.&quot;_pg_foreign_data_wrappers&quot;" order="0" x="7808" y="483">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="2" name="_pg_foreign_servers" fq-name="information_schema.&quot;_pg_foreign_servers&quot;" order="1" x="3765" y="1127">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="3" name="_pg_foreign_table_columns" fq-name="information_schema.&quot;_pg_foreign_table_columns&quot;" order="2" x="7028" y="20">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="4" name="_pg_foreign_tables" fq-name="information_schema.&quot;_pg_foreign_tables&quot;" order="3" x="20" y="692">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="5" name="_pg_user_mappings" fq-name="information_schema.&quot;_pg_user_mappings&quot;" order="4" x="442" y="692">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="6" name="administrable_role_authorizations" fq-name="information_schema.administrable_role_authorizations" order="5" x="2125" y="30">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="7" name="applicable_roles" fq-name="information_schema.applicable_roles" order="6" x="2547" y="30">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="8" name="attributes" fq-name="information_schema.&quot;attributes&quot;" order="7" x="7028" y="4743">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="9" name="character_sets" fq-name="information_schema.character_sets" order="8" x="2125" y="900">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="10" name="check_constraint_routine_usage" fq-name="information_schema.check_constraint_routine_usage" order="9" x="1268" y="493">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="11" name="check_constraints" fq-name="information_schema.check_constraints" order="10" x="7462" y="20">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="12" name="collation_character_set_applicability" fq-name="information_schema.collation_character_set_applicability" order="11" x="1747" y="493">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="13" name="collations" fq-name="information_schema.collations" order="12" x="7808" y="20">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="14" name="column_column_usage" fq-name="information_schema.column_column_usage" order="13" x="442" y="315">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="15" name="column_domain_usage" fq-name="information_schema.column_domain_usage" order="14" x="853" y="692">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="16" name="column_options" fq-name="information_schema.column_options" order="15" x="2125" y="493">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="17" name="column_privileges" fq-name="information_schema.column_privileges" order="16" x="2547" y="900">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="18" name="column_udt_usage" fq-name="information_schema.column_udt_usage" order="17" x="1268" y="692">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="19" name="columns" fq-name="information_schema.&quot;columns&quot;" order="18" x="853" y="2224">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="20" name="constraint_column_usage" fq-name="information_schema.constraint_column_usage" order="19" x="1747" y="692">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="21" name="constraint_table_usage" fq-name="information_schema.constraint_table_usage" order="20" x="2547" y="493">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="22" name="data_type_privileges" fq-name="information_schema.data_type_privileges" order="21" x="853" y="315">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="23" name="domain_constraints" fq-name="information_schema.domain_constraints" order="22" x="2971" y="900">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="24" name="domain_udt_usage" fq-name="information_schema.domain_udt_usage" order="23" x="2971" y="493">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="25" name="domains" fq-name="information_schema.domains" order="24" x="5017" y="4783">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="26" name="element_types" fq-name="information_schema.element_types" order="25" x="5841" y="4763">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="27" name="enabled_roles" fq-name="information_schema.enabled_roles" order="26" x="20" y="50">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="28" name="foreign_data_wrapper_options" fq-name="information_schema.foreign_data_wrapper_options" order="27" x="20" y="167">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="29" name="foreign_data_wrappers" fq-name="information_schema.foreign_data_wrappers" order="28" x="1268" y="315">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="30" name="foreign_server_options" fq-name="information_schema.foreign_server_options" order="29" x="442" y="167">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="31" name="foreign_servers" fq-name="information_schema.foreign_servers" order="30" x="2125" y="692">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="32" name="foreign_table_options" fq-name="information_schema.foreign_table_options" order="31" x="1747" y="315">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="33" name="foreign_tables" fq-name="information_schema.foreign_tables" order="32" x="2125" y="315">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="34" name="information_schema_catalog_name" fq-name="information_schema.information_schema_catalog_name" order="33" x="442" y="50">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="35" name="key_column_usage" fq-name="information_schema.key_column_usage" order="34" x="4187" y="1127">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="36" name="parameters" fq-name="information_schema.parameters" order="35" x="7808" y="4733">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="37" name="referential_constraints" fq-name="information_schema.referential_constraints" order="36" x="4620" y="1127">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="38" name="role_column_grants" fq-name="information_schema.role_column_grants" order="37" x="3394" y="900">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="39" name="role_routine_grants" fq-name="information_schema.role_routine_grants" order="38" x="2971" y="2244">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="40" name="role_table_grants" fq-name="information_schema.role_table_grants" order="39" x="3765" y="900">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="41" name="role_udt_grants" fq-name="information_schema.role_udt_grants" order="40" x="2547" y="692">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="42" name="role_usage_grants" fq-name="information_schema.role_usage_grants" order="41" x="4187" y="900">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="43" name="routine_column_usage" fq-name="information_schema.routine_column_usage" order="42" x="3394" y="2244">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="44" name="routine_privileges" fq-name="information_schema.routine_privileges" order="43" x="3765" y="2244">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="45" name="routine_routine_usage" fq-name="information_schema.routine_routine_usage" order="44" x="3394" y="493">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="46" name="routine_sequence_usage" fq-name="information_schema.routine_sequence_usage" order="45" x="5017" y="1127">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="47" name="routine_table_usage" fq-name="information_schema.routine_table_usage" order="46" x="5432" y="1127">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="48" name="routines" fq-name="information_schema.&quot;routines&quot;" order="47" x="1268" y="1844">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="49" name="schemata" fq-name="information_schema.schemata" order="48" x="2971" y="692">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="50" name="sequences" fq-name="information_schema.&quot;sequences&quot;" order="49" x="2125" y="4172">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="51" name="sql_features" fq-name="information_schema.sql_features" order="50" x="3394" y="692">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="52" name="sql_implementation_info" fq-name="information_schema.sql_implementation_info" order="51" x="2547" y="315">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="53" name="sql_parts" fq-name="information_schema.sql_parts" order="52" x="2971" y="315">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="54" name="sql_sizing" fq-name="information_schema.sql_sizing" order="53" x="853" y="167">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="55" name="table_constraints" fq-name="information_schema.table_constraints" order="54" x="4187" y="2244">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="56" name="table_privileges" fq-name="information_schema.table_privileges" order="55" x="4620" y="900">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="57" name="tables" fq-name="information_schema.&quot;tables&quot;" order="56" x="2547" y="4172">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="58" name="transforms" fq-name="information_schema.&quot;transforms&quot;" order="57" x="5017" y="900">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="59" name="triggered_update_columns" fq-name="information_schema.triggered_update_columns" order="58" x="3765" y="692">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="60" name="triggers" fq-name="information_schema.triggers" order="59" x="20" y="4883">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="61" name="udt_privileges" fq-name="information_schema.udt_privileges" order="60" x="4187" y="692">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="62" name="usage_privileges" fq-name="information_schema.usage_privileges" order="61" x="5432" y="900">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="63" name="user_defined_types" fq-name="information_schema.user_defined_types" order="62" x="6256" y="4763">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="64" name="user_mapping_options" fq-name="information_schema.user_mapping_options" order="63" x="3394" y="315">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="65" name="user_mappings" fq-name="information_schema.user_mappings" order="64" x="2971" y="30">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="66" name="view_column_usage" fq-name="information_schema.view_column_usage" order="65" x="4620" y="692">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="67" name="view_routine_usage" fq-name="information_schema.view_routine_usage" order="66" x="3765" y="493">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="68" name="view_table_usage" fq-name="information_schema.view_table_usage" order="67" x="4187" y="493">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="69" name="views" fq-name="information_schema.&quot;views&quot;" order="68" x="4620" y="2244">
+				<path name="information_schema"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="70" name="pg_aggregate" fq-name="pg_catalog.pg_aggregate" order="69" color-bg="204,192,184" x="2125" y="4833">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="71" name="pg_am" fq-name="pg_catalog.pg_am" order="70" color-bg="204,192,184" x="1268" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="72" name="pg_amop" fq-name="pg_catalog.pg_amop" order="71" color-bg="204,192,184" x="5841" y="1127">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="73" name="pg_amproc" fq-name="pg_catalog.pg_amproc" order="72" color-bg="204,192,184" x="4620" y="493">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="74" name="pg_attrdef" fq-name="pg_catalog.pg_attrdef" order="73" color-bg="204,192,184" x="1747" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="75" name="pg_attribute" fq-name="pg_catalog.pg_attribute" order="74" color-bg="204,192,184" x="4620" y="4793">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="76" name="pg_auth_members" fq-name="pg_catalog.pg_auth_members" order="75" color-bg="204,192,184" x="2125" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="77" name="pg_authid" fq-name="pg_catalog.pg_authid" order="76" color-bg="204,192,184" x="2971" y="4172">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="78" name="pg_available_extension_versions" fq-name="pg_catalog.pg_available_extension_versions" order="77" color-bg="204,192,184" x="6256" y="1127">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="79" name="pg_available_extensions" fq-name="pg_catalog.pg_available_extensions" order="78" color-bg="204,192,184" x="2547" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="80" name="pg_backend_memory_contexts" fq-name="pg_catalog.pg_backend_memory_contexts" order="79" color-bg="204,192,184" x="6672" y="1127">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="81" name="pg_cast" fq-name="pg_catalog.pg_cast" order="80" color-bg="204,192,184" x="5017" y="493">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="82" name="pg_class" fq-name="pg_catalog.pg_class" order="81" color-bg="204,192,184" x="442" y="2334">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="83" name="pg_collation" fq-name="pg_catalog.pg_collation" order="82" color-bg="204,192,184" x="5017" y="2244">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="84" name="pg_config" fq-name="pg_catalog.pg_config" order="83" color-bg="204,192,184" x="853" y="40">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="85" name="pg_constraint" fq-name="pg_catalog.pg_constraint" order="84" color-bg="204,192,184" x="4187" y="4803">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="86" name="pg_conversion" fq-name="pg_catalog.pg_conversion" order="85" color-bg="204,192,184" x="5841" y="900">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="87" name="pg_cursors" fq-name="pg_catalog.pg_cursors" order="86" color-bg="204,192,184" x="5432" y="493">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="88" name="pg_database" fq-name="pg_catalog.pg_database" order="87" color-bg="204,192,184" x="4620" y="4152">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="89" name="pg_db_role_setting" fq-name="pg_catalog.pg_db_role_setting" order="88" color-bg="204,192,184" x="3394" y="30">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="90" name="pg_default_acl" fq-name="pg_catalog.pg_default_acl" order="89" color-bg="204,192,184" x="3765" y="315">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="91" name="pg_depend" fq-name="pg_catalog.pg_depend" order="90" color-bg="204,192,184" x="5017" y="692">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="92" name="pg_description" fq-name="pg_catalog.pg_description" order="91" color-bg="204,192,184" x="2971" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="93" name="pg_enum" fq-name="pg_catalog.pg_enum" order="92" color-bg="204,192,184" x="3394" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="94" name="pg_event_trigger" fq-name="pg_catalog.pg_event_trigger" order="93" color-bg="204,192,184" x="5432" y="692">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="95" name="pg_extension" fq-name="pg_catalog.pg_extension" order="94" color-bg="204,192,184" x="6256" y="900">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="96" name="pg_file_settings" fq-name="pg_catalog.pg_file_settings" order="95" color-bg="204,192,184" x="5841" y="692">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="97" name="pg_foreign_data_wrapper" fq-name="pg_catalog.pg_foreign_data_wrapper" order="96" color-bg="204,192,184" x="6256" y="692">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="98" name="pg_foreign_server" fq-name="pg_catalog.pg_foreign_server" order="97" color-bg="204,192,184" x="6672" y="900">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="99" name="pg_foreign_table" fq-name="pg_catalog.pg_foreign_table" order="98" color-bg="204,192,184" x="3765" y="30">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="100" name="pg_group" fq-name="pg_catalog.pg_group" order="99" color-bg="204,192,184" x="4187" y="30">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="101" name="pg_hba_file_rules" fq-name="pg_catalog.pg_hba_file_rules" order="100" color-bg="204,192,184" x="7028" y="1127">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="102" name="pg_index" fq-name="pg_catalog.pg_index" order="101" color-bg="204,192,184" x="1268" y="4853">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="103" name="pg_indexes" fq-name="pg_catalog.pg_indexes" order="102" color-bg="204,192,184" x="4187" y="315">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="104" name="pg_inherits" fq-name="pg_catalog.pg_inherits" order="103" color-bg="204,192,184" x="3765" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="105" name="pg_init_privs" fq-name="pg_catalog.pg_init_privs" order="104" color-bg="204,192,184" x="4620" y="315">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="106" name="pg_language" fq-name="pg_catalog.pg_language" order="105" color-bg="204,192,184" x="7462" y="1127">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="107" name="pg_largeobject" fq-name="pg_catalog.pg_largeobject" order="106" color-bg="204,192,184" x="4620" y="30">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="108" name="pg_largeobject_metadata" fq-name="pg_catalog.pg_largeobject_metadata" order="107" color-bg="204,192,184" x="5017" y="30">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="109" name="pg_locks" fq-name="pg_catalog.pg_locks" order="108" color-bg="204,192,184" x="7028" y="4132">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="110" name="pg_matviews" fq-name="pg_catalog.pg_matviews" order="109" color-bg="204,192,184" x="6672" y="692">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="111" name="pg_namespace" fq-name="pg_catalog.pg_namespace" order="110" color-bg="204,192,184" x="4187" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="112" name="pg_opclass" fq-name="pg_catalog.pg_opclass" order="111" color-bg="204,192,184" x="7808" y="1127">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="113" name="pg_operator" fq-name="pg_catalog.pg_operator" order="112" color-bg="204,192,184" x="5841" y="4142">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="114" name="pg_opfamily" fq-name="pg_catalog.pg_opfamily" order="113" color-bg="204,192,184" x="5017" y="315">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="115" name="pg_partitioned_table" fq-name="pg_catalog.pg_partitioned_table" order="114" color-bg="204,192,184" x="7028" y="900">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="116" name="pg_policies" fq-name="pg_catalog.pg_policies" order="115" color-bg="204,192,184" x="7462" y="900">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="117" name="pg_policy" fq-name="pg_catalog.pg_policy" order="116" color-bg="204,192,184" x="7808" y="900">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="118" name="pg_prepared_statements" fq-name="pg_catalog.pg_prepared_statements" order="117" color-bg="204,192,184" x="7028" y="692">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="119" name="pg_prepared_xacts" fq-name="pg_catalog.pg_prepared_xacts" order="118" color-bg="204,192,184" x="5432" y="315">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="120" name="pg_proc" fq-name="pg_catalog.pg_proc" order="119" color-bg="204,192,184" x="6672" y="4753">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="121" name="pg_publication" fq-name="pg_catalog.pg_publication" order="120" color-bg="204,192,184" x="20" y="3798">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="122" name="pg_publication_rel" fq-name="pg_catalog.pg_publication_rel" order="121" color-bg="204,192,184" x="5432" y="30">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="123" name="pg_publication_tables" fq-name="pg_catalog.pg_publication_tables" order="122" color-bg="204,192,184" x="5841" y="30">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="124" name="pg_range" fq-name="pg_catalog.pg_range" order="123" color-bg="204,192,184" x="7462" y="692">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="125" name="pg_replication_origin" fq-name="pg_catalog.pg_replication_origin" order="124" color-bg="204,192,184" x="1268" y="40">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="126" name="pg_replication_origin_status" fq-name="pg_catalog.pg_replication_origin_status" order="125" color-bg="204,192,184" x="4620" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="127" name="pg_replication_slots" fq-name="pg_catalog.pg_replication_slots" order="126" color-bg="204,192,184" x="6256" y="4142">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="128" name="pg_rewrite" fq-name="pg_catalog.pg_rewrite" order="127" color-bg="204,192,184" x="20" y="1137">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="129" name="pg_roles" fq-name="pg_catalog.pg_roles" order="128" color-bg="204,192,184" x="4187" y="4162">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="130" name="pg_rules" fq-name="pg_catalog.pg_rules" order="129" color-bg="204,192,184" x="5017" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="131" name="pg_seclabel" fq-name="pg_catalog.pg_seclabel" order="130" color-bg="204,192,184" x="5841" y="315">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="132" name="pg_seclabels" fq-name="pg_catalog.pg_seclabels" order="131" color-bg="204,192,184" x="442" y="1137">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="133" name="pg_sequence" fq-name="pg_catalog.pg_sequence" order="132" color-bg="204,192,184" x="853" y="1137">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="134" name="pg_sequences" fq-name="pg_catalog.pg_sequences" order="133" color-bg="204,192,184" x="6256" y="2234">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="135" name="pg_settings" fq-name="pg_catalog.pg_settings" order="134" color-bg="204,192,184" x="442" y="4883">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="136" name="pg_shadow" fq-name="pg_catalog.pg_shadow" order="135" color-bg="204,192,184" x="442" y="3798">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="137" name="pg_shdepend" fq-name="pg_catalog.pg_shdepend" order="136" color-bg="204,192,184" x="7808" y="692">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="138" name="pg_shdescription" fq-name="pg_catalog.pg_shdescription" order="137" color-bg="204,192,184" x="6256" y="30">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="139" name="pg_shmem_allocations" fq-name="pg_catalog.pg_shmem_allocations" order="138" color-bg="204,192,184" x="5432" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="140" name="pg_shseclabel" fq-name="pg_catalog.pg_shseclabel" order="139" color-bg="204,192,184" x="5841" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="141" name="pg_stat_activity" fq-name="pg_catalog.pg_stat_activity" order="140" color-bg="204,192,184" x="2547" y="4833">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="142" name="pg_stat_all_indexes" fq-name="pg_catalog.pg_stat_all_indexes" order="141" color-bg="204,192,184" x="1268" y="1137">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="143" name="pg_stat_all_tables" fq-name="pg_catalog.pg_stat_all_tables" order="142" color-bg="204,192,184" x="2971" y="4823">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="144" name="pg_stat_archiver" fq-name="pg_catalog.pg_stat_archiver" order="143" color-bg="204,192,184" x="20" y="910">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="145" name="pg_stat_bgwriter" fq-name="pg_catalog.pg_stat_bgwriter" order="144" color-bg="204,192,184" x="6672" y="2234">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="146" name="pg_stat_database" fq-name="pg_catalog.pg_stat_database" order="145" color-bg="204,192,184" x="5432" y="4773">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="147" name="pg_stat_database_conflicts" fq-name="pg_catalog.pg_stat_database_conflicts" order="146" color-bg="204,192,184" x="442" y="910">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="148" name="pg_stat_gssapi" fq-name="pg_catalog.pg_stat_gssapi" order="147" color-bg="204,192,184" x="6256" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="149" name="pg_stat_progress_analyze" fq-name="pg_catalog.pg_stat_progress_analyze" order="148" color-bg="204,192,184" x="3394" y="4172">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="150" name="pg_stat_progress_basebackup" fq-name="pg_catalog.pg_stat_progress_basebackup" order="149" color-bg="204,192,184" x="5841" y="493">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="151" name="pg_stat_progress_cluster" fq-name="pg_catalog.pg_stat_progress_cluster" order="150" color-bg="204,192,184" x="3765" y="4172">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="152" name="pg_stat_progress_copy" fq-name="pg_catalog.pg_stat_progress_copy" order="151" color-bg="204,192,184" x="5432" y="2244">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="153" name="pg_stat_progress_create_index" fq-name="pg_catalog.pg_stat_progress_create_index" order="152" color-bg="204,192,184" x="7462" y="4132">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="154" name="pg_stat_progress_vacuum" fq-name="pg_catalog.pg_stat_progress_vacuum" order="153" color-bg="204,192,184" x="7028" y="2234">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="155" name="pg_stat_replication" fq-name="pg_catalog.pg_stat_replication" order="154" color-bg="204,192,184" x="1747" y="4853">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="156" name="pg_stat_replication_slots" fq-name="pg_catalog.pg_stat_replication_slots" order="155" color-bg="204,192,184" x="5841" y="2244">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="157" name="pg_stat_slru" fq-name="pg_catalog.pg_stat_slru" order="156" color-bg="204,192,184" x="853" y="3798">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="158" name="pg_stat_ssl" fq-name="pg_catalog.pg_stat_ssl" order="157" color-bg="204,192,184" x="1747" y="1137">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="159" name="pg_stat_subscription" fq-name="pg_catalog.pg_stat_subscription" order="158" color-bg="204,192,184" x="1268" y="3798">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="160" name="pg_stat_sys_indexes" fq-name="pg_catalog.pg_stat_sys_indexes" order="159" color-bg="204,192,184" x="2125" y="1137">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="161" name="pg_stat_sys_tables" fq-name="pg_catalog.pg_stat_sys_tables" order="160" color-bg="204,192,184" x="3394" y="4823">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="162" name="pg_stat_user_functions" fq-name="pg_catalog.pg_stat_user_functions" order="161" color-bg="204,192,184" x="6256" y="493">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="163" name="pg_stat_user_indexes" fq-name="pg_catalog.pg_stat_user_indexes" order="162" color-bg="204,192,184" x="2547" y="1137">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="164" name="pg_stat_user_tables" fq-name="pg_catalog.pg_stat_user_tables" order="163" color-bg="204,192,184" x="3765" y="4823">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="165" name="pg_stat_wal" fq-name="pg_catalog.pg_stat_wal" order="164" color-bg="204,192,184" x="1747" y="2959">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="166" name="pg_stat_wal_receiver" fq-name="pg_catalog.pg_stat_wal_receiver" order="165" color-bg="204,192,184" x="6672" y="4142">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="167" name="pg_stat_xact_all_tables" fq-name="pg_catalog.pg_stat_xact_all_tables" order="166" color-bg="204,192,184" x="7462" y="2234">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="168" name="pg_stat_xact_sys_tables" fq-name="pg_catalog.pg_stat_xact_sys_tables" order="167" color-bg="204,192,184" x="7808" y="2234">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="169" name="pg_stat_xact_user_functions" fq-name="pg_catalog.pg_stat_xact_user_functions" order="168" color-bg="204,192,184" x="6672" y="493">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="170" name="pg_stat_xact_user_tables" fq-name="pg_catalog.pg_stat_xact_user_tables" order="169" color-bg="204,192,184" x="20" y="4272">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="171" name="pg_statio_all_indexes" fq-name="pg_catalog.pg_statio_all_indexes" order="170" color-bg="204,192,184" x="853" y="910">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="172" name="pg_statio_all_sequences" fq-name="pg_catalog.pg_statio_all_sequences" order="171" color-bg="204,192,184" x="6256" y="315">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="173" name="pg_statio_all_tables" fq-name="pg_catalog.pg_statio_all_tables" order="172" color-bg="204,192,184" x="442" y="4272">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="174" name="pg_statio_sys_indexes" fq-name="pg_catalog.pg_statio_sys_indexes" order="173" color-bg="204,192,184" x="1268" y="910">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="175" name="pg_statio_sys_sequences" fq-name="pg_catalog.pg_statio_sys_sequences" order="174" color-bg="204,192,184" x="6672" y="315">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="176" name="pg_statio_sys_tables" fq-name="pg_catalog.pg_statio_sys_tables" order="175" color-bg="204,192,184" x="853" y="4272">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="177" name="pg_statio_user_indexes" fq-name="pg_catalog.pg_statio_user_indexes" order="176" color-bg="204,192,184" x="1747" y="910">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="178" name="pg_statio_user_sequences" fq-name="pg_catalog.pg_statio_user_sequences" order="177" color-bg="204,192,184" x="7028" y="315">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="179" name="pg_statio_user_tables" fq-name="pg_catalog.pg_statio_user_tables" order="178" color-bg="204,192,184" x="1268" y="4272">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="180" name="pg_statistic" fq-name="pg_catalog.pg_statistic" order="179" color-bg="204,192,184" x="7462" y="4743">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="181" name="pg_statistic_ext" fq-name="pg_catalog.pg_statistic_ext" order="180" color-bg="204,192,184" x="2125" y="2254">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="182" name="pg_statistic_ext_data" fq-name="pg_catalog.pg_statistic_ext_data" order="181" color-bg="204,192,184" x="7462" y="315">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="183" name="pg_stats" fq-name="pg_catalog.pg_stats" order="182" color-bg="204,192,184" x="5017" y="4152">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="184" name="pg_stats_ext" fq-name="pg_catalog.pg_stats_ext" order="183" color-bg="204,192,184" x="5432" y="4152">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="185" name="pg_stats_ext_exprs" fq-name="pg_catalog.pg_stats_ext_exprs" order="184" color-bg="204,192,184" x="7808" y="4132">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="186" name="pg_subscription" fq-name="pg_catalog.pg_subscription" order="185" color-bg="204,192,184" x="1747" y="4182">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="187" name="pg_subscription_rel" fq-name="pg_catalog.pg_subscription_rel" order="186" color-bg="204,192,184" x="6672" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="188" name="pg_tables" fq-name="pg_catalog.pg_tables" order="187" color-bg="204,192,184" x="2971" y="1137">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="189" name="pg_tablespace" fq-name="pg_catalog.pg_tablespace" order="188" color-bg="204,192,184" x="7808" y="315">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="190" name="pg_timezone_abbrevs" fq-name="pg_catalog.pg_timezone_abbrevs" order="189" color-bg="204,192,184" x="6672" y="30">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="191" name="pg_timezone_names" fq-name="pg_catalog.pg_timezone_names" order="190" color-bg="204,192,184" x="7028" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="192" name="pg_transform" fq-name="pg_catalog.pg_transform" order="191" color-bg="204,192,184" x="20" y="503">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="193" name="pg_trigger" fq-name="pg_catalog.pg_trigger" order="192" color-bg="204,192,184" x="853" y="4863">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="194" name="pg_ts_config" fq-name="pg_catalog.pg_ts_config" order="193" color-bg="204,192,184" x="442" y="503">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="195" name="pg_ts_config_map" fq-name="pg_catalog.pg_ts_config_map" order="194" color-bg="204,192,184" x="7462" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="196" name="pg_ts_dict" fq-name="pg_catalog.pg_ts_dict" order="195" color-bg="204,192,184" x="7028" y="493">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="197" name="pg_ts_parser" fq-name="pg_catalog.pg_ts_parser" order="196" color-bg="204,192,184" x="3394" y="1137">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="198" name="pg_ts_template" fq-name="pg_catalog.pg_ts_template" order="197" color-bg="204,192,184" x="853" y="503">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="199" name="pg_type" fq-name="pg_catalog.pg_type" order="198" color-bg="204,192,184" x="20" y="2344">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="200" name="pg_user" fq-name="pg_catalog.pg_user" order="199" color-bg="204,192,184" x="2547" y="2254">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="201" name="pg_user_mapping" fq-name="pg_catalog.pg_user_mapping" order="200" color-bg="204,192,184" x="7808" y="167">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="202" name="pg_user_mappings" fq-name="pg_catalog.pg_user_mappings" order="201" color-bg="204,192,184" x="7462" y="493">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="203" name="pg_views" fq-name="pg_catalog.pg_views" order="202" color-bg="204,192,184" x="20" y="325">
+				<path name="pg_catalog"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="204" name="addresses" fq-name="public.addresses" order="203" color-bg="228,255,181" x="1268" y="3551">
+				<path name="public"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="205" name="categories" fq-name="public.categories" order="204" color-bg="228,255,181" x="2125" y="2501">
+				<path name="public"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="206" name="computer_peripheral" fq-name="public.computer_peripheral" order="205" color-bg="228,255,181" x="1747" y="40">
+				<path name="public"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="207" name="computer_peripherals" fq-name="public.computer_peripherals" order="206" color-bg="228,255,181" x="20" y="1775">
+				<path name="public"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="208" name="computers" fq-name="public.computers" order="207" color-bg="228,255,181" x="442" y="1645">
+				<path name="public"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="209" name="contact_persons" fq-name="public.contact_persons" order="208" color-bg="228,255,181" x="1747" y="1434">
+				<path name="public"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="210" name="departments" fq-name="public.departments" order="209" color-bg="228,255,181" x="2125" y="4589">
+				<path name="public"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="211" name="employee_status" fq-name="public.employee_status" order="210" color-bg="228,255,181" x="1268" y="4746">
+				<path name="public"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="212" name="employees" fq-name="public.employees" order="211" color-bg="228,255,181" x="1747" y="4469">
+				<path name="public"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="213" name="item_assignments" fq-name="public.item_assignments" order="212" color-bg="228,255,181" x="1268" y="4045">
+				<path name="public"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="214" name="items" fq-name="public.items" order="213" color-bg="228,255,181" x="1747" y="3206">
+				<path name="public"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="215" name="labels" fq-name="public.labels" order="214" color-bg="228,255,181" x="853" y="3171">
+				<path name="public"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="216" name="purchases" fq-name="public.purchases" order="215" color-bg="228,255,181" x="853" y="1636">
+				<path name="public"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="217" name="suppliers" fq-name="public.suppliers" order="216" color-bg="228,255,181" x="2125" y="1664">
+				<path name="public"/>
+				<path name="assets_db"/>
+			</entity>
+			<entity id="218" name="transfer_history" fq-name="public.transfer_history" order="217" color-bg="228,255,181" x="1268" y="4559">
+				<path name="public"/>
+				<path name="assets_db"/>
+			</entity>
+		</data-source>
+	</entities>
+	<relations>
+		<relation name="device_category_fk_constraint" fq-name="public.computers.device_category_fk_constraint" type="fk" pk-ref="205" fk-ref="208">
+			<bend type="abs" x="853" y="1813"/>
+			<bend type="abs" x="1268" y="1813"/>
+			<bend type="abs" x="1747" y="1813"/>
+		</relation>
+		<relation name="fkjcdcde7htb3tyjgouo4g9xbmr" fq-name="public.items.fkjcdcde7htb3tyjgouo4g9xbmr" type="fk" pk-ref="205" fk-ref="214"/>
+		<relation name="fke67p2xyljs01v74khclsph3t2" fq-name="public.computer_peripherals.fke67p2xyljs01v74khclsph3t2" type="fk" pk-ref="208" fk-ref="207"/>
+		<relation name="employee_department_fk_constraint" fq-name="public.employees.employee_department_fk_constraint" type="fk" pk-ref="210" fk-ref="212"/>
+		<relation name="employee_address_fk_constraint" fq-name="public.addresses.employee_address_fk_constraint" type="fk" pk-ref="212" fk-ref="204"/>
+		<relation name="fk9kovjs33hk4ev0ein2w1qho6r" fq-name="public.employee_status.fk9kovjs33hk4ev0ein2w1qho6r" type="fk" pk-ref="212" fk-ref="211"/>
+		<relation name="fkmi0ohgjt7mr5jixykdsr6j7x4" fq-name="public.item_assignments.fkmi0ohgjt7mr5jixykdsr6j7x4" type="fk" pk-ref="212" fk-ref="213"/>
+		<relation name="fk3ms4grldx79w5nd9bma26q0nh" fq-name="public.transfer_history.fk3ms4grldx79w5nd9bma26q0nh" type="fk" pk-ref="212" fk-ref="218"/>
+		<relation name="fkoq5hptwt8qpsu58iyawxp5qy8" fq-name="public.transfer_history.fkoq5hptwt8qpsu58iyawxp5qy8" type="fk" pk-ref="212" fk-ref="218"/>
+		<relation name="fkmsqujpes5uqefqc9e28hwa5tt" fq-name="public.labels.fkmsqujpes5uqefqc9e28hwa5tt" type="fk" pk-ref="213" fk-ref="215"/>
+		<relation name="fkarw1tu6h2myqnqn3gid8t9rxx" fq-name="public.item_assignments.fkarw1tu6h2myqnqn3gid8t9rxx" type="fk" pk-ref="214" fk-ref="213"/>
+		<relation name="fkhin9os0n81o7e2wq3jgof8ojk" fq-name="public.transfer_history.fkhin9os0n81o7e2wq3jgof8ojk" type="fk" pk-ref="214" fk-ref="218"/>
+		<relation name="computer_label_fk_constraint" fq-name="public.computers.computer_label_fk_constraint" type="fk" pk-ref="215" fk-ref="208"/>
+		<relation name="device_purchase_fk_constraint" fq-name="public.computers.device_purchase_fk_constraint" type="fk" pk-ref="216" fk-ref="208"/>
+		<relation name="supplier_address_fk_constraint" fq-name="public.addresses.supplier_address_fk_constraint" type="fk" pk-ref="217" fk-ref="204"/>
+		<relation name="supplier_contact_person_fk_constraint" fq-name="public.contact_persons.supplier_contact_person_fk_constraint" type="fk" pk-ref="217" fk-ref="209"/>
+		<relation name="fk19no9r2d31i2g27fh8h72xif8" fq-name="public.items.fk19no9r2d31i2g27fh8h72xif8" type="fk" pk-ref="217" fk-ref="214"/>
+		<relation name="purchase_supplier_fk_constraint" fq-name="public.purchases.purchase_supplier_fk_constraint" type="fk" pk-ref="217" fk-ref="216">
+			<bend type="abs" x="1268" y="1771"/>
+			<bend type="abs" x="1747" y="1771"/>
+		</relation>
+	</relations>
+</diagram>

@@ -1,0 +1,32 @@
+{
+	"folders": {},
+	"connections": {
+		"postgres-jdbc-185de631867-685b9b9013711f78": {
+			"provider": "postgresql",
+			"driver": "postgres-jdbc",
+			"name": "assets_db",
+			"save-password": true,
+			"configuration": {
+				"host": "localhost",
+				"port": "5432",
+				"database": "assets_db",
+				"url": "jdbc:postgresql://localhost:5432/assets_db",
+				"configurationType": "MANUAL",
+				"type": "dev",
+				"provider-properties": {},
+				"auth-model": "native"
+			}
+		}
+	},
+	"connection-types": {
+		"dev": {
+			"name": "Development",
+			"color": "255,255,255",
+			"description": "Regular development database",
+			"auto-commit": true,
+			"confirm-execute": false,
+			"confirm-data-change": false,
+			"auto-close-transactions": false
+		}
+	}
+}
