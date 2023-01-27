@@ -456,7 +456,7 @@ void shouldFindPurchase() {
 					.contentType(APPLICATION_JSON)
 					.extract().as(Computer.class);
 		
-		assertThat(computer).extracting("model", "modelNumber", "SerialNumber", "purchase.purchaseQty")
+		assertThat(computer).extracting("model", "modelNumber", "serialNumber", "purchase.purchaseQty")
 										 .doesNotContainNull()
 										 .containsExactly(UPDATED_MODEL_NAME, UPDATED_MODEL_NUMBER, UPDATED_SERIAL_NUMBER, PURCHASE_QUANTITY);
 	}

@@ -36,12 +36,10 @@ import com.assets.management.assets.model.entity.Address;
 import com.assets.management.assets.model.entity.Computer;
 import com.assets.management.assets.model.entity.Purchase;
 import com.assets.management.assets.model.entity.Supplier;
-import com.assets.management.assets.model.valueobject.PurchasePerSupplier;
 import com.assets.management.assets.model.valueobject.SupplierType;
 
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
-import io.quarkus.test.junit.DisabledOnIntegrationTest;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
@@ -256,7 +254,7 @@ class PurchaseResourceTest {
 		
 	@Test
 	@Order(9)
-	@DisabledOnIntegrationTest
+//	@DisabledOnIntegrationTest
 	void shouldCountPurchasesPerSupplier() {  
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
