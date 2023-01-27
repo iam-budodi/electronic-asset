@@ -26,7 +26,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import com.assets.management.assets.model.Supplier;
+import com.assets.management.assets.model.entity.Supplier;
 import com.assets.management.assets.service.SupplierService;
 
 @Path("/suppliers")

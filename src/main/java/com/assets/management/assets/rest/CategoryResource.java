@@ -24,7 +24,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import com.assets.management.assets.model.Category;
+import com.assets.management.assets.model.entity.Category;
 import com.assets.management.assets.service.CategoryService;
 
 

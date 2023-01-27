@@ -11,7 +11,7 @@ import javax.ws.rs.NotFoundException;
 
 import org.jboss.logging.Logger;
 
-import com.assets.management.assets.model.Employee;
+import com.assets.management.assets.model.entity.Employee;
 import com.assets.management.assets.qualifier.WorkId;
 import com.assets.management.assets.util.NumberGenerator;
 

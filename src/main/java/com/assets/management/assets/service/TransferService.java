@@ -9,10 +9,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
 
-import com.assets.management.assets.model.AssignmentStatus;
-import com.assets.management.assets.model.Employee;
-import com.assets.management.assets.model.ItemAssignment;
-import com.assets.management.assets.model.TransferHistory;
+import com.assets.management.assets.model.entity.Employee;
+import com.assets.management.assets.model.entity.ItemAssignment;
+import com.assets.management.assets.model.entity.TransferHistory;
+import com.assets.management.assets.model.valueobject.AssignmentStatus;
 import com.assets.management.assets.util.QrCodeClient;
 
 import io.quarkus.hibernate.orm.panache.Panache;

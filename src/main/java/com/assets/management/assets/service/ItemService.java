@@ -11,8 +11,8 @@ import javax.ws.rs.NotFoundException;
 
 import org.jboss.logging.Logger;
 
-import com.assets.management.assets.model.Item;
-import com.assets.management.assets.model.Supplier;
+import com.assets.management.assets.model.entity.Item;
+import com.assets.management.assets.model.entity.Supplier;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;

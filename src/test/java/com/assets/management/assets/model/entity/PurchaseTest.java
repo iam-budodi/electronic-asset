@@ -1,4 +1,4 @@
-package com.assets.management.assets.model;
+package com.assets.management.assets.model.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -25,7 +25,7 @@ import io.quarkus.test.junit.QuarkusTest;
 @Transactional
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PurchaseTest {
-	private static final LocalDate PURCHASE_DATE = LocalDate.of(2022, Month.JANUARY, 19);
+	private static final LocalDate PURCHASE_DATE = LocalDate.of(2023, Month.JANUARY, 19);
 	private static final Integer PURCHASE_QUANTITY = 5;
 	private static final BigDecimal PURCHASE_PRICE = BigDecimal.valueOf(1850000).setScale(2, RoundingMode.HALF_UP);
 	private static final String INVOICE_NUMBER = "UBX-123456PLC";
@@ -40,6 +40,7 @@ class PurchaseTest {
 	@Test
 	@Order(1)
 	void shouldAddPurchase() {
+//		Purchase purchase = new Purchase();
 		Purchase purchase = new Purchase();
 		purchase.purchaseDate = PURCHASE_DATE;
 		purchase.purchaseQty = PURCHASE_QUANTITY;

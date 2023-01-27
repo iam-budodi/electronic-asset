@@ -8,7 +8,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-import com.assets.management.assets.model.QrContent;
+import com.assets.management.assets.model.valueobject.QrContent;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 

@@ -1,4 +1,4 @@
-package com.assets.management.assets.model;
+package com.assets.management.assets.model.entity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

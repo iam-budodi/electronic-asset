@@ -29,9 +29,9 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.assets.management.assets.model.Address;
-import com.assets.management.assets.model.Supplier;
-import com.assets.management.assets.model.SupplierType;
+import com.assets.management.assets.model.entity.Address;
+import com.assets.management.assets.model.entity.Supplier;
+import com.assets.management.assets.model.valueobject.SupplierType;
 
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;

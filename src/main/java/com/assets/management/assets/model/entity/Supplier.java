@@ -1,4 +1,4 @@
-package com.assets.management.assets.model;
+package com.assets.management.assets.model.entity;
 
 import java.util.Optional;
 
@@ -17,6 +17,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import com.assets.management.assets.model.valueobject.SupplierType;
 
 import io.quarkus.panache.common.Parameters;
 

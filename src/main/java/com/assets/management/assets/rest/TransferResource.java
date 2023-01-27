@@ -17,8 +17,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
-import com.assets.management.assets.model.ItemAssignment;
-import com.assets.management.assets.model.TransferHistory;
+import com.assets.management.assets.model.entity.ItemAssignment;
+import com.assets.management.assets.model.entity.TransferHistory;
 import com.assets.management.assets.service.TransferService;
 
 @Path("transfer")

@@ -24,10 +24,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
- 
-import com.assets.management.assets.model.Item;
-import com.assets.management.assets.model.ItemAssignment;
-import com.assets.management.assets.model.Label;
+
+import com.assets.management.assets.model.entity.Item;
+import com.assets.management.assets.model.entity.ItemAssignment;
+import com.assets.management.assets.model.entity.Label;
 import com.assets.management.assets.service.AssignmentService;
 
 @Path("/assigns")

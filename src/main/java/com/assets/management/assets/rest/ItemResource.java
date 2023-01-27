@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.jboss.logging.Logger;
 
-import com.assets.management.assets.model.Item;
+import com.assets.management.assets.model.entity.Item;
 import com.assets.management.assets.service.ItemService;
 
 @Path("/items")

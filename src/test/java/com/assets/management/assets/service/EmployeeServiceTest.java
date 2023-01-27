@@ -23,10 +23,10 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.assets.management.assets.model.Address;
-import com.assets.management.assets.model.Employee;
-import com.assets.management.assets.model.EmploymentStatus;
-import com.assets.management.assets.model.Gender;
+import com.assets.management.assets.model.entity.Address;
+import com.assets.management.assets.model.entity.Employee;
+import com.assets.management.assets.model.valueobject.EmploymentStatus;
+import com.assets.management.assets.model.valueobject.Gender;
 
 import io.quarkus.test.junit.QuarkusTest;
 
@@ -224,7 +224,7 @@ class EmployeeServiceTest {
 		EntityNotFoundException thrown = assertThrows(EntityNotFoundException.class,
 				() -> employeeService.deleteEmployee(randomId));
 		assertEquals(
-				"Unable to find com.assets.management.assets.model.Employee with id " + randomId,
+				"Unable to find com.assets.management.assets.model.entity.Employee with id " + randomId,
 				thrown.getMessage());
 	}
 

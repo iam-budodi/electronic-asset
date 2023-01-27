@@ -1,4 +1,4 @@
-package com.assets.management.assets.model;
+package com.assets.management.assets.model.entity;
 
 import javax.persistence.Column;
 import javax.persistence.EnumType;
@@ -8,6 +8,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import com.assets.management.assets.model.valueobject.Gender;
 
 @MappedSuperclass
 public class Person extends BaseEntity {

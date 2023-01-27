@@ -1,4 +1,4 @@
-package com.assets.management.assets.model;
+package com.assets.management.assets.model.entity;
 
 import java.time.LocalDate;
 
@@ -14,6 +14,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+
+import com.assets.management.assets.model.valueobject.Status;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 

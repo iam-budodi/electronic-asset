@@ -1,4 +1,4 @@
-package com.assets.management.assets.model;
+package com.assets.management.assets.model.entity;
 
 import java.util.Set;
 
@@ -19,6 +19,8 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import com.assets.management.assets.model.valueobject.Peripheral;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.panache.common.Parameters;
@@ -82,10 +84,15 @@ public class Computer extends PanacheEntity {
 	@Column(name = "graphics_card")
 	public Integer graphicsCard;
 
-//	@NotNull
+	@NotNull
 	@ElementCollection
 	@Enumerated(EnumType.STRING)
-	@Column(name = "peripherals", nullable = false)
+	@JoinColumn(
+			name = "peripherals",
+			nullable = false,
+			foreignKey = @ForeignKey(
+					name = "device_peripherals_fk_constraint", 
+					foreignKeyDefinition = ""))
 	public Set<Peripheral> peripherals;
 	
 	@JoinColumn(

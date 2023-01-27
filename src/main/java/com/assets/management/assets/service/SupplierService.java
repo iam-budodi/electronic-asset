@@ -9,7 +9,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
 
-import com.assets.management.assets.model.Supplier;
+import com.assets.management.assets.model.entity.Supplier;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.panache.common.Parameters;

@@ -36,11 +36,11 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.assets.management.assets.model.Address;
-import com.assets.management.assets.model.Department;
-import com.assets.management.assets.model.Employee;
-import com.assets.management.assets.model.EmploymentStatus;
-import com.assets.management.assets.model.Gender;
+import com.assets.management.assets.model.entity.Address;
+import com.assets.management.assets.model.entity.Department;
+import com.assets.management.assets.model.entity.Employee;
+import com.assets.management.assets.model.valueobject.EmploymentStatus;
+import com.assets.management.assets.model.valueobject.Gender;
 
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;

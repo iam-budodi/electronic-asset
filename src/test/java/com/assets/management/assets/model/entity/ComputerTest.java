@@ -1,4 +1,4 @@
-package com.assets.management.assets.model;
+package com.assets.management.assets.model.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,6 +19,8 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+
+import com.assets.management.assets.model.valueobject.Peripheral;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.test.junit.QuarkusTest;
@@ -183,12 +185,18 @@ class ComputerTest {
 	
 	@Test
 	@Order(8)
-	void shouldDelete() {
+	void shouldDeleteComputer() {
 		assertThat(Computer.deleteById(computerId)).isTrue();
 	}
 	
 	@Test
 	@Order(9)
+	void shouldDeletePurchase() {
+		assertThat(Purchase.deleteById(purchaseId)).isTrue();
+	}
+	
+	@Test
+	@Order(10)
 	void shouldNotRetrieveDeletedRecord() {
 		List<Computer> computers = Computer.listAll();
 		assertThat(computers).extracting("id").doesNotContain(computerId);

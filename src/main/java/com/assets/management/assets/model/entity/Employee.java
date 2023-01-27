@@ -1,4 +1,4 @@
-package com.assets.management.assets.model;
+package com.assets.management.assets.model.entity;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -24,6 +24,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
+
+import com.assets.management.assets.model.valueobject.EmploymentStatus;
 
 import io.quarkus.panache.common.Parameters;
 

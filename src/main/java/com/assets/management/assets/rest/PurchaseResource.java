@@ -22,9 +22,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import com.assets.management.assets.model.Computer;
-import com.assets.management.assets.model.Purchase;
-import com.assets.management.assets.model.Supplier;
+import com.assets.management.assets.model.entity.Computer;
+import com.assets.management.assets.model.entity.Purchase;
+import com.assets.management.assets.model.entity.Supplier;
+import com.assets.management.assets.model.valueobject.PurchasePerSupplier;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.panache.common.Parameters;
@@ -51,22 +52,34 @@ public class PurchaseResource {
 	
 	@POST
 	public Response makePurchase(@Valid Purchase purchase, @Context UriInfo uriInfo) {
-		boolean isDuplicate =  Purchase.findByInvoice(purchase.invoiceNumber).isPresent();
-		if (isDuplicate)  return Response.status(Status.CONFLICT).entity("Purchase record already exists!").build();
-		else if (purchase.supplier != null) {
-			if (purchase.supplier.id == null) return Response.status(Status.BAD_REQUEST).entity("Invalid supplier").build();
-			boolean isSupplier = Supplier.findByIdOptional(purchase.supplier.id ).isPresent();
-			if (!isSupplier) 
-				return Response.status(Status.BAD_REQUEST).entity("Make sure there's supplier record for this purchase").build();	
-		}
+		boolean isDuplicate = Purchase.findByInvoice(purchase.invoiceNumber).isPresent();
+		if (isDuplicate) return Response.status(Status.CONFLICT).entity("Purchase record already exists!").build();
+		if (purchase.supplier == null || purchase.supplier.id == null) 
+			return Response.status(Status.BAD_REQUEST).entity("Invalid supplier").build();
 		
-		Purchase.persist(purchase);
-		URI purchaseURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(purchase.id)).build();
-		return Response.created(purchaseURI).build();
+//			return Response.status(Status.BAD_REQUEST).entity("Make sure there's supplier record for this purchase").build();
+//		else if (purchase.supplier != null) {
+//			if (purchase.supplier.id == null) return Response.status(Status.BAD_REQUEST).entity("Invalid supplier").build();
+//			boolean isSupplier = Supplier.findByIdOptional(purchase.supplier.id).isPresent();
+//			if (!isSupplier) 
+//				return Response.status(Status.NOT_FOUND).entity("Supplier dont exist").build();	
+//		}
+
+
+		return Supplier.findByIdOptional(purchase.supplier.id).map(
+				supplier -> {
+					Purchase.persist(purchase);
+					URI purchaseURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(purchase.id)).build();
+					return Response.created(purchaseURI).build();
+					}
+				).orElseGet(() -> Response.status(Status.NOT_FOUND).entity("Supplier dont exists").build());
+//		Purchase.persist(purchase);
+//		URI purchaseURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(purchase.id)).build();
+//		return Response.created(purchaseURI).build();
 	}
 	
 	@GET
-	@Path("/{id: \\d+}")
+	@Path("/{id}")
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Response findPurchaseById(@PathParam("id") @NotNull Long purchaseId) {
 		return Purchase.find("SELECT DISTINCT p FROM Purchase p "
@@ -77,6 +90,18 @@ public class PurchaseResource {
 				.firstResultOptional()
 				.map(purchase -> Response.ok(purchase).build())
 				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
+	}
+
+	@GET
+	@Path("/count")
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public Response countItemPerSupplier() {
+		List<PurchasePerSupplier> purchasesPerSupplier = Purchase.find("SELECT p.supplier.name AS supplier, COUNT(p.supplier) AS purchases "
+				+ "FROM Purchase p "
+				+ "GROUP BY p.supplier.name"
+				).project(PurchasePerSupplier.class).list();
+
+		return Response.ok(purchasesPerSupplier).build();
 	}
 	
 	@GET
@@ -96,16 +121,16 @@ public class PurchaseResource {
 				+ "WHERE p.invoiceNumber = :invoiceNumber", 
 				Sort.by("p.purchaseDate").and("cg.name").and("c.brand"), 
 				Parameters.with("invoiceNumber", invoiceNumber))
-//				+ "ORDER BY p.purchaseDate")
 				.page(pIndex, pSize).list();
 		return Response.ok(computers).build();
 	}
 	
 	@PUT
-	@Path("/{id: \\d+}")
+	@Path("/{id}")
 	public Response updatePurchase(@PathParam("id") @NotNull Long purchaseId, @Valid Purchase purchase) {
-		if (!purchaseId.equals(purchase.id)) 
-			return Response.status(Response.Status.CONFLICT).entity(purchase).build();
+		if (!purchaseId.equals(purchase.id)) return Response.status(Response.Status.CONFLICT).entity(purchase).build();
+		else 	if (purchase.supplier == null) 
+			return Response.status(Status.BAD_REQUEST).entity("Supplier details should be encluded").build();
 		
 		return Purchase.findByIdOptional(purchaseId).map(
 				exists -> {
@@ -116,7 +141,7 @@ public class PurchaseResource {
 	}
 	
 	@DELETE
-	@Path("/{id: \\d+}")
+	@Path("/{id}")
 	public Response deletePurchase(@PathParam("id") @NotNull Long purchaseId) {
 				return Purchase.deleteById(purchaseId) 
 						? Response.status(Status.NO_CONTENT).build() 

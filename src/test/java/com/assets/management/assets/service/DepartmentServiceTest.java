@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.assets.management.assets.model.Department;
+import com.assets.management.assets.model.entity.Department;
 
 import io.quarkus.test.junit.QuarkusTest;
 
@@ -152,7 +152,7 @@ class DepartmentServiceTest {
 				EntityNotFoundException.class, 
 				() -> service.deleteDepartment(randomId));
 		assertEquals(
-				"Unable to find com.assets.management.assets.model.Department with id " 
+				"Unable to find com.assets.management.assets.model.entity.Department with id " 
 						+ randomId,
 				thrown.getMessage());
 	}

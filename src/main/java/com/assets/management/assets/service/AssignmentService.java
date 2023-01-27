@@ -11,11 +11,11 @@ import javax.ws.rs.NotFoundException;
 
 import org.jboss.logging.Logger;
 
-import com.assets.management.assets.model.Employee;
-import com.assets.management.assets.model.Item;
-import com.assets.management.assets.model.ItemAssignment;
-import com.assets.management.assets.model.Label;
-import com.assets.management.assets.model.Status;
+import com.assets.management.assets.model.entity.Employee;
+import com.assets.management.assets.model.entity.Item;
+import com.assets.management.assets.model.entity.ItemAssignment;
+import com.assets.management.assets.model.entity.Label;
+import com.assets.management.assets.model.valueobject.Status;
 import com.assets.management.assets.util.QrCodeClient;
 
 import io.quarkus.hibernate.orm.panache.Panache;

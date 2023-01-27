@@ -1,4 +1,4 @@
-package com.assets.management.assets.model;
+package com.assets.management.assets.model.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -43,6 +43,7 @@ public class Purchase extends PanacheEntity implements Serializable {
 
 	@Min(1)
 	@NotNull
+//	@Digits(fraction = 0, integer = 0)
 	@Column(name = "purchase_quantity", nullable = false)
 	public Integer purchaseQty;
 

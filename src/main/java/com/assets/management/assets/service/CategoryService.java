@@ -9,7 +9,7 @@ import javax.ws.rs.NotFoundException;
 
 import org.jboss.logging.Logger;
 
-import com.assets.management.assets.model.Category;
+import com.assets.management.assets.model.entity.Category;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 

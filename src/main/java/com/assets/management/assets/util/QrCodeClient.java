@@ -6,8 +6,8 @@ import javax.inject.Inject;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.assets.management.assets.client.QrProxy;
-import com.assets.management.assets.model.ItemAssignment;
-import com.assets.management.assets.model.QrContent;
+import com.assets.management.assets.model.entity.ItemAssignment;
+import com.assets.management.assets.model.valueobject.QrContent;
 
 @ApplicationScoped
 public class QrCodeClient {

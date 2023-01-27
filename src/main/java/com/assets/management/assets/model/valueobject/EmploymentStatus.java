@@ -1,4 +1,4 @@
-package com.assets.management.assets.model;
+package com.assets.management.assets.model.valueobject;
 
 public enum EmploymentStatus {
 	CONTRACT, 

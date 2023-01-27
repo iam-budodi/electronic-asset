@@ -25,8 +25,8 @@ import javax.ws.rs.core.UriInfo;
 
 import org.jboss.logging.Logger;
 
-import com.assets.management.assets.model.Computer;
-import com.assets.management.assets.model.Purchase;
+import com.assets.management.assets.model.entity.Computer;
+import com.assets.management.assets.model.entity.Purchase;
 import com.assets.management.assets.service.ComputerService;
 
 import io.quarkus.hibernate.orm.panache.Panache;
@@ -55,7 +55,7 @@ public class ComputerResource {
 				+ "LEFT JOIN FETCH c.purchase p "
 				+ "LEFT JOIN FETCH p.supplier s "
 				+ "LEFT JOIN FETCH s.address "
-				+ "ORDER BY p.purchaseDate")
+				+ "ORDER BY p.purchaseDate, c.brand, c.model")
 				.page(pageIndex, pageSize).list();
 		return Response.ok(computers).build();
 	}
@@ -63,20 +63,29 @@ public class ComputerResource {
 	@POST
 	public Response createComputer(@Valid Computer computer, @Context UriInfo uriInfo) {
 		LOG.info("CHECKING FOR PURCHASE OBJ: " + computer.purchase.id);
-		if (computer.purchase.id == null) return Response.status(Status.BAD_REQUEST).entity("Invalid purchase details").build();
-		boolean exists =  Purchase.findByIdOptional(computer.purchase.id).isPresent();
 		if (Computer.checkSerialNumber(computer.serialNumber))
 			return Response.status(Status.CONFLICT).entity("Duplicate is not allow!").build();
-		else if (!exists) 
-			return Response.status(Status.NOT_FOUND).entity("Make sure there's purchase record for the item").build();
-		
-		Computer.persist(computer);
-		URI computerUri = uriInfo.getAbsolutePathBuilder().path(Long.toString(computer.id)).build();
-		return Response.created(computerUri).build();
+//		boolean exists =  Purchase.findByIdOptional(computer.purchase.id).isPresent();
+		if (computer.purchase == null || computer.purchase.id == null)
+			return Response.status(Status.BAD_REQUEST).entity("Invalid purchase details").build();
+//		else if (!exists) 
+//			return Response.status(Status.NOT_FOUND).entity("Make sure there's purchase record for the item").build();
+
+		return Purchase.findByIdOptional(computer.purchase.id).map(
+				purchase -> {
+					Computer.persist(computer);
+					URI computerUri = uriInfo.getAbsolutePathBuilder().path(Long.toString(computer.id)).build();
+					return Response.created(computerUri).build();
+					}
+				).orElseGet(() -> Response.status(Status.NOT_FOUND).entity("Purchase record dont exists").build());
+
+//		Computer.persist(computer);
+//		URI computerUri = uriInfo.getAbsolutePathBuilder().path(Long.toString(computer.id)).build();
+//		return Response.created(computerUri).build();
 	}
 	
 	@GET
-	@Path("/{id: \\d+}")
+	@Path("/{id}")
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Response findComputerById(@PathParam("id") @NotNull Long computerId) {
 		return Computer.find("SELECT DISTINCT c FROM Computer c "
@@ -93,7 +102,7 @@ public class ComputerResource {
 	}
 	
 	@PUT
-	@Path("/{id: \\d+}")
+	@Path("/{id}")
 	public Response updateComputer(@PathParam("id") @NotNull Long computerId, @Valid Computer computer) {
 		if (!computerId.equals(computer.id)) 
 			return Response.status(Response.Status.CONFLICT).entity(computer).build();
@@ -107,7 +116,7 @@ public class ComputerResource {
 	}
 	
 	@DELETE
-	@Path("/{id: \\d+}")
+	@Path("/{id}")
 	public Response deleteComputer(@PathParam("id") @NotNull Long computerId) {
 				return Computer.deleteById(computerId) 
 						? Response.status(Status.NO_CONTENT).build() 

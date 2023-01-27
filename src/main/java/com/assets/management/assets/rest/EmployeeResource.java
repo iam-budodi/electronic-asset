@@ -27,8 +27,8 @@ import javax.ws.rs.core.UriInfo;
 
 import org.jboss.logging.Logger;
 
-import com.assets.management.assets.model.Department;
-import com.assets.management.assets.model.Employee;
+import com.assets.management.assets.model.entity.Department;
+import com.assets.management.assets.model.entity.Employee;
 import com.assets.management.assets.service.EmployeeService;
 
 import io.quarkus.panache.common.Parameters;
