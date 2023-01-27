@@ -41,6 +41,7 @@ import com.assets.management.assets.model.valueobject.SupplierType;
 
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
+import io.quarkus.test.junit.DisabledOnIntegrationTest;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
@@ -255,6 +256,7 @@ class PurchaseResourceTest {
 		
 	@Test
 	@Order(9)
+	@DisabledOnIntegrationTest
 	void shouldCountPurchasesPerSupplier() {  
 		List<PurchasePerSupplier> purchasPerSuppliers = given()
 			.header(ACCEPT, APPLICATION_JSON)
