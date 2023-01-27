@@ -95,7 +95,7 @@ public class PurchaseResource {
 	@GET
 	@Path("/count")
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public Response countItemPerSupplier() {
+	public Response countPurchasePerSupplier() {
 		List<PurchasePerSupplier> purchasesPerSupplier = Purchase.find("SELECT p.supplier.name AS supplier, COUNT(p.supplier) AS purchases "
 				+ "FROM Purchase p "
 				+ "GROUP BY p.supplier.name"
