@@ -11,12 +11,12 @@ public class PurchasePerSupplier {
 //	@NotNull
 //	@Size(min = 2, max = 64)
 //	@Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
-	@JsonProperty("isbn_13")
+	@JsonProperty
 	public final String supplierName;
 //	
 //	@Min(1)
 //	@NotNull
-	@JsonProperty("isbn_13")
+	@JsonProperty
 	public final Long purchaseCount;
 	
 	public PurchasePerSupplier(@ProjectedFieldName("supplier.name") String supplierName, Long purchaseCount) {
