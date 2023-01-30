@@ -29,7 +29,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 		uniqueConstraints = {
 				@UniqueConstraint(
 						name = "unique_invoice_number", 
-						columnNames = { "invoice_number" })
+						columnNames = { "purchase_invoice_number" })
 				}
 		)
 public class Purchase extends PanacheEntity implements Serializable {
@@ -53,7 +53,7 @@ public class Purchase extends PanacheEntity implements Serializable {
 	public BigDecimal purchasePrice;
 
 	@NotNull
-	@Column(name = "invoice_number", nullable = false)
+	@Column(name = "purchase_invoice_number", nullable = false)
 	public String invoiceNumber;
 
 //	@MapsId
