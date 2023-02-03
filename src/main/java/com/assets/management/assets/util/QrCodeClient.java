@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.assets.management.assets.client.QrProxy;
+import com.assets.management.assets.model.entity.Asset;
 import com.assets.management.assets.model.entity.ItemAssignment;
 import com.assets.management.assets.model.valueobject.QrContent;
 
@@ -15,8 +16,8 @@ public class QrCodeClient {
 	@RestClient
 	QrProxy qrProxy;
 
-	public byte[] formatQrImgToString(String serialNumber) {
-		QrContent qrContent = ItemAssignment.projectQrContents(serialNumber);
+	public byte[] formatQrImgToString(QrContent qrContent) {
+//		QrContent qrContent = Asset.projectQrContents(serialNumber); // from the new design
 //		byte[] qrCode = qrProxy.createQrString(qrContent);
 //		return Base64.getEncoder().encodeToString(qrCode);
 		return qrProxy.createQrString(qrContent);

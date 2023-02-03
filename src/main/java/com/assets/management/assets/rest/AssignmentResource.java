@@ -84,6 +84,7 @@ public class AssignmentResource {
 		return Response.ok(items).build();
 	}
 
+	// utilized in employeeresource
 	@GET
 	@Path("/preview/{id}")
 	@Produces("image/png")
@@ -93,7 +94,7 @@ public class AssignmentResource {
 					+ "FROM ItemAssignment i "
 					+ "WHERE i.item.id = ?1", itemId)
 					.firstResult();
-		return Response.ok(label.itemQrString).build();
+		return Response.ok(label.qrByteString).build();
 	}
 		
 	@PUT

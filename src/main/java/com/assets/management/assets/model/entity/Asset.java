@@ -20,6 +20,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.assets.management.assets.model.valueobject.QrContent;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.panache.common.Parameters;
 
@@ -75,7 +77,7 @@ public class Asset  extends PanacheEntity {
 	@JoinColumn(
 			name = "label_fk", 
 			foreignKey = @ForeignKey(
-					name = "computer_label_fk_constraint", 
+					name = "asset_label_fk_constraint", 
 					foreignKeyDefinition = ""))
 	public Label label;
 
@@ -96,5 +98,10 @@ public class Asset  extends PanacheEntity {
 		return find(
 				"#Asset.getSN", Parameters.with("serialNumber", serialNumber).map())
 				.firstResultOptional().isPresent();
+	}
+	
+	public static QrContent projectQrContents(String sn) {
+		// Query projection
+		return find("serialNumber", sn).project(QrContent.class).singleResult();
 	}
 }

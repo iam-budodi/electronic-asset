@@ -12,7 +12,7 @@ import javax.ws.rs.NotFoundException;
 import com.assets.management.assets.model.entity.Employee;
 import com.assets.management.assets.model.entity.ItemAssignment;
 import com.assets.management.assets.model.entity.TransferHistory;
-import com.assets.management.assets.model.valueobject.AssignmentStatus;
+import com.assets.management.assets.model.valueobject.AllocationStatus;
 import com.assets.management.assets.util.QrCodeClient;
 
 import io.quarkus.hibernate.orm.panache.Panache;
@@ -37,9 +37,9 @@ public class TransferService {
 				.orElseThrow(() -> new NotFoundException("Item was not assigned to any user"));
 		history.transferedFromEmployee = assignment.employee;
 		assignment.employee = newCustodian;
-		assignment.status = AssignmentStatus.Transfered;
+		assignment.status = AllocationStatus.TRANSFERED;
 		assignment.item.transferCount += 1;
-		assignment.label.itemQrString = qrCodeClient.formatQrImgToString(assignment.itemSerialNumber);
+//		assignment.label.itemQrString = qrCodeClient.formatQrImgToString(assignment.itemSerialNumber);
 		
 		Panache.getEntityManager().merge(assignment);
 		

@@ -18,7 +18,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 
-import com.assets.management.assets.model.valueobject.AssignmentStatus;
+import com.assets.management.assets.model.valueobject.AllocationStatus;
 import com.assets.management.assets.model.valueobject.QrContent;
 import com.assets.management.assets.model.valueobject.Status;
 
@@ -48,7 +48,7 @@ public class ItemAssignment extends PanacheEntity {
 	@ColumnDefault(value = "'Assigned'")
 	@Enumerated(EnumType.STRING)
 	@Column(name = "assignment_status", nullable = false)
-	public AssignmentStatus status;
+	public AllocationStatus status;
 
 	@Column(length = 4000)
 	public String remarks;
@@ -58,13 +58,13 @@ public class ItemAssignment extends PanacheEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	public Employee employee;
-	 
-	@OneToOne(
-	        mappedBy = "itemAssignment", 
-	        cascade = CascadeType.ALL,
-	        fetch = FetchType.LAZY
-	)
-	public Label label;
+//	 
+//	@OneToOne(
+//	        mappedBy = "itemAssignment", 
+//	        cascade = CascadeType.ALL,
+//	        fetch = FetchType.LAZY
+//	)
+//	public Label label;
 
 	public static Boolean isItemAssigned(Long itemId) {
 		return find("item.id = ?1", itemId)

@@ -2,6 +2,7 @@ package com.assets.management.assets.rest;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -11,6 +12,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -25,9 +27,17 @@ import javax.ws.rs.core.UriInfo;
 
 import org.jboss.logging.Logger;
 
+import com.assets.management.assets.model.entity.Allocation;
+import com.assets.management.assets.model.entity.Asset;
 import com.assets.management.assets.model.entity.Computer;
+import com.assets.management.assets.model.entity.Employee;
+import com.assets.management.assets.model.entity.Item;
+import com.assets.management.assets.model.entity.ItemAssignment;
+import com.assets.management.assets.model.entity.Label;
 import com.assets.management.assets.model.entity.Purchase;
+import com.assets.management.assets.model.valueobject.QrContent;
 import com.assets.management.assets.service.ComputerService;
+import com.assets.management.assets.util.QrCodeClient;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.panache.common.Parameters;
@@ -43,6 +53,9 @@ public class ComputerResource {
 	
 	@Inject
 	ComputerService computerService;
+	
+	@Inject
+	QrCodeClient qrCodeClient;
 	
 	@GET
 	@Transactional(Transactional.TxType.SUPPORTS)
@@ -83,6 +96,71 @@ public class ComputerResource {
 //		URI computerUri = uriInfo.getAbsolutePathBuilder().path(Long.toString(computer.id)).build();
 //		return Response.created(computerUri).build();
 	}
+//	
+//	@POST
+//	@Path("/{id}/allocates")
+//	public Response assignItem(
+//			@PathParam("id") @NotNull Long computerId, 
+//			@QueryParam("employee") @NotNull Long employeeId, 
+//			@Valid Allocation allocation,
+//			@Context UriInfo uriInfo) {
+//		
+//		Optional<Allocation>  allocated =  Allocation.find("SELECT DISTINCT a FROM Allocation a "
+//				+ "LEFT JOIN FETCH a.employee e "
+//				+ "LEFT JOIN FETCH a.asset c "
+//				+ "WHERE c.id = :compId "
+//				+ "AND e.id = :empId", 
+//				Parameters.with("compId", computerId).and("empId", employeeId))
+//				.firstResultOptional();
+//
+//		if (allocated.isPresent()) 
+//			return Response.status(Status.CONFLICT).entity("Asset is already taken!").build();
+//
+//		Employee employee = Employee.findById(employeeId);
+//		Computer computer =  Computer.findById(computerId);
+//		
+//		if (employee == null || computer == null) 
+//			return Response.status(Response.Status.NOT_FOUND).entity("Employee/Computer don't exist").build();
+//		
+//		
+//
+//		QrContent qrContent = Computer.projectQrContents(computer.serialNumber);
+//		computer.label.itemQrString = qrCodeClient.formatQrImgToString(qrContent);
+//		allocation.employee = employee;
+//		allocation.asset = computer;
+//		
+////		TODO: ENCRYPT THE  URL OF THE ALLOCATION DETAILS
+////		By first allocate the computer
+////		then create the qr code with the allocation URI 
+////		persist the bytes of the qr code.
+////		TODO: IN THE RELATED GET REQUEST RETURN THE QR CODE OF THE ENCRYPTED  URL OF THE ALLOCATION DETAILS
+////		Label label = new Label();
+////		label.itemQrString = "dummy".getBytes();
+////		assignment.label = label;
+////		assignment.item.status = Status.InUse;
+////		assignment.item.transferCount = 0;
+////		
+////		assignment.label.itemAssignment = assignment;
+////		assignment.label.id = assignment.id;
+////		
+////		ItemAssignment.persist(assignment);
+////		assignment.label.itemQrString = qrCodeClient.formatQrImgToString(assignment.itemSerialNumber);
+////		Panache.getEntityManager().merge(assignment);
+////		
+////		return assignment;
+//		
+//		
+////		try {
+////			assignment = assignmentService.assignItem(assignment, employeeId, itemId);
+////		} catch (NotFoundException ex) {
+////			return Response.status(Response.Status.NOT_FOUND).build();
+////		}
+//		
+//		Allocation.persist(allocation);
+//		URI uri = uriInfo.getAbsolutePathBuilder().path(Long.toString(allocation.id)) .build();
+//
+//		return Response.created(uri).build();
+//	}
 	
 	@GET
 	@Path("/{id}")

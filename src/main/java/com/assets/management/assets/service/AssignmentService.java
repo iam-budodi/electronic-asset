@@ -48,16 +48,16 @@ public class AssignmentService {
 		.orElseThrow(() -> new NotFoundException());
 		
 		Label label = new Label();
-		label.itemQrString = "dummy".getBytes();
-		assignment.label = label;
+		label.qrByteString = "dummy".getBytes();
+//		assignment.label = label;
 		assignment.item.status = Status.InUse;
 		assignment.item.transferCount = 0;
-		
-		assignment.label.itemAssignment = assignment;
-		assignment.label.id = assignment.id;
+//		
+//		assignment.label.itemAssignment = assignment;
+//		assignment.label.id = assignment.id;
 		
 		ItemAssignment.persist(assignment);
-		assignment.label.itemQrString = qrCodeClient.formatQrImgToString(assignment.itemSerialNumber);
+//		assignment.label.itemQrString = qrCodeClient.formatQrImgToString(assignment.itemSerialNumber);
 		Panache.getEntityManager().merge(assignment);
 		
 		return assignment;

@@ -4,6 +4,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
@@ -18,27 +19,21 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 @Entity
 @Table(name = "labels")
 public class Label extends PanacheEntity {
-
-	@Size(max = 64)
-	@Column(name = "item_tag", length = 64)
-	public String itemTag;
+	
+// TO MOVED TO THE BARCODE TABLE
+//	@Size(max = 64)
+//	@Column(name = "item_tag", length = 64)
+//	public String itemTag;
 
 	@NotNull
 	@Size(max = 4000)
 	@Column(name = "item_qr_string", length = 4000, nullable = false)
-	public byte[] itemQrString;
+	public byte[] qrByteString;
 	
-	@JsonIgnore
-	@OneToOne(
-			mappedBy = "label", 
-			orphanRemoval = true,
-			cascade = CascadeType.ALL, 
-			fetch = FetchType.LAZY)
-	public Computer computer;
-	 
-	@OneToOne(fetch = FetchType.LAZY)
-	@MapsId
-	@JoinColumn(name = "assignment_id")
-	@JsonIgnore
-	public ItemAssignment itemAssignment;
+//	 TO BE DELETED  PERMANENTLY
+//	@OneToOne(fetch = FetchType.LAZY)
+//	@MapsId
+//	@JoinColumn(name = "assignment_id")
+//	@JsonIgnore
+//	public ItemAssignment itemAssignment;
 }
