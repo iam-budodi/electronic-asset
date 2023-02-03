@@ -7,7 +7,6 @@ import java.util.Hashtable;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.validation.Valid;
 
 import org.jboss.logging.Logger;
 

@@ -2,10 +2,8 @@ package com.assets.management.assets.rest;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -35,7 +33,6 @@ import org.jboss.logging.Logger;
 import com.assets.management.assets.client.QrProxy;
 import com.assets.management.assets.model.entity.Allocation;
 import com.assets.management.assets.model.entity.Asset;
-import com.assets.management.assets.model.entity.Computer;
 import com.assets.management.assets.model.entity.Department;
 import com.assets.management.assets.model.entity.Employee;
 import com.assets.management.assets.model.entity.Label;
@@ -110,7 +107,6 @@ public class EmployeeResource {
 		return Response.created(employeeUri).build();
 	}
 	
-	// TODO: BEfore allocating check is the allocation exists with the deallocated status
 	@POST
 	@Path("/{id}/assets")
 	@Transactional(Transactional.TxType.REQUIRED)
@@ -118,7 +114,6 @@ public class EmployeeResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response allocateAsset(
 			@PathParam("id") @NotNull Long employeeId, 
-//			@QueryParam("asset") @NotNull Long assetId, 
 			@Valid Allocation allocation,
 			@Context UriInfo uriInfo) throws WriterException, IOException {
 
@@ -130,9 +125,9 @@ public class EmployeeResource {
 		Optional<Allocation>  allocated =  Allocation.find("SELECT DISTINCT a FROM Allocation a "
 				+ "LEFT JOIN FETCH a.employee e "
 				+ "LEFT JOIN FETCH a.asset c "
-				+ "WHERE c.id = :compId "
+				+ "WHERE c.id = :assetId "
 				+ "AND a.status <> :status", 
-				Parameters.with("compId", allocation.asset.id)
+				Parameters.with("assetId", allocation.asset.id)
 				.and("status", AllocationStatus.DEALLOCATED))
 				.firstResultOptional();
 
@@ -151,61 +146,56 @@ public class EmployeeResource {
 		Allocation.persist(allocation);
 		URI allocationURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(allocation.id)) .build();
 		
-		LOG.info("THEN URI : " + allocationURI.toString());
-		// Content for creating QR: http://localhost:8802/rest/employees/6/assets/8
-		
 		Label label = new Label();
 		label.qrByteString = qrGenerator.generateQrString(allocationURI);
 		Label.persist(label);
-		 asset.label = label; // used to update asset with label qr code when asset was the r/ship owning side 
+		 asset.label = label; 
 
 		return Response.created(allocationURI).build();
 	}
 
-
-	// TODO: Update the method to also look into the transfer table
+//	TODO: ERROR: check status side THE conditionS--- EXPROLE OPTION OF USING DEFAULT VALUE
 	@GET
 	@Path("{id}/allocations")
 	@Transactional(Transactional.TxType.SUPPORTS)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response employeeAllocations(
 			@PathParam("id") @NotNull Long employeeId,
-			@QueryParam("status") AllocationStatus status) {
+			@QueryParam("status") AllocationStatus filteredStatus) {
 		
 		List<Allocation> allocations = Allocation.find("SELECT DISTINCT a FROM Allocation a "
 				+ "LEFT JOIN FETCH a.employee e "
 				+ "LEFT JOIN FETCH a.asset ast "
-//				+ "LEFT JOIN FETCH ast.label l " // test the behavior befor uncomment
 				+ "WHERE e.id = :employeeId "
-				+ "AND a.status <> :status", 
+				+ "AND a.status <> :status "
+				+ "AND a.status = :filteredStatus", 
 				Parameters.with("employeeId", employeeId) //check before you go further
-				.and("status", status)) // ERROR: check status side of this AND condition
+				.and("status", AllocationStatus.DEALLOCATED)
+				.and("filteredStatus", filteredStatus)) // TODO: ERROR: check status side of this AND condition
 				.list();
 		
 		return Response.ok(allocations).build();
 	}
-	
-	// TODO: Update the method to also look into the transfer table
+	 
 	@GET
-	@Path("{employee-id}/allocations/{asset-id}") 
-//	@Path("{id}/allocations") // check this when all other fails
+	@Path("{employeeId}/allocations/{assetId}") 
 	@Produces("image/png")
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public Response qrImagePreview(
-			@PathParam("employee-id") @NotNull Long employeeId,
-//			@QueryParam("serialno") @NotNull String serialNumber,
-			@PathParam("asset-id") @NotNull Long assetId){
-		// TODO: IN THE RELATED GET REQUEST RETURN THE QR CODE OF THE ENCRYPTED  URL OF THE ALLOCATION DETAILS
-		
+	public Response employeeQRPreview(
+			@PathParam("employeeId") @NotNull Long employeeId,
+			@PathParam("assetId") @NotNull Long assetId) {
 		Optional<Label> label = Allocation.find("SELECT DISTINCT a.asset.label FROM Allocation a "
 				+ "WHERE a.employee.id = :employeeId "
-				+ "AND a.asset.id = :assetId",
+				+ "AND a.asset.id = :assetId "
+				+ "AND a.status <> :status", 
 				Parameters.with("employeeId", employeeId) 
+				.and("status", AllocationStatus.DEALLOCATED)
 				.and("assetId", assetId))
 				.firstResultOptional();
 		
-		return label.map(qrImage -> Response.ok(qrImage.qrByteString).build())
-				.orElseGet(() -> Response.status(Status.NO_CONTENT).build());
+		return label
+						.map(qrImage -> Response.ok(qrImage.qrByteString).build())
+						.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
 	
 	@PUT
