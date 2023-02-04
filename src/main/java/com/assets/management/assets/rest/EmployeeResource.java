@@ -27,10 +27,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
-import com.assets.management.assets.client.QrProxy;
 import com.assets.management.assets.model.entity.Allocation;
 import com.assets.management.assets.model.entity.Asset;
 import com.assets.management.assets.model.entity.Department;
@@ -55,9 +53,9 @@ public class EmployeeResource {
 	@Inject
 	QRGenerator qrGenerator;
 	
-	@Inject
-	@RestClient
-	QrProxy qrProxy;
+//	@Inject
+//	@RestClient
+//	QrProxy qrProxy;
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -205,6 +203,8 @@ public class EmployeeResource {
 		return label.map(qrImage -> Response.ok(qrImage.qrByteString).build())
 							.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
+	
+	// TODO: implement the resource to redirect when the qr code is scanned and the address clicked
 	
 	@PUT
 	@Path("/{id}")
