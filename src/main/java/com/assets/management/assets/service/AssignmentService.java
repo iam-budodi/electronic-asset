@@ -48,7 +48,7 @@ public class AssignmentService {
 		.orElseThrow(() -> new NotFoundException());
 		
 		Label label = new Label();
-		label.qrByteString = "dummy".getBytes();
+//		label.qrByteString = "dummy".getBytes();
 //		assignment.label = label;
 		assignment.item.status = Status.InUse;
 		assignment.item.transferCount = 0;
@@ -85,7 +85,6 @@ public class AssignmentService {
 		found.delete();
 	}
 	
-
 	public void updateAssignment(@Valid ItemAssignment assignment, @NotNull Long assignmentId) {
 		ItemAssignment.findByIdOptional(assignmentId).map(
 		        itemFound -> Panache.getEntityManager().merge(assignment)

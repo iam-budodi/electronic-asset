@@ -65,6 +65,8 @@ public class EmployeeResource {
 			@QueryParam("page") @DefaultValue("0") Integer pageIndex,
 			@QueryParam("size") @DefaultValue("15") Integer pageSize) {
 		List<Employee> employees = employeeService.listEmployees(pageIndex, pageSize);
+		
+		if (employees.size() == 0) return Response.status(Status.NO_CONTENT).build();
 		return Response.ok(employees).build();
 	}
 
@@ -88,7 +90,9 @@ public class EmployeeResource {
 	@Transactional(Transactional.TxType.SUPPORTS)
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response countEmployees() {
-		return Response.ok(Employee.count()).build();
+		Long nbEmployees = Employee.count();
+		if (nbEmployees == 0) return Response.status(Status.NO_CONTENT).build();
+		return Response.ok(nbEmployees).build();
 	}
 
 	@POST
@@ -149,12 +153,11 @@ public class EmployeeResource {
 		Label label = new Label();
 		label.qrByteString = qrGenerator.generateQrString(allocationURI);
 		Label.persist(label);
-		 asset.label = label; 
+		asset.label = label; 
 
 		return Response.created(allocationURI).build();
 	}
-
-//	TODO: ERROR: check status side THE conditionS--- EXPROLE OPTION OF USING DEFAULT VALUE
+ 
 	@GET
 	@Path("{id}/allocations")
 	@Transactional(Transactional.TxType.SUPPORTS)
@@ -165,15 +168,21 @@ public class EmployeeResource {
 		
 		List<Allocation> allocations = Allocation.find("SELECT DISTINCT a FROM Allocation a "
 				+ "LEFT JOIN FETCH a.employee e "
+				+ "LEFT JOIN FETCH e.department "
+				+ "LEFT JOIN FETCH e.address "
 				+ "LEFT JOIN FETCH a.asset ast "
+				+ "LEFT JOIN FETCH ast.category "
+				+ "LEFT JOIN FETCH ast.label "
+				+ "LEFT JOIN FETCH ast.purchase p "
+				+ "LEFT JOIN FETCH p.supplier s "
+				+ "LEFT JOIN FETCH s.address "
 				+ "WHERE e.id = :employeeId "
-				+ "AND a.status <> :status "
-				+ "AND a.status = :filteredStatus", 
-				Parameters.with("employeeId", employeeId) //check before you go further
-				.and("status", AllocationStatus.DEALLOCATED)
-				.and("filteredStatus", filteredStatus)) // TODO: ERROR: check status side of this AND condition
+				+ "AND (:status IS NULL OR a.status = :status) ",
+				Parameters.with("employeeId", employeeId) 
+				.and	("status", filteredStatus)) 
 				.list();
 		
+		if (allocations.size() == 0) return Response.status(Status.NO_CONTENT).build();
 		return Response.ok(allocations).build();
 	}
 	 
@@ -193,9 +202,8 @@ public class EmployeeResource {
 				.and("assetId", assetId))
 				.firstResultOptional();
 		
-		return label
-						.map(qrImage -> Response.ok(qrImage.qrByteString).build())
-						.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
+		return label.map(qrImage -> Response.ok(qrImage.qrByteString).build())
+							.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
 	
 	@PUT

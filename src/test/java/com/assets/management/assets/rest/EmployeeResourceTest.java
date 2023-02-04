@@ -10,6 +10,7 @@ import static javax.ws.rs.core.Response.Status.CONFLICT;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static javax.ws.rs.core.Response.Status.OK;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -86,7 +87,7 @@ class EmployeeResourceTest {
 	
 	@TestHTTPResource //("departments")
 	@TestHTTPEndpoint(DepartmentResource.class)
-	static URL deptUrl;
+	URL deptUrl;
 	
 	@TestHTTPResource("count")
 	@TestHTTPEndpoint(EmployeeResource.class)
@@ -94,15 +95,24 @@ class EmployeeResourceTest {
 	
 	@Test
 	@Order(1)
-	void shouldFetchEmptyEmployees() {
+	void shouldRetrieveNoEmployees() {
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
 			.when()
 			.get()
 			.then()
-			 	.statusCode(Status.OK.getStatusCode())
-			 	.body("isEmpty()", is(true))
-				.contentType(APPLICATION_JSON); 
+			 	.statusCode(Status.NO_CONTENT.getStatusCode());
+	}
+	
+	@Test
+	@Order(1)
+	void shouldCountNoEmployees() {
+		given()
+			.header(ACCEPT, TEXT_PLAIN)
+			.when()
+			.get(countEndpoint)
+			.then()
+				.statusCode(Status.NO_CONTENT.getStatusCode());
 	}
 		
 	@Test
@@ -155,6 +165,7 @@ class EmployeeResourceTest {
 		// retrieve created URI and extract department Id
 		String[] elements = deptLocation.split("/");
 		departmentId = elements[elements.length - 1];
+		assertThat(departmentId).isNotNull();
 	}
 	
 	@Test 
@@ -171,7 +182,8 @@ class EmployeeResourceTest {
 					.contentType(ContentType.JSON)
 //					.extract().body().as(getDepartmentTypeRef());
 					.extract().as(Department.class);
-//		resetDepartment();
+		
+		assertThat(department).isNotNull();
 	}
 	
 	@Test

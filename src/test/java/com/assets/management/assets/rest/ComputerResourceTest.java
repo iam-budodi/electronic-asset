@@ -112,15 +112,13 @@ class ComputerResourceTest {
 //	
 	@Test
 	@Order(1)
-	void shouldListEmptyComputers() {
+	void shouldRetrieveNoComputers() {
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
 			.when()
 			.get()
 			.then()
-			 	.statusCode(Status.OK.getStatusCode())
-			 	.body("isEmpty()", is(true))
-				.contentType(APPLICATION_JSON); 
+			 	.statusCode(Status.NO_CONTENT.getStatusCode());
 	}
 		
 	@Test

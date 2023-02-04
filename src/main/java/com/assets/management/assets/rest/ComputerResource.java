@@ -57,6 +57,8 @@ public class ComputerResource {
 				+ "LEFT JOIN FETCH s.address "
 				+ "ORDER BY p.purchaseDate, c.brand, c.model")
 				.page(pageIndex, pageSize).list();
+
+		if (computers.size() == 0) return Response.status(Status.NO_CONTENT).build();
 		return Response.ok(computers).build();
 	}
 	
