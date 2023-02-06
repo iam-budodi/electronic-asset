@@ -12,8 +12,6 @@ import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.emptyCollectionOf;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -33,7 +31,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import com.assets.management.assets.model.entity.Address;
-import com.assets.management.assets.model.entity.Computer;
 import com.assets.management.assets.model.entity.Purchase;
 import com.assets.management.assets.model.entity.Supplier;
 import com.assets.management.assets.model.valueobject.SupplierType;
@@ -82,10 +79,10 @@ class PurchaseResourceTest {
 	@TestHTTPResource
 	@TestHTTPEndpoint(SupplierResource.class)
 	static URL supplierURL;
-	
-	@TestHTTPResource("computers")
-	@TestHTTPEndpoint(PurchaseResource.class)
-	URL computersEndpoint;
+//	
+//	@TestHTTPResource("assets")
+//	@TestHTTPEndpoint(PurchaseResource.class)
+//	URL computersEndpoint;
 	
 	@TestHTTPResource("count")
 	@TestHTTPEndpoint(PurchaseResource.class)
@@ -93,15 +90,13 @@ class PurchaseResourceTest {
 	
 	@Test
 	@Order(1)
-	void shouldListEmptyPurchases() {
+	void shouldRetrieveNoPurchases() {
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
 			.when()
 			.get()
 			.then()
-			 	.statusCode(Status.OK.getStatusCode())
-			 	.body("isEmpty()", is(true))
-				.contentType(APPLICATION_JSON); 
+			 	.statusCode(Status.NO_CONTENT.getStatusCode());
 	}
 		
 	@Test
@@ -277,14 +272,14 @@ class PurchaseResourceTest {
 	void shouldRetrievePurchasedComputers() {  
 		given()
 			.header(ACCEPT, APPLICATION_JSON)
-			.queryParam("invoice", "invoiceNumber")
+			.pathParam("invoice", INVOICE_NUMBER)
 			.when()
-			.get(computersEndpoint)
+			.get("/{invoice}/assets")
 			.then()
-				.statusCode(OK.getStatusCode())
-				.contentType(APPLICATION_JSON)
-				.body("", is(emptyCollectionOf(Computer.class)))
-				.body("", hasSize(0));
+				.statusCode(NO_CONTENT.getStatusCode());
+//				.contentType(APPLICATION_JSON)
+//				.body("", is(emptyCollectionOf(Computer.class)))
+//				.body("", hasSize(0));
 	}
 	
 	@Test

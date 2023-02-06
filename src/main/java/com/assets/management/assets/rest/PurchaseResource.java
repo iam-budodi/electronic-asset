@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import com.assets.management.assets.model.entity.Asset;
 import com.assets.management.assets.model.entity.Computer;
 import com.assets.management.assets.model.entity.Purchase;
 import com.assets.management.assets.model.entity.Supplier;
@@ -47,6 +48,8 @@ public class PurchaseResource {
 				+ "LEFT JOIN FETCH s.address "
 				+ "ORDER BY p.purchaseDate, p.purchaseQty DESC")
 				.page(pageIndex, pageSize).list();
+		
+		if (purchases.size() == 0) return Response.status(Status.NO_CONTENT).build();
 		return Response.ok(purchases).build();
 	}
 	
@@ -56,15 +59,6 @@ public class PurchaseResource {
 		if (isDuplicate) return Response.status(Status.CONFLICT).entity("Purchase record already exists!").build();
 		if (purchase.supplier == null || purchase.supplier.id == null) 
 			return Response.status(Status.BAD_REQUEST).entity("Invalid supplier").build();
-		
-//			return Response.status(Status.BAD_REQUEST).entity("Make sure there's supplier record for this purchase").build();
-//		else if (purchase.supplier != null) {
-//			if (purchase.supplier.id == null) return Response.status(Status.BAD_REQUEST).entity("Invalid supplier").build();
-//			boolean isSupplier = Supplier.findByIdOptional(purchase.supplier.id).isPresent();
-//			if (!isSupplier) 
-//				return Response.status(Status.NOT_FOUND).entity("Supplier dont exist").build();	
-//		}
-
 
 		return Supplier.findByIdOptional(purchase.supplier.id).map(
 				supplier -> {
@@ -73,9 +67,6 @@ public class PurchaseResource {
 					return Response.created(purchaseURI).build();
 					}
 				).orElseGet(() -> Response.status(Status.NOT_FOUND).entity("Supplier dont exists").build());
-//		Purchase.persist(purchase);
-//		URI purchaseURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(purchase.id)).build();
-//		return Response.created(purchaseURI).build();
 	}
 	
 	@GET
@@ -105,24 +96,26 @@ public class PurchaseResource {
 	}
 	
 	@GET
-	@Path("/computers")
+	@Path("/{invoice}/assets")
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public Response listAllPurchasedComputer(
-			@QueryParam("invoice") @NotNull String invoiceNumber,
+	public Response listAllAssetsPerPurchase(
+			@PathParam("invoice") @NotNull String invoiceNumber,
 			@QueryParam("page") @DefaultValue("0") Integer pIndex,
 			@QueryParam("size") @DefaultValue("15") Integer pSize) {
 
-		List<Computer> computers = Computer.find("SELECT DISTINCT c FROM Computer c "
-				+ "LEFT JOIN FETCH c.category cg "
-				+ "LEFT JOIN FETCH c.label "
-				+ "LEFT JOIN FETCH c.purchase p "
+		List<Asset> assets = Asset.find("SELECT DISTINCT a FROM Asset a "
+				+ "LEFT JOIN FETCH a.category cg "
+				+ "LEFT JOIN FETCH a.label "
+				+ "LEFT JOIN FETCH a.purchase p "
 				+ "LEFT JOIN FETCH p.supplier s "
 				+ "LEFT JOIN FETCH s.address "
 				+ "WHERE p.invoiceNumber = :invoiceNumber", 
-				Sort.by("p.purchaseDate").and("cg.name").and("c.brand"), 
+				Sort.by("p.purchaseDate").and("cg.name").and("a.brand"), 
 				Parameters.with("invoiceNumber", invoiceNumber))
 				.page(pIndex, pSize).list();
-		return Response.ok(computers).build();
+		
+		if (assets.size() == 0) return Response.status(Status.NO_CONTENT).build();
+		return Response.ok(assets).build();
 	}
 	
 	@PUT

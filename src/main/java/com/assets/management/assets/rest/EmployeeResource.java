@@ -42,6 +42,8 @@ import com.google.zxing.WriterException;
 import io.quarkus.panache.common.Parameters;
 
 @Path("/employees")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class EmployeeResource {
 
 	@Inject
@@ -58,7 +60,6 @@ public class EmployeeResource {
 //	QrProxy qrProxy;
 
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
 	public Response listEmployees(
 			@QueryParam("page") @DefaultValue("0") Integer pageIndex,
 			@QueryParam("size") @DefaultValue("15") Integer pageSize) {
@@ -71,7 +72,6 @@ public class EmployeeResource {
 	@GET
 	@Path("/{id}")
 	@Transactional(Transactional.TxType.SUPPORTS)
-	@Produces(MediaType.APPLICATION_JSON)
 	public Response findEmployee(@PathParam("id") @NotNull Long empId) {
 		return Employee.find("FROM Employee e "
 				+ "LEFT JOIN FETCH e.department "
@@ -86,7 +86,6 @@ public class EmployeeResource {
 	@GET
 	@Path("/count")
 	@Transactional(Transactional.TxType.SUPPORTS)
-	@Produces(MediaType.TEXT_PLAIN)
 	public Response countEmployees() {
 		Long nbEmployees = Employee.count();
 		if (nbEmployees == 0) return Response.status(Status.NO_CONTENT).build();
@@ -94,8 +93,6 @@ public class EmployeeResource {
 	}
 
 	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
 	public Response createEmployee(@Valid Employee employee, @Context UriInfo uriInfo) {
 		if (employee.address == null || employee.department == null)
 			return Response.status(Status.BAD_REQUEST).build();
@@ -110,10 +107,8 @@ public class EmployeeResource {
 	}
 	
 	@POST
-	@Path("/{id}/assets")
+	@Path("/{id}/allocations")
 	@Transactional(Transactional.TxType.REQUIRED)
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
 	public Response allocateAsset(
 			@PathParam("id") @NotNull Long employeeId, 
 			@Valid Allocation allocation,
@@ -155,12 +150,11 @@ public class EmployeeResource {
 
 		return Response.created(allocationURI).build();
 	}
- 
+	
 	@GET
 	@Path("{id}/allocations")
 	@Transactional(Transactional.TxType.SUPPORTS)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response employeeAllocations(
+	public Response employeeAllAllocatedAssets(
 			@PathParam("id") @NotNull Long employeeId,
 			@QueryParam("status") AllocationStatus filteredStatus) {
 		
@@ -183,9 +177,37 @@ public class EmployeeResource {
 		if (allocations.size() == 0) return Response.status(Status.NO_CONTENT).build();
 		return Response.ok(allocations).build();
 	}
-	 
+
+
+	// TODO: implement the resource to redirect when the qr code is scanned and the address clicked
 	@GET
-	@Path("{employeeId}/allocations/{assetId}") 
+	@Path("/{employeeId}/allocations/{allocationId}")
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public Response getEmployeeAllocateAsset(
+			@PathParam("employeeId") @NotNull Long employeeId,
+			@PathParam("allocationId") @NotNull Long allocationId) {
+		Optional<Allocation>  allocation =  Allocation.find("SELECT DISTINCT a FROM Allocation a "
+				+ "LEFT JOIN FETCH a.employee e "
+				+ "LEFT JOIN FETCH e.department "
+				+ "LEFT JOIN FETCH e.address "
+				+ "LEFT JOIN FETCH a.asset ast "
+				+ "LEFT JOIN FETCH ast.category "
+				+ "LEFT JOIN FETCH ast.label "
+				+ "LEFT JOIN FETCH ast.purchase p "
+				+ "LEFT JOIN FETCH p.supplier s "
+				+ "LEFT JOIN FETCH s.address "
+				+ "WHERE e.id = :employeeId "
+				+ "AND a.id = :allocationId ", 
+				Parameters.with("employeeId", employeeId)
+				.and("allocationId", allocationId))
+				.firstResultOptional();
+		
+		return allocation.map(foundAllocation -> Response.ok(foundAllocation).build())
+										.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
+	}
+		
+	@GET
+	@Path("{employeeId}/assets/{assetId}") 
 	@Produces("image/png")
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Response employeeQRPreview(
@@ -203,12 +225,9 @@ public class EmployeeResource {
 		return label.map(qrImage -> Response.ok(qrImage.qrByteString).build())
 							.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
-	
-	// TODO: implement the resource to redirect when the qr code is scanned and the address clicked
-	
+		
 	@PUT
 	@Path("/{id}")
-	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateEmployee(@PathParam("id") @NotNull Long empId, @Valid Employee employee) {
 		if (!empId.equals(employee.id)) return Response.status(Response.Status.CONFLICT).entity(employee).build();
 		else 	if (employee.department == null) return Response.status(Status.BAD_REQUEST).build();

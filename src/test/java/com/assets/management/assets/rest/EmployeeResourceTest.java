@@ -108,7 +108,7 @@ class EmployeeResourceTest {
 	@Order(1)
 	void shouldCountNoEmployees() {
 		given()
-			.header(ACCEPT, TEXT_PLAIN)
+			.header(ACCEPT, APPLICATION_JSON)
 			.when()
 			.get(countEndpoint)
 			.then()
@@ -274,12 +274,12 @@ class EmployeeResourceTest {
 	@Order(9)
 	void shouldCountEmployee() {  
 		given()
-			.header(ACCEPT, TEXT_PLAIN)
+			.header(ACCEPT, APPLICATION_JSON)
 			.when()
 			.get(countEndpoint)
 			.then()
 				.statusCode(OK.getStatusCode())
-				.contentType(TEXT_PLAIN)
+				.contentType(APPLICATION_JSON)
 //				.body(containsString(String.valueOf(count)))
 				.body(is(greaterThanOrEqualTo(String.valueOf(1))));
 	}
