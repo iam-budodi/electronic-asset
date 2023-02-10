@@ -23,7 +23,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import com.assets.management.assets.model.entity.Asset;
-import com.assets.management.assets.model.entity.Computer;
 import com.assets.management.assets.model.entity.Purchase;
 import com.assets.management.assets.model.entity.Supplier;
 import com.assets.management.assets.model.valueobject.PurchasePerSupplier;

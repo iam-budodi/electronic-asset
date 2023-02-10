@@ -14,7 +14,7 @@ import org.jboss.logging.Logger;
 import com.assets.management.assets.model.entity.Employee;
 import com.assets.management.assets.model.entity.Item;
 import com.assets.management.assets.model.entity.ItemAssignment;
-import com.assets.management.assets.model.entity.Label;
+import com.assets.management.assets.model.entity.QRCode;
 import com.assets.management.assets.model.valueobject.Status;
 import com.assets.management.assets.util.QrCodeClient;
 
@@ -47,7 +47,7 @@ public class AssignmentService {
 				item -> assignment.item = (Item) item)
 		.orElseThrow(() -> new NotFoundException());
 		
-		Label label = new Label();
+		QRCode label = new QRCode();
 //		label.qrByteString = "dummy".getBytes();
 //		assignment.label = label;
 		assignment.item.status = Status.InUse;

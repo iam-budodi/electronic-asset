@@ -10,7 +10,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 @Entity
 @Table(name = "labels")
-public class Label extends PanacheEntity {
+public class QRCode extends PanacheEntity {
 	
 // TO MOVED TO THE BARCODE TABLE
 //	@Size(max = 64)

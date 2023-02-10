@@ -26,9 +26,9 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
-@Entity
+//@Entity
 @DynamicInsert
-@Table(name = "item_assignments")
+//@Table(name = "item_assignments")
 public class ItemAssignment extends PanacheEntity {
 
 	@NotNull

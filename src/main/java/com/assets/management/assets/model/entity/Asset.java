@@ -79,7 +79,7 @@ public class Asset  extends PanacheEntity {
 			foreignKey = @ForeignKey(
 					name = "asset_label_fk_constraint", 
 					foreignKeyDefinition = ""))
-	public Label label;
+	public QRCode label;
 
 	@NotNull
 	@JoinColumn(

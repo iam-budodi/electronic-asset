@@ -2,6 +2,7 @@ package com.assets.management.assets.rest;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,8 @@ import com.assets.management.assets.model.entity.Allocation;
 import com.assets.management.assets.model.entity.Asset;
 import com.assets.management.assets.model.entity.Department;
 import com.assets.management.assets.model.entity.Employee;
-import com.assets.management.assets.model.entity.Label;
+import com.assets.management.assets.model.entity.QRCode;
+import com.assets.management.assets.model.entity.Transfer;
 import com.assets.management.assets.model.valueobject.AllocationStatus;
 import com.assets.management.assets.service.EmployeeService;
 import com.assets.management.assets.util.QRGenerator;
@@ -143,12 +145,55 @@ public class EmployeeResource {
 		Allocation.persist(allocation);
 		URI allocationURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(allocation.id)) .build();
 		
-		Label label = new Label();
+		QRCode label = new QRCode();
 		label.qrByteString = qrGenerator.generateQrString(allocationURI);
-		Label.persist(label);
+		QRCode.persist(label);
 		asset.label = label; 
 
 		return Response.created(allocationURI).build();
+	}
+	
+	@POST
+	@Path("/{id}/transfers")
+	@Transactional(Transactional.TxType.REQUIRED)
+	public Response transferAsset(
+			@PathParam("id") @NotNull Long fromEmployeeId, 
+			@QueryParam("toemployee") @NotNull Long toEmployeeId,
+			@Valid Transfer transfer,
+			@Context UriInfo uriInfo) throws WriterException, IOException {
+
+		if (transfer.asset == null || transfer.asset.id == null)
+			return Response.status(Status.BAD_REQUEST).build();
+		else if (transfer.fromEmployee == null || !fromEmployeeId.equals(transfer.fromEmployee.id)) 
+			return Response.status(Response.Status.CONFLICT).entity(transfer.fromEmployee).build();
+		
+		Allocation allocated =  Allocation.find("SELECT DISTINCT a FROM Allocation a "
+				+ "LEFT JOIN FETCH a.employee e "
+				+ "LEFT JOIN FETCH a.asset c "
+				+ "WHERE c.id = :assetId "
+				+ "AND e.id = :fromEmployeeId "
+				+ "AND a.status NOT IN :status", 
+				Parameters.with("assetId", transfer.asset.id)
+				.and("fromEmployeeId", fromEmployeeId)
+				.and("status", Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.TRANSFERED)))
+				.firstResult();
+
+		if (allocated == null)
+			return Response.status(Status.CONFLICT).entity("Asset cannot be transfered!").build();
+
+		LOG.info("THEN TO THE USER ID : " + allocated.id);
+
+		Employee toEmployee = Employee.findById(toEmployeeId);
+		if (toEmployee == null) return Response.status(Response.Status.NOT_FOUND).entity("Employee don't exist").build();
+		
+		transfer.toEmployee = toEmployee;
+		Transfer.persist(transfer);
+		URI transferURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(transfer.id)) .build();
+				
+		allocated.status = AllocationStatus.TRANSFERED;
+		allocated.asset.label.qrByteString = qrGenerator.generateQrString(transferURI);
+		
+		return Response.created(transferURI).build();
 	}
 	
 	@GET
@@ -178,7 +223,6 @@ public class EmployeeResource {
 		return Response.ok(allocations).build();
 	}
 
-
 	// TODO: implement the resource to redirect when the qr code is scanned and the address clicked
 	@GET
 	@Path("/{employeeId}/allocations/{allocationId}")
@@ -205,6 +249,36 @@ public class EmployeeResource {
 		return allocation.map(foundAllocation -> Response.ok(foundAllocation).build())
 										.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
+	
+	// TODO: implement the resource to redirect when the qr code is scanned and the address clicked
+	@GET
+	@Path("/{employeeId}/transfers/{transferId}")
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public Response getTransferDetails(
+			@PathParam("employeeId") @NotNull Long fromEmployeeId,
+			@PathParam("transferId") @NotNull Long transferId) {
+		Optional<Transfer>  transfer =  Transfer.find("SELECT DISTINCT t FROM Transfer t "
+				+ "LEFT JOIN FETCH t.fromEmployee fe "
+//				+ "LEFT JOIN FETCH fe.department "
+//				+ "LEFT JOIN FETCH fe.address "
+				+ "LEFT JOIN FETCH t.toEmployee te "
+//				+ "LEFT JOIN FETCH te.department "
+//				+ "LEFT JOIN FETCH te.address "
+				+ "LEFT JOIN FETCH t.asset ast "
+				+ "LEFT JOIN FETCH ast.category "
+				+ "LEFT JOIN FETCH ast.label "
+				+ "LEFT JOIN FETCH ast.purchase p "
+				+ "LEFT JOIN FETCH p.supplier s "
+				+ "LEFT JOIN FETCH s.address "
+				+ "WHERE fe.id = :fromEmployeeId "
+				+ "AND a.id = :allocationId ", 
+				Parameters.with("employeeId", fromEmployeeId)
+				.and("transferId", transferId))
+				.firstResultOptional();
+		
+		return transfer.map(transferFound -> Response.ok(transferFound).build())
+				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
+	}
 		
 	@GET
 	@Path("{employeeId}/assets/{assetId}") 
@@ -213,7 +287,7 @@ public class EmployeeResource {
 	public Response employeeQRPreview(
 			@PathParam("employeeId") @NotNull Long employeeId,
 			@PathParam("assetId") @NotNull Long assetId) {
-		Optional<Label> label = Allocation.find("SELECT DISTINCT a.asset.label FROM Allocation a "
+		Optional<QRCode> label = Allocation.find("SELECT DISTINCT a.asset.label FROM Allocation a "
 				+ "WHERE a.employee.id = :employeeId "
 				+ "AND a.asset.id = :assetId "
 				+ "AND a.status <> :status", 

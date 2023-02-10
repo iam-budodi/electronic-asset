@@ -19,9 +19,9 @@ import com.assets.management.assets.model.valueobject.Status;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
-@Entity
+//@Entity
 @DynamicInsert
-@Table(name = "items")
+//@Table(name = "items")
 public class Item extends PanacheEntity {
 
 	@NotNull

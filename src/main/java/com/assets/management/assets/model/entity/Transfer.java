@@ -26,17 +26,17 @@ public class Transfer extends PanacheEntity {
 	public String transferRemark; 
 
 	@JoinColumn(
-			name = "prev_employee_fk", 
+			name = "from_employee_fk", 
 			foreignKey = @ForeignKey(
-					name = "prev_employee_transfer_fk_constraint", 
+					name = "fransfer_from_employee_fk_constraint", 
 					foreignKeyDefinition = ""))
 	@ManyToOne(fetch = FetchType.LAZY)
 	public Employee fromEmployee; 
 
 	@JoinColumn(
-			name = "new_employee_fk", 
+			name = "to_employee_fk", 
 			foreignKey = @ForeignKey(
-					name = "new_employee_transfer_fk_constraint", 
+					name = "transfer_to_employee_fk_constraint", 
 					foreignKeyDefinition = ""))
 	@ManyToOne(fetch = FetchType.LAZY)
 	public Employee toEmployee; 
