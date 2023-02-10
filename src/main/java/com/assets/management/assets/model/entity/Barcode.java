@@ -11,16 +11,15 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 @Entity
 @Table(
-		name = "qr_codes", 
+		name = "barcodes", 
 		uniqueConstraints = {
 				@UniqueConstraint(
-						name = "unique_label", 
-						columnNames = { "qr_label" })})
-public class QRCode extends PanacheEntity {
+						name = "unique_tag", 
+						columnNames = { "asset_tag" })})
+public class Barcode extends PanacheEntity {
 
 	@NotNull
-	@Size(max = 4000)
-	@Column(name = "qr_label", length = 4000, nullable = false)
-	public byte[] qrByteString;
-	
+	@Size(max = 64)
+	@Column(name = "asset_tag", length = 64, unique = true)
+	public String barcodeStrings;
 }

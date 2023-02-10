@@ -47,7 +47,7 @@ import io.quarkus.panache.common.Parameters;
 })
 public class Employee extends Person {
  
-//	@NotNull
+	@NotNull
 	@Column(name = "work_id")
 	public String workId;
 

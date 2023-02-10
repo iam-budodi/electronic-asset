@@ -57,7 +57,7 @@ class EmployeeResourceTest {
 	private static final String DEFAULT_EMAIL = "japhetseba@gmail.com";
 	private static final String DEFAULT_PHONE = "0744608510";
 	private static final Gender DEFAULT_GENDER = Gender.MALE;
-//	private static final String DEFAULT_WORK_ID = "UDSM-2013-00002";
+	private static final String DEFAULT_WORK_ID = "UDSM-2013-00005";
 	private static final LocalDate DEFAULT_BIRTH_DATE = LocalDate.of(1992, Month.JUNE, 12);
 	private static final LocalDate DEFAULT_HIRE_DATE = LocalDate.of(2019, Month.APRIL, 8);
 	private static final Set<EmploymentStatus> DEFAULT_STATUS = EnumSet.of(EmploymentStatus.CONTRACT,
@@ -203,6 +203,7 @@ class EmployeeResourceTest {
 		employee.email = DEFAULT_EMAIL;
 		employee.mobile = DEFAULT_PHONE;
 		employee.gender = DEFAULT_GENDER;
+		employee.workId = DEFAULT_WORK_ID;
 		employee.dateOfBirth = DEFAULT_BIRTH_DATE;
 		employee.hireDate = DEFAULT_HIRE_DATE;
 		employee.status = DEFAULT_STATUS;

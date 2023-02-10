@@ -12,10 +12,12 @@ import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -31,7 +33,6 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.entity.Allocation;
-import com.assets.management.assets.model.entity.Asset;
 import com.assets.management.assets.model.entity.Department;
 import com.assets.management.assets.model.entity.Employee;
 import com.assets.management.assets.model.entity.QRCode;
@@ -65,8 +66,8 @@ public class EmployeeResource {
 	public Response listEmployees(
 			@QueryParam("page") @DefaultValue("0") Integer pageIndex,
 			@QueryParam("size") @DefaultValue("15") Integer pageSize) {
-		List<Employee> employees = employeeService.listEmployees(pageIndex, pageSize);
 		
+		List<Employee> employees = employeeService.listEmployees(pageIndex, pageSize);
 		if (employees.size() == 0) return Response.status(Status.NO_CONTENT).build();
 		return Response.ok(employees).build();
 	}
@@ -75,12 +76,7 @@ public class EmployeeResource {
 	@Path("/{id}")
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Response findEmployee(@PathParam("id") @NotNull Long empId) {
-		return Employee.find("FROM Employee e "
-				+ "LEFT JOIN FETCH e.department "
-				+ "LEFT JOIN FETCH e.address "
-				+ "WHERE e.id = :id ", 
-				Parameters.with("id", empId))
-				.firstResultOptional()
+		return employeeService.findById(empId)
 				.map(employee -> Response.ok(employee).build())
 				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
@@ -109,46 +105,30 @@ public class EmployeeResource {
 	}
 	
 	@POST
-	@Path("/{id}/allocations")
+	@Path("/{id}/allocates")
 	@Transactional(Transactional.TxType.REQUIRED)
 	public Response allocateAsset(
 			@PathParam("id") @NotNull Long employeeId, 
 			@Valid Allocation allocation,
 			@Context UriInfo uriInfo) throws WriterException, IOException {
 
-		if (allocation.asset== null || allocation.asset.id == null)
+		if (allocation.asset == null || allocation.asset.id == null)
 			return Response.status(Status.BAD_REQUEST).build();
 		else if (allocation.employee != null && !employeeId.equals(allocation.employee.id)) 
 			return Response.status(Response.Status.CONFLICT).entity(allocation.employee).build();
-		
-		Optional<Allocation>  allocated =  Allocation.find("SELECT DISTINCT a FROM Allocation a "
-				+ "LEFT JOIN FETCH a.employee e "
-				+ "LEFT JOIN FETCH a.asset c "
-				+ "WHERE c.id = :assetId "
-				+ "AND a.status <> :status", 
-				Parameters.with("assetId", allocation.asset.id)
-				.and("status", AllocationStatus.DEALLOCATED))
-				.firstResultOptional();
 
-		if (allocated.isPresent()) 
-			return Response.status(Status.CONFLICT).entity("Asset is already taken!").build();
-
-		LOG.info("THEN TO THE USER ID : " + employeeId);
-		Employee employee = Employee.findById(employeeId);
-		Asset asset =  Asset.findById(allocation.asset.id);
-		
-		if (employee == null || asset == null) 
+		URI allocationURI;		
+		try {
+			employeeService.allocateAsset(allocation, employeeId);
+			allocationURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(allocation.id)).build();
+			employeeService.updateAssetWithlabel(allocation.asset, allocationURI);
+		} catch (NotFoundException nf) {
 			return Response.status(Response.Status.NOT_FOUND).entity("Employee/Asset don't exist").build();
-		
-		allocation.employee = employee;
-		allocation.asset = asset;
-		Allocation.persist(allocation);
-		URI allocationURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(allocation.id)) .build();
-		
-		QRCode label = new QRCode();
-		label.qrByteString = qrGenerator.generateQrString(allocationURI);
-		QRCode.persist(label);
-		asset.label = label; 
+		} catch (ClientErrorException ce) {
+			return Response.status(Status.CONFLICT).entity("Asset is already taken!").build();
+		} catch (WriterException | IOException ex) {
+			return Response.status(Status.BAD_REQUEST).build();
+		}
 
 		return Response.created(allocationURI).build();
 	}
