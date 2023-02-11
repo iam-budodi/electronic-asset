@@ -2,6 +2,7 @@ package com.assets.management.assets.service;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +20,7 @@ import com.assets.management.assets.model.entity.Allocation;
 import com.assets.management.assets.model.entity.Asset;
 import com.assets.management.assets.model.entity.Employee;
 import com.assets.management.assets.model.entity.QRCode;
+import com.assets.management.assets.model.entity.Transfer;
 import com.assets.management.assets.model.valueobject.AllocationStatus;
 import com.assets.management.assets.util.QRGenerator;
 import com.google.zxing.WriterException;
@@ -64,14 +66,18 @@ public class EmployeeService {
 	}
 	
 	public Allocation allocateAsset(@Valid Allocation allocation,  @NotNull Long employeeId) {
+		// TODO : RETHINK DEALING WITH STATUS TO HANDLE ALLOCATION
 		Optional<Allocation>  allocated =  Allocation.find("SELECT DISTINCT a FROM Allocation a "
 				+ "LEFT JOIN FETCH a.employee e "
 				+ "LEFT JOIN FETCH a.asset c "
 				+ "LEFT JOIN Transfer t ON c.id = t.asset.id "
 				+ "WHERE c.id = :assetId "
-				+ "AND a.status <> :status", 
+				+ "AND :allocationStatus NOT MEMBER OF a.status "
+				+ "AND EXISTS ( SELECT 1 FROM t.status t WHERE t IN :transferStatus) ",
+//				+ "AND a.status <> :status",  original and working
 				Parameters.with("assetId", allocation.asset.id)
-				.and("status", AllocationStatus.DEALLOCATED))
+				.and("allocationStatus", AllocationStatus.RETIRED)
+				.and("transferStatus", Arrays.asList(AllocationStatus.ALLOCATED, AllocationStatus.TRANSFERED, AllocationStatus.RETIRED)))
 				.firstResultOptional();
 		
 		if (allocated.isPresent()) throw new ClientErrorException(409);
@@ -85,6 +91,22 @@ public class EmployeeService {
 		allocation.asset = asset;
 		Allocation.persist(allocation);
 		return allocation;
+	}
+	
+	public void transferAsset(@Valid Transfer transfer, @NotNull Long fromEmployeeId, @NotNull Long toEmployeeId) {
+		Allocation allocated =  Allocation.find("SELECT DISTINCT a FROM Allocation a "
+				+ "LEFT JOIN FETCH a.employee e "
+				+ "LEFT JOIN FETCH a.asset c "
+				+ "LEFT JOIN Transfer t ON c.id = t.asset.id "
+				+ "WHERE c.id = :assetId "
+				+ "AND e.id IN  (:fromEmployeeId,  t.toEmployee.id) "
+				+ "AND t.toEmployee.id <> :toEmployeeId "
+				+ "AND a.status NOT IN :status", 
+				Parameters.with("assetId", transfer.asset.id)
+				.and("fromEmployeeId", fromEmployeeId)
+				.and("toEmployeeId", toEmployeeId)
+				.and("status", Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.RETIRED, AllocationStatus.RETURNED)))
+				.firstResult();
 	}
 
 	public void updateEmployee(@Valid Employee employee, @NotNull Long empId) {

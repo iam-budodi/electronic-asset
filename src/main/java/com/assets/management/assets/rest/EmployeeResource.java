@@ -152,7 +152,8 @@ public class EmployeeResource {
 				+ "LEFT JOIN FETCH a.asset c "
 				+ "WHERE c.id = :assetId "
 				+ "AND e.id = :fromEmployeeId "
-				+ "AND a.status NOT IN :status", 
+				+ "AND NOT EXISTS ( SELECT 1 FROM a.status s WHERE s IN :status) ", 
+//				+ "AND a.status NOT IN :status",  original and works
 				Parameters.with("assetId", transfer.asset.id)
 				.and("fromEmployeeId", fromEmployeeId)
 				.and("status", Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.TRANSFERED)))
@@ -165,12 +166,17 @@ public class EmployeeResource {
 
 		Employee toEmployee = Employee.findById(toEmployeeId);
 		if (toEmployee == null) return Response.status(Response.Status.NOT_FOUND).entity("Employee don't exist").build();
-		
+
+		allocated.status.remove(AllocationStatus.ALLOCATED);// AllocationStatus.TRANSFERED;
+		allocated.status.add(AllocationStatus.DEALLOCATED);
+		allocated.status.add(AllocationStatus.TRANSFERED);
+		transfer.status.add(AllocationStatus.TRANSFERED);
+		transfer.status.add(AllocationStatus.ALLOCATED);
 		transfer.toEmployee = toEmployee;
 		Transfer.persist(transfer);
 		URI transferURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(transfer.id)) .build();
 				
-		allocated.status = AllocationStatus.TRANSFERED;
+//		allocated.status = AllocationStatus.TRANSFERED;
 		allocated.asset.label.qrByteString = qrGenerator.generateQrString(transferURI);
 		
 		return Response.created(transferURI).build();
@@ -194,7 +200,8 @@ public class EmployeeResource {
 				+ "LEFT JOIN FETCH p.supplier s "
 				+ "LEFT JOIN FETCH s.address "
 				+ "WHERE e.id = :employeeId "
-				+ "AND (:status IS NULL OR a.status = :status) ",
+				+ "AND (:status IS NULL OR :status MEMBER OF a.status) ",
+//				+ "AND (:status IS NULL OR a.status = :status) ", original and working
 				Parameters.with("employeeId", employeeId) 
 				.and	("status", filteredStatus)) 
 				.list();

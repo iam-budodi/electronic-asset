@@ -1,8 +1,12 @@
 package com.assets.management.assets.model.entity;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -35,18 +39,19 @@ public class Allocation extends PanacheEntity {
 	@Column(name = "allocation_remarks", length = 4000)
 	public String allocationRemark; 
 	
-//	@ElementCollection
+	@ElementCollection
 	@Enumerated(EnumType.STRING)
-	@ColumnDefault(value = "'ALLOCATED'") 
+//	@ColumnDefault(value = "'ALLOCATED'") 
 //	@ColumnDefault(value = AllocationStatus.ALLOCATED)
 	@JoinColumn(
 			name = "allocation_status",
 			nullable = false,
+//			columnDefinition = "SET('ALLOCATED', 'TRANSFERED') DEFAULT 'ALLOCATED'",
 			foreignKey = @ForeignKey(
 					name = "allocation_status_fk_constraint", 
 					foreignKeyDefinition = ""))
-//	public Set<AllocationStatus> status = new HashSet<>(List.of(AllocationStatus.ALLOCATED));
-	public AllocationStatus status;
+	public Set<AllocationStatus> status = new HashSet<>(List.of(AllocationStatus.ALLOCATED));
+//	public AllocationStatus status;
 
 	@JoinColumn(
 			name = "employee_fk", 
