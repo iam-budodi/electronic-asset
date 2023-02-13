@@ -68,5 +68,12 @@ public class Allocation extends PanacheEntity {
 					foreignKeyDefinition = ""))
 	@ManyToOne(fetch = FetchType.LAZY)
 	public Asset asset; 
-
+	
+	@Override
+	public String toString() {
+		return "Allocation [allocationDate=" + allocationDate + ", deallocationDate=" + deallocationDate
+				+ ", allocationRemark=" + allocationRemark + ", status=" + status + ", employee=" + employee
+				+ ", asset=" + asset + "]";
+	}
+	
 }

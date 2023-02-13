@@ -67,5 +67,12 @@ public class Transfer extends PanacheEntity {
 					name = "asset_transfer_fk_constraint", 
 					foreignKeyDefinition = ""))
 	@ManyToOne(fetch = FetchType.LAZY)
-	public Asset asset; 
+	public Asset asset;
+
+	@Override
+	public String toString() {
+		return "Transfer [transferDate=" + transferDate + ", transferRemark=" + transferRemark + ", status=" + status
+				+ ", fromEmployee=" + fromEmployee + ", toEmployee=" + toEmployee + ", asset=" + asset + "]";
+	} 
+	
 }
