@@ -36,7 +36,15 @@ import io.quarkus.panache.common.Parameters;
 					+ "LEFT JOIN FETCH to.address LEFT JOIN FETCH t.asset  ast LEFT JOIN FETCH ast.category "
 					+ "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
 					+ "LEFT JOIN FETCH s.address WHERE to.id = :employeeId  AND (:assetId  IS NULL OR ast.id = :assetId) "
-					+ "AND (:status IS NULL OR :status MEMBER OF t.status)")})
+					+ "AND (:status IS NULL OR :status MEMBER OF t.status)"),
+	@NamedQuery(
+			name = "Transfer.qrPreview", 
+			query = "FROM Transfer t LEFT JOIN FETCH t.fromEmployee fro LEFT JOIN FETCH fro.department "
+					+ "LEFT JOIN FETCH fro.address LEFT JOIN FETCH t.toEmployee to LEFT JOIN FETCH to.department "
+					+ "LEFT JOIN FETCH to.address LEFT JOIN FETCH t.asset  ast LEFT JOIN FETCH ast.category "
+					+ "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
+					+ "LEFT JOIN FETCH s.address WHERE to.id = :employeeId AND t.id = :transferId")
+})
 public class Transfer extends PanacheEntity {
 
 	@CreationTimestamp
@@ -95,6 +103,11 @@ public class Transfer extends PanacheEntity {
 				.firstResult();
 	}
 	
+	public static Transfer qrPreviewDetails(Long employeeId, Long transferId) {
+		return find("#Transfer.qrPreview",
+				Parameters.with("employeeId", employeeId).and("transferId", transferId))
+				.firstResult();
+	}
 	@Override
 	public String toString() {
 		return "Transfer [transferDate=" + transferDate + ", transferRemark=" + transferRemark + ", status=" + status

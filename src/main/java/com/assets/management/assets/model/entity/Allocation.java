@@ -17,12 +17,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.DynamicInsert;
 
 import com.assets.management.assets.model.valueobject.AllocationStatus;
 
@@ -39,7 +35,14 @@ import io.quarkus.panache.common.Parameters;
 					+ "LEFT JOIN FETCH e.address LEFT JOIN FETCH a.asset ast LEFT JOIN FETCH ast.category "
 					+ "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
 					+ "LEFT JOIN FETCH s.address WHERE e.id = :employeeId AND (:assetId  IS NULL OR ast.id = :assetId) "
-					+ "AND (:status IS NULL OR :status MEMBER OF a.status)")})
+					+ "AND (:status IS NULL OR :status MEMBER OF a.status)"),
+	@NamedQuery(
+			name = "Allocation.qrPreview", 
+			query = " FROM Allocation a LEFT JOIN FETCH a.employee e LEFT JOIN FETCH e.department "
+					+ "LEFT JOIN FETCH e.address LEFT JOIN FETCH a.asset ast LEFT JOIN FETCH ast.category "
+					+ "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
+					+ "LEFT JOIN FETCH s.address WHERE e.id = :employeeId AND a.id = :allocationId")
+})
 public class Allocation extends PanacheEntity {
 
 	@CreationTimestamp
@@ -89,6 +92,12 @@ public class Allocation extends PanacheEntity {
 		return find("#Allocation.listAllandFilter",
 				Parameters.with("employeeId", employeeId).and("assetId", assetId)
 				.and("status", AllocationStatus.ALLOCATED))
+				.firstResult();
+	}
+	
+	public static Allocation qrPreviewDetails(Long employeeId, Long allocationId) {
+		return find("#Allocation.qrPreview",
+				Parameters.with("employeeId", employeeId).and("allocationId", allocationId))
 				.firstResult();
 	}
 	

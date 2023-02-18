@@ -3,12 +3,10 @@ package com.assets.management.assets.rest;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
-import javax.persistence.Tuple;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -42,9 +40,6 @@ import com.assets.management.assets.service.EmployeeService;
 import com.assets.management.assets.util.QRGenerator;
 import com.google.zxing.WriterException;
 
-import io.quarkus.hibernate.orm.panache.Panache;
-import io.quarkus.panache.common.Parameters;
-
 @Path("/employees")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -66,8 +61,7 @@ public class EmployeeResource {
 	@GET
 	public Response listEmployees(
 			@QueryParam("page") @DefaultValue("0") Integer pageIndex,
-			@QueryParam("size") @DefaultValue("15") Integer pageSize) {
-		
+			@QueryParam("size") @DefaultValue("15") Integer pageSize) {	
 		List<Employee> employees = employeeService.listEmployees(pageIndex, pageSize);
 		if (employees.size() == 0) return Response.status(Status.NO_CONTENT).build();
 		return Response.ok(employees).build();
@@ -172,7 +166,7 @@ public class EmployeeResource {
 	}
 	
 	@GET
-	@Path("{id}/allocations")
+	@Path("{id}/allocates")
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Response employeeAllAssets(
 			@PathParam("id") Long employeeId,
@@ -182,42 +176,11 @@ public class EmployeeResource {
 			return Response.status(Status.NO_CONTENT).build();
 		
 		return Response.ok(allocationsOrTransfers).build();
-
-	}
-	
-	// TODO: implement the resource to redirect when the qr code is scanned and the address clicked
-	@GET
-	@Path("/{employeeId}/transfers/{transferId}")
-	@Transactional(Transactional.TxType.SUPPORTS)
-	public Response getTransferDetails(
-			@PathParam("employeeId") @NotNull Long fromEmployeeId,
-			@PathParam("transferId") @NotNull Long transferId) {
-		Optional<Transfer>  transfer =  Transfer.find("SELECT DISTINCT t FROM Transfer t "
-				+ "LEFT JOIN FETCH t.fromEmployee fe "
-//				+ "LEFT JOIN FETCH fe.department "
-//				+ "LEFT JOIN FETCH fe.address "
-				+ "LEFT JOIN FETCH t.toEmployee te "
-//				+ "LEFT JOIN FETCH te.department "
-//				+ "LEFT JOIN FETCH te.address "
-				+ "LEFT JOIN FETCH t.asset ast "
-				+ "LEFT JOIN FETCH ast.category "
-				+ "LEFT JOIN FETCH ast.label "
-				+ "LEFT JOIN FETCH ast.purchase p "
-				+ "LEFT JOIN FETCH p.supplier s "
-				+ "LEFT JOIN FETCH s.address "
-				+ "WHERE fe.id = :fromEmployeeId "
-				+ "AND a.id = :allocationId ", 
-				Parameters.with("employeeId", fromEmployeeId)
-				.and("transferId", transferId))
-				.firstResultOptional();
-		
-		return transfer.map(transferFound -> Response.ok(transferFound).build())
-				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
 		
 	@GET
-	@Path("{employeeId}/assets/{assetId}") 
 	@Produces("image/png")
+	@Path("{employeeId}/assets/{assetId}") 
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Response employeeQRPreview(
 			@PathParam("employeeId") @NotNull Long employeeId,
@@ -229,6 +192,21 @@ public class EmployeeResource {
 		 return allocated == null 
 				 ? Response.ok(transfered.asset.label.qrByteString).build() 
 						 : Response.ok(allocated.asset.label.qrByteString).build();
+	}
+ 
+	@GET
+	@Path("/{employeeId}/allocates/{id}")
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public Response getQRDetails(
+			@PathParam("employeeId") @NotNull Long employeeId,
+			@PathParam("id") @NotNull Long id) {
+		Allocation allocated = Allocation.qrPreviewDetails(employeeId, id);
+		Transfer transfered = Transfer.qrPreviewDetails(employeeId, id);
+		
+		if (allocated == null && transfered == null) return Response.status(Status.NOT_FOUND).build();
+		 return allocated == null 
+				 ? Response.ok(transfered).build() 
+						 : Response.ok(allocated).build();
 	}
 		
 	@PUT
