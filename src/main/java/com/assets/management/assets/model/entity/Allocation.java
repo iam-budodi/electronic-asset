@@ -14,7 +14,11 @@ import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
@@ -23,10 +27,18 @@ import org.hibernate.annotations.DynamicInsert;
 import com.assets.management.assets.model.valueobject.AllocationStatus;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.panache.common.Parameters;
 
 @Entity
-@DynamicInsert
+// @DynamicInsert
 @Table(name = "asset_allocations")
+@NamedQueries({
+	@NamedQuery(
+			name = "Allocation.listAllandFilter", 
+			query = " FROM Allocation a LEFT JOIN FETCH a.employee e LEFT JOIN FETCH e.department "
+					+ "LEFT JOIN FETCH e.address LEFT JOIN FETCH a.asset ast LEFT JOIN FETCH ast.category "
+					+ "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
+					+ "LEFT JOIN FETCH s.address WHERE e.id = :employeeId AND (:status IS NULL OR :status MEMBER OF a.status)")})
 public class Allocation extends PanacheEntity {
 
 	@CreationTimestamp
@@ -41,17 +53,13 @@ public class Allocation extends PanacheEntity {
 	
 	@ElementCollection
 	@Enumerated(EnumType.STRING)
-//	@ColumnDefault(value = "'ALLOCATED'") 
-//	@ColumnDefault(value = AllocationStatus.ALLOCATED)
 	@JoinColumn(
 			name = "allocation_status",
 			nullable = false,
-//			columnDefinition = "SET('ALLOCATED', 'TRANSFERED') DEFAULT 'ALLOCATED'",
 			foreignKey = @ForeignKey(
 					name = "allocation_status_fk_constraint", 
 					foreignKeyDefinition = ""))
 	public Set<AllocationStatus> status = new HashSet<>(List.of(AllocationStatus.ALLOCATED));
-//	public AllocationStatus status;
 
 	@JoinColumn(
 			name = "employee_fk", 
@@ -68,6 +76,12 @@ public class Allocation extends PanacheEntity {
 					foreignKeyDefinition = ""))
 	@ManyToOne(fetch = FetchType.LAZY)
 	public Asset asset; 
+	
+	public static List<Allocation> listAllandFilterQuery(AllocationStatus filteredStatus, Long employeeId) {
+		return find("#Allocation.listAllandFilter",
+				Parameters.with("employeeId", employeeId).and("status", filteredStatus))
+				.list();
+	}
 	
 	@Override
 	public String toString() {

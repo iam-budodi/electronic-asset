@@ -2,6 +2,7 @@ package com.assets.management.assets.model.entity;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -13,6 +14,8 @@ import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -21,9 +24,18 @@ import org.hibernate.annotations.CreationTimestamp;
 import com.assets.management.assets.model.valueobject.AllocationStatus;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.panache.common.Parameters;
 
 @Entity
 @Table(name = "asset_transfers")
+@NamedQueries({
+	@NamedQuery(
+			name = "Transfer.listAllandFilter", 
+			query = "FROM Transfer t LEFT JOIN FETCH t.fromEmployee fro LEFT JOIN FETCH fro.department "
+					+ "LEFT JOIN FETCH fro.address LEFT JOIN FETCH t.toEmployee to LEFT JOIN FETCH to.department "
+					+ "LEFT JOIN FETCH to.address LEFT JOIN FETCH t.asset  ast LEFT JOIN FETCH ast.category "
+					+ "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
+					+ "LEFT JOIN FETCH s.address WHERE to.id = :employeeId AND (:status IS NULL OR :status MEMBER OF t.status)")})
 public class Transfer extends PanacheEntity {
 
 	@CreationTimestamp
@@ -42,7 +54,6 @@ public class Transfer extends PanacheEntity {
 			foreignKey = @ForeignKey(
 					name = "transfer_status_fk_constraint", 
 					foreignKeyDefinition = ""))
-//	public Set<AllocationStatus> status = new HashSet<>(List.of(AllocationStatus.ALLOCATED));
 	public Set<AllocationStatus> status = new HashSet<>();
 
 	@JoinColumn(
@@ -68,7 +79,13 @@ public class Transfer extends PanacheEntity {
 					foreignKeyDefinition = ""))
 	@ManyToOne(fetch = FetchType.LAZY)
 	public Asset asset;
-
+	
+	public static List<Transfer> listAllandFilterQuery(AllocationStatus filteredStatus, Long employeeId) {
+		return find("#Transfer.listAllandFilter",
+				Parameters.with("employeeId", employeeId).and("status", filteredStatus))
+				.list();
+	}
+	
 	@Override
 	public String toString() {
 		return "Transfer [transferDate=" + transferDate + ", transferRemark=" + transferRemark + ", status=" + status

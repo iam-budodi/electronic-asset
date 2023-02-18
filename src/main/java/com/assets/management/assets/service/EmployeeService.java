@@ -3,6 +3,7 @@ package com.assets.management.assets.service;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -97,8 +98,7 @@ public class EmployeeService {
 		Allocation.persist(allocation);
 		return allocation;
 	}
-	
-	// make sure to employee  exist to the db and allocated status is present on subsequent transfer
+	 
 	public Transfer transferAsset(@Valid Transfer transfer, @NotNull Long fromEmployeeId) {
 		Tuple allocationTransfer =  Panache.getEntityManager().createQuery("SELECT a AS allocation, t AS transfer FROM Allocation a "
 				+ "LEFT JOIN FETCH a.employee e "
@@ -149,6 +149,17 @@ public class EmployeeService {
 		Transfer.persist(transfer);
 		return transfer;
 	}
+	
+	@Transactional(Transactional.TxType.SUPPORTS)
+	public List<Object> employeeAssets(@Valid AllocationStatus filteredStatus, @NotNull Long employeeId) {
+		List<Allocation> allocations = Allocation.listAllandFilterQuery(filteredStatus, employeeId);
+		List<Transfer> transfers = Transfer.listAllandFilterQuery(filteredStatus, employeeId);
+		List<Object> allocationsOrTransfers = new ArrayList<>();
+		allocationsOrTransfers.addAll(allocations);
+		allocationsOrTransfers.addAll(transfers);
+		
+		return allocationsOrTransfers;
+	}
 
 	public void updateEmployee(@Valid Employee employee, @NotNull Long empId) {
 		employee.address = null;
@@ -172,6 +183,8 @@ public class EmployeeService {
 	}
 	
 	public void updateTranferedAssetWithlabel(@Valid Transfer transfered, URI transferURI) throws WriterException, IOException {
+		LOG.info("TRANSFERED OBJ IN SVC  : " + transfered.toString());
+		LOG.info("TRANSFER UPDATED URI IN SVC  : " + transferURI.toString());
 		transfered.asset.label.qrByteString = qrGenerator.generateQrString(transferURI);
 	}
 

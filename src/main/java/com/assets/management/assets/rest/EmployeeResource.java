@@ -136,8 +136,7 @@ public class EmployeeResource {
 
 		return Response.created(allocationURI).build();
 	}
-	
-	// TODO: GET IT FROM SERVICES CLASS 
+	 
 	@POST
 	@Path("/{id}/transfers")
 	public Response transferAsset(
@@ -149,72 +148,14 @@ public class EmployeeResource {
 			return Response.status(Status.BAD_REQUEST).build();
 		else if (transfer.fromEmployee == null || !fromEmployeeId.equals(transfer.fromEmployee.id)) 
 			return Response.status(Response.Status.CONFLICT).entity(transfer.fromEmployee).build();
+		else if (transfer.toEmployee == null || transfer.toEmployee.id == null) 
+			return Response.status(Response.Status.BAD_REQUEST).entity("Include employee to transfer the asset").build();
 
-//		Tuple allocationTransfer =  Panache.getEntityManager().createQuery("SELECT a AS allocation, t AS transfer FROM Allocation a "
-//				+ "LEFT JOIN FETCH a.employee e "
-//				+ "LEFT JOIN FETCH a.asset c "
-//				+ "LEFT JOIN Transfer t ON c.id = t.asset.id "
-//				+ "WHERE (c.id = :assetId AND e.id = :fromEmployeeId) "
-//				+ "AND  e.id <> :toEmployeeId "
-//				+ "AND EXISTS ( SELECT 1 FROM a.status s WHERE s IN :allocationStatus) "
-//				+ "OR  EXISTS ( "
-//					+ "SELECT 1 FROM Transfer tr "
-//					+ "WHERE tr.asset.id = :assetId "
-//					+ "AND tr.fromEmployee.id <> :fromEmployeeId "
-//					+ "AND tr.toEmployee.id <> :toEmployeeId "
-//					+ "AND (:transferStatus  MEMBER OF t.status) "
-//					+ "AND EXISTS ( SELECT 1 FROM a.status s WHERE s IN :secondAllocationStatus)"
-//				+ ") ", Tuple.class)
-//		.setParameter("toEmployeeId", transfer.toEmployee.id)
-//		.setParameter("fromEmployeeId", transfer.fromEmployee.id)
-//		.setParameter("assetId", transfer.asset.id)
-//		.setParameter("transferStatus", AllocationStatus.ALLOCATED)
-//		.setParameter("secondAllocationStatus", Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.TRANSFERED))
-//		.setParameter("allocationStatus", Arrays.asList(AllocationStatus.ALLOCATED))
-//		.getSingleResult();
-//
-//		Allocation allocated = (Allocation) allocationTransfer.get("allocation");
-//		Transfer transfered = (Transfer) allocationTransfer.get("transfer");
-//		List<AllocationStatus> transferedStatus = Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.TRANSFERED);
-//		
-//		if (allocated == null)
-//			return Response.status(Status.CONFLICT).entity("Asset cannot be transfered!").build();
-//		
-//		LOG.info("THEN TO THE USER ID : " + allocated.toString());
-//		if (transfer.toEmployee == null) return Response.status(Response.Status.NOT_FOUND).entity("Employee don't exist").build();
-//		
-//		// test implementation 
-//		Transfer newTransfer;
-//		if (allocated.status.remove(AllocationStatus.ALLOCATED))  allocated.status.addAll(transferedStatus);
-//		else if (transfered.status.remove(AllocationStatus.ALLOCATED)) {
-//			if (!transfered.toEmployee.id.equals(transfer.fromEmployee.id)) 
-//				return Response.status(Status.BAD_REQUEST).entity("Ensure Asset is transfered from the current custodian").build();
-//			
-//			transfered.status.addAll(transferedStatus); 
-//			newTransfer = new Transfer();
-//			newTransfer.status.add(AllocationStatus.ALLOCATED);
-//			newTransfer.toEmployee = transfer.toEmployee;
-//			newTransfer.asset = transfer.asset;
-//			newTransfer.fromEmployee = transfer.fromEmployee;
-//			newTransfer.transferRemark = transfer.transferRemark;
-//
-//			Transfer.persist(newTransfer);
-//			URI transferURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(newTransfer.id)) .build();
-//			allocated.asset.label.qrByteString = qrGenerator.generateQrString(transferURI);
-//			return Response.created(transferURI).build();
-//		}
-//		
-//		transfer.status.add(AllocationStatus.ALLOCATED);
-//		Transfer.persist(transfer);
-//		URI transferURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(transfer.id)) .build();
-//		allocated.deallocationDate = Instant.now();
-//		allocated.asset.label.qrByteString = qrGenerator.generateQrString(transferURI);
-//		return Response.created(transferURI).build();
-		
 		URI transferURI = null;
 		try {
 			Transfer transfered = employeeService.transferAsset(transfer, fromEmployeeId);
 			transferURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(transfer.id)) .build();
+			LOG.info("TRANSFER UPDATED URI N REST  : " + transferURI.toString());
 			employeeService.updateTranferedAssetWithlabel(transfered, transferURI);
 //			employeeService.updateAssetWithlabel(transfer.asset, transferURI);
 		} catch (NoResultException ex) {
@@ -239,34 +180,10 @@ public class EmployeeResource {
 	public Response employeeAllAssets(
 			@PathParam("id") Long employeeId,
 			@QueryParam("status") AllocationStatus filteredStatus) {
-
-		List<Allocation> allocations = Allocation.find(
-		        "SELECT a FROM Allocation a "
-				+ "LEFT JOIN FETCH a.employee e "
-				+ "LEFT JOIN FETCH e.department "
-				+ "LEFT JOIN FETCH e.address "
-				+ "LEFT JOIN FETCH a.asset ast "
-		        + "WHERE e.id = :employeeId AND (:status IS NULL OR :status MEMBER OF a.status)",
-		        Parameters.with("employeeId", employeeId)
-				.and("status", filteredStatus))
-		        .list();
-
-		List<Transfer> transfers = Transfer.find(
-		        "SELECT t FROM Transfer t "
-		        + "LEFT JOIN FETCH t.fromEmployee "
-		        + "LEFT JOIN FETCH t.toEmployee "
-		        + "LEFT JOIN FETCH t.asset "
-		        + "WHERE t.toEmployee.id = :employeeId "
-		        + "AND (:status IS NULL OR :status MEMBER OF t.status) ",
-		        Parameters.with("employeeId", employeeId)
-				.and("status", filteredStatus))
-		        .list();
-
-		List<Object> allocationsOrTransfers = new ArrayList<>();
-		allocationsOrTransfers.addAll(allocations);
-		allocationsOrTransfers.addAll(transfers);
-
-		if (allocationsOrTransfers.size() == 0) return Response.status(Status.NO_CONTENT).build();
+		List<Object> allocationsOrTransfers = employeeService.employeeAssets(filteredStatus, employeeId);
+		if (allocationsOrTransfers.size() == 0)
+			return Response.status(Status.NO_CONTENT).build();
+		
 		return Response.ok(allocationsOrTransfers).build();
 
 	}
