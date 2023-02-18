@@ -2,7 +2,6 @@ package com.assets.management.assets.rest;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,10 +36,8 @@ import org.jboss.logging.Logger;
 import com.assets.management.assets.model.entity.Allocation;
 import com.assets.management.assets.model.entity.Department;
 import com.assets.management.assets.model.entity.Employee;
-import com.assets.management.assets.model.entity.QRCode;
 import com.assets.management.assets.model.entity.Transfer;
 import com.assets.management.assets.model.valueobject.AllocationStatus;
-import com.assets.management.assets.model.valueobject.SingleList;
 import com.assets.management.assets.service.EmployeeService;
 import com.assets.management.assets.util.QRGenerator;
 import com.google.zxing.WriterException;
@@ -143,7 +140,6 @@ public class EmployeeResource {
 			@PathParam("id") @NotNull Long fromEmployeeId,
 			@Valid Transfer transfer,
 			@Context UriInfo uriInfo) {
-
 		if (transfer.asset == null || transfer.asset.id == null)
 			return Response.status(Status.BAD_REQUEST).build();
 		else if (transfer.fromEmployee == null || !fromEmployeeId.equals(transfer.fromEmployee.id)) 
@@ -152,12 +148,13 @@ public class EmployeeResource {
 			return Response.status(Response.Status.BAD_REQUEST).entity("Include employee to transfer the asset").build();
 
 		URI transferURI = null;
+		String uriSubPath = "employees" + "/" + Long.toString(transfer.toEmployee.id) + "/" + "allocates" + "/";
+		
 		try {
 			Transfer transfered = employeeService.transferAsset(transfer, fromEmployeeId);
-			transferURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(transfer.id)) .build();
-			LOG.info("TRANSFER UPDATED URI N REST  : " + transferURI.toString());
+			transferURI = uriInfo.getBaseUriBuilder().path(uriSubPath + Long.toString(transfer.id)).build();
+			LOG.info("TRANSFERED URI : " + transferURI.toString());
 			employeeService.updateTranferedAssetWithlabel(transfered, transferURI);
-//			employeeService.updateAssetWithlabel(transfer.asset, transferURI);
 		} catch (NoResultException ex) {
 			transfer = null;
 		} catch (NotFoundException nf) {
@@ -187,33 +184,6 @@ public class EmployeeResource {
 		return Response.ok(allocationsOrTransfers).build();
 
 	}
-
-	// TODO: implement the resource to redirect when the qr code is scanned and the address clicked
-//	@GET
-//	@Path("/{employeeId}/allocations/{allocationId}")
-//	@Transactional(Transactional.TxType.SUPPORTS)
-//	public Response getEmployeeAllocateAsset(
-//			@PathParam("employeeId") @NotNull Long employeeId,
-//			@PathParam("allocationId") @NotNull Long allocationId) {
-//		Optional<Allocation>  allocation =  Allocation.find("SELECT DISTINCT a FROM Allocation a "
-//				+ "LEFT JOIN FETCH a.employee e "
-//				+ "LEFT JOIN FETCH e.department "
-//				+ "LEFT JOIN FETCH e.address "
-//				+ "LEFT JOIN FETCH a.asset ast "
-//				+ "LEFT JOIN FETCH ast.category "
-//				+ "LEFT JOIN FETCH ast.label "
-//				+ "LEFT JOIN FETCH ast.purchase p "
-//				+ "LEFT JOIN FETCH p.supplier s "
-//				+ "LEFT JOIN FETCH s.address "
-//				+ "WHERE e.id = :employeeId "
-//				+ "AND a.id = :allocationId ", 
-//				Parameters.with("employeeId", employeeId)
-//				.and("allocationId", allocationId))
-//				.firstResultOptional();
-//		
-//		return allocation.map(foundAllocation -> Response.ok(foundAllocation).build())
-//										.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
-//	}
 	
 	// TODO: implement the resource to redirect when the qr code is scanned and the address clicked
 	@GET
@@ -252,37 +222,13 @@ public class EmployeeResource {
 	public Response employeeQRPreview(
 			@PathParam("employeeId") @NotNull Long employeeId,
 			@PathParam("assetId") @NotNull Long assetId) {
-//		Optional<QRCode> label = Allocation.find("SELECT DISTINCT a.asset.label FROM Allocation a "
-//				+ "WHERE a.employee.id = :employeeId "
-//				+ "AND a.asset.id = :assetId "
-//				+ "AND :status NOT MEMBER OF a.status ", //<> :status",  //  (:transferStatus  MEMBER OF t.status)
-//				Parameters.with("employeeId", employeeId) 
-//				.and("status", AllocationStatus.DEALLOCATED)
-//				.and("assetId", assetId))
-//				.firstResultOptional();
+		Allocation allocated = Allocation.assetForQRPreview(employeeId, assetId);
+		Transfer transfered = Transfer.assetForQRPreview(employeeId, assetId);
 		
-		
-		Tuple allocationsOrTransfers = Panache.getEntityManager().createQuery(
-				"SELECT a AS allocation, t AS transfer FROM Allocation a "
-				+ "LEFT JOIN  Transfer t ON  a.employee.id = t.toEmployee.id " // if it fails try IN all to anf from employee id 
-				+ "WHERE a.employee.id = :employeeId OR t.toEmployee.id = :employeeId "
-				+ "AND a.asset.id = :assetId OR t.asset.id = :assetId "
-				+ "AND (:status MEMBER OF a.status OR :status MEMBER OF t.status)", Tuple.class)
-		        .setParameter("employeeId", employeeId)
-		        .setParameter("status", AllocationStatus.ALLOCATED)
-		        .setParameter("assetId", assetId)
-		        .getSingleResult();
-		
-
-		Allocation allocated = (Allocation) allocationsOrTransfers.get("allocation");
-		Transfer transfered = (Transfer) allocationsOrTransfers.get("transfer");
-		
+		if (allocated == null && transfered == null) return Response.status(Status.NO_CONTENT).build();
 		 return allocated == null 
 				 ? Response.ok(transfered.asset.label.qrByteString).build() 
 						 : Response.ok(allocated.asset.label.qrByteString).build();
-		 
-//		return label.map(qrImage -> Response.ok(qrImage.qrByteString).build())
-//							.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
 		
 	@PUT
@@ -291,9 +237,10 @@ public class EmployeeResource {
 		if (!empId.equals(employee.id)) return Response.status(Response.Status.CONFLICT).entity(employee).build();
 		else 	if (employee.department == null) return Response.status(Status.BAD_REQUEST).build();
 
+		employee.address = null;
 		try {
 			employeeService.updateEmployee(employee, empId);
-		} catch (EntityNotFoundException | NoResultException enf) {
+		} catch (NotFoundException nf) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 

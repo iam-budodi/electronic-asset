@@ -35,7 +35,8 @@ import io.quarkus.panache.common.Parameters;
 					+ "LEFT JOIN FETCH fro.address LEFT JOIN FETCH t.toEmployee to LEFT JOIN FETCH to.department "
 					+ "LEFT JOIN FETCH to.address LEFT JOIN FETCH t.asset  ast LEFT JOIN FETCH ast.category "
 					+ "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
-					+ "LEFT JOIN FETCH s.address WHERE to.id = :employeeId AND (:status IS NULL OR :status MEMBER OF t.status)")})
+					+ "LEFT JOIN FETCH s.address WHERE to.id = :employeeId  AND (:assetId  IS NULL OR ast.id = :assetId) "
+					+ "AND (:status IS NULL OR :status MEMBER OF t.status)")})
 public class Transfer extends PanacheEntity {
 
 	@CreationTimestamp
@@ -82,8 +83,16 @@ public class Transfer extends PanacheEntity {
 	
 	public static List<Transfer> listAllandFilterQuery(AllocationStatus filteredStatus, Long employeeId) {
 		return find("#Transfer.listAllandFilter",
-				Parameters.with("employeeId", employeeId).and("status", filteredStatus))
+				Parameters.with("employeeId", employeeId).and("assetId", null)
+				.and("status", filteredStatus))
 				.list();
+	}
+	
+	public static Transfer assetForQRPreview(Long employeeId, Long assetId) {
+		return find("#Transfer.listAllandFilter",
+				Parameters.with("employeeId", employeeId).and("assetId", assetId)
+				.and("status", AllocationStatus.ALLOCATED))
+				.firstResult();
 	}
 	
 	@Override

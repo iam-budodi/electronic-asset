@@ -52,20 +52,18 @@ public class EmployeeService {
 
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public List<Employee> listEmployees(Integer page, Integer size) {
-		return Employee.find("FROM Employee e "
-				+ "LEFT JOIN FETCH e.department d "
-				+ "LEFT JOIN FETCH e.address ", Sort.by("d.name").and("e.hireDate").and("e.firstName").and("e.lastName"))
+		return Employee.find(
+				"FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address ", 
+				Sort.by("d.name").and("e.hireDate").and("e.firstName").and("e.lastName"))
 				.page(page, size)
 				.list();
 	}
 	
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Optional<Employee> findById(@NotNull Long employeeId) {
-		return Employee.find("FROM Employee e "
-				+ "LEFT JOIN FETCH e.department "
-				+ "LEFT JOIN FETCH e.address "
-				+ "WHERE e.id = :employeeId ", 
-				Parameters.with("employeeId", employeeId))
+		return Employee.find(
+				"FROM Employee e LEFT JOIN FETCH e.department LEFT JOIN FETCH e.address "
+				+ "WHERE e.id = :employeeId ", Parameters.with("employeeId", employeeId))
 				.firstResultOptional();
 	}
 	
@@ -138,7 +136,6 @@ public class EmployeeService {
 			if (!transfered.toEmployee.id.equals(transfer.fromEmployee.id)) throw new BadRequestException();
 			
 			transfered.status.addAll(transferedStatus);
-//			transfered.deallocationDate = Instant.now();
 			transfer.status.add(AllocationStatus.ALLOCATED);
 			Transfer.persist(transfer);
 			LOG.info("PERSISTED 2ND  PARAM OBJ : " + transfer.toString());
@@ -162,7 +159,6 @@ public class EmployeeService {
 	}
 
 	public void updateEmployee(@Valid Employee employee, @NotNull Long empId) {
-		employee.address = null;
 		Employee.findByIdOptional(empId)
 			.map(found -> Panache.getEntityManager().merge(employee))
 			.orElseThrow(() -> new NotFoundException("Employee dont exist"));
@@ -183,9 +179,10 @@ public class EmployeeService {
 	}
 	
 	public void updateTranferedAssetWithlabel(@Valid Transfer transfered, URI transferURI) throws WriterException, IOException {
-		LOG.info("TRANSFERED OBJ IN SVC  : " + transfered.toString());
-		LOG.info("TRANSFER UPDATED URI IN SVC  : " + transferURI.toString());
 		transfered.asset.label.qrByteString = qrGenerator.generateQrString(transferURI);
+		QRCode.findByIdOptional(transfered.asset.label.id)
+		.map(found -> Panache.getEntityManager().merge(transfered.asset.label))
+		.orElseThrow(() -> new NotFoundException("Label dont exist"));
 	}
 
 }
