@@ -2,6 +2,7 @@ package com.assets.management.assets.service;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -12,11 +13,9 @@ import javax.persistence.Tuple;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.jboss.logging.Logger;
 
@@ -131,11 +130,15 @@ public class EmployeeService {
 		if (allocated == null)  throw new ClientErrorException(409);
 		if (transfer.toEmployee == null) throw new NotFoundException();
 		 
-		if (allocated.status.remove(AllocationStatus.ALLOCATED))  allocated.status.addAll(transferedStatus);
+		if (allocated.status.remove(AllocationStatus.ALLOCATED))  {
+			allocated.status.addAll(transferedStatus);
+			allocated.deallocationDate = Instant.now();
+		} 
 		else if (transfered.status.remove(AllocationStatus.ALLOCATED)) {
 			if (!transfered.toEmployee.id.equals(transfer.fromEmployee.id)) throw new BadRequestException();
 			
 			transfered.status.addAll(transferedStatus);
+//			transfered.deallocationDate = Instant.now();
 			transfer.status.add(AllocationStatus.ALLOCATED);
 			Transfer.persist(transfer);
 			LOG.info("PERSISTED 2ND  PARAM OBJ : " + transfer.toString());
