@@ -54,10 +54,7 @@ class DepartmentResourceTest {
 			.when()
 			.get()
 			.then()
-			 	.statusCode(Status.OK.getStatusCode())
-			 	.body("", hasSize(greaterThanOrEqualTo(0)))
-//			 	.body("size()", is(size)) // this works uncomment when troubled
-				.contentType(APPLICATION_JSON); 
+			 	.statusCode(Status.NO_CONTENT.getStatusCode());
 	}
 	
 	@Test

@@ -3,13 +3,10 @@ package com.assets.management.assets.service;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
-
-import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.entity.Department;
 
@@ -19,9 +16,6 @@ import io.quarkus.hibernate.orm.panache.Panache;
 @Transactional(Transactional.TxType.REQUIRED)
 public class DepartmentService {
 
-	@Inject
-	Logger LOG;
-
 	public Department insertDepartment(@Valid Department department) {
 		Department.persist(department);
 		return department;
@@ -29,15 +23,12 @@ public class DepartmentService {
 	}
 
 	public void updateDepartment(@Valid Department dept, @NotNull Long deptId) {
-		findDepartment(deptId).map(
-				foundDept -> Panache.getEntityManager().merge(dept))
-		.orElseThrow(() -> new NotFoundException("Department don't exist"));
+		findDepartment(deptId).map(foundDept -> Panache.getEntityManager().merge(dept))
+							.orElseThrow(() -> new NotFoundException("Department don't exist"));
 	}
 
 	public void deleteDepartment(@NotNull Long deptId) {
-		Panache.getEntityManager()
-				.getReference(Department.class, deptId)
-				.delete();
+		Panache.getEntityManager().getReference(Department.class, deptId).delete();
 	}
 
 	@Transactional(Transactional.TxType.SUPPORTS)

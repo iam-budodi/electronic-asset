@@ -23,11 +23,13 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import com.assets.management.assets.model.entity.Category;
@@ -36,21 +38,24 @@ import io.quarkus.hibernate.orm.panache.Panache;
 
 
 @Path("/categories")
-@Transactional(Transactional.TxType.REQUIRED)
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Tag(name="Category Endpoint", description = "This API allows to group related assets")
+@Transactional(Transactional.TxType.REQUIRED)
+@Tag(name="Category Endpoint", description = "This API allows to group and CRUD related assets")
 public class CategoryResource {
 
 	@GET
 	@Transactional(Transactional.TxType.SUPPORTS)
 	@Operation(summary = "Retrieves all asset categories from the database")
-	@APIResponse(
-			responseCode = "200", 
-			content = @Content(
-					mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Category.class)),
-			description = "Lists all the categories")
-	@APIResponse(responseCode = "204", description = "No categories to display")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "200", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Category.class, type = SchemaType.ARRAY)),
+				description = "Lists all the categories"),
+		@APIResponse(responseCode = "204", description = "No categories to display"),
+		@APIResponse(responseCode = "404", description = "Categories is not found for a given name query")
+	})
 	public Response listCategories(@Parameter(description = "Category name query parameter", required = false)  @QueryParam("name") String catName) {
 		List<Category> categories = Category.findAllOrderByName();
 		if (categories.size() == 0) return Response.status(Status.NO_CONTENT).build();
@@ -65,13 +70,15 @@ public class CategoryResource {
 	@Path("/{id}")
 	@Transactional(Transactional.TxType.SUPPORTS)
 	@Operation(summary = "Returns asset category for a given identifier")
-	@APIResponse(
-			responseCode = "200", 
-			content = @Content(
-					mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Category.class)),
-			description = "Returns a found category")
-	@APIResponse(responseCode = "404", description = "Categories is not found for a given identifier")
-	@APIResponse(responseCode = "400", description = "Invalid input")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "200", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Category.class)),
+				description = "Returns a found category"),
+		@APIResponse(responseCode = "400", description = "Invalid input"),
+		@APIResponse(responseCode = "404", description = "Categories is not found for a given identifier")
+	})
 	public Response findCategory(@Parameter(description = "Category identifier", required = true) @PathParam("id") @NotNull @Min(1) Long categoryId) {
 		return Category.findByIdOptional(categoryId)
 				.map(category -> Response.ok(category).build())
@@ -82,12 +89,14 @@ public class CategoryResource {
 	@Path("/count")
 	@Transactional(Transactional.TxType.SUPPORTS)
 	@Operation(summary = "Counts all asset categories available in the database")
-	@APIResponse(
-			responseCode = "200", 
-			content = @Content(
-					mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Long.class)),
-			description = "Number of all categories available")
-	@APIResponse(responseCode = "204", description = "No categories available in the database")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "200", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Long.class)),
+				description = "Number of all categories available"),
+		@APIResponse(responseCode = "204", description = "No categories available in the database")
+	})
 	public Response countCategory() {
 		Long nbCategories = Category.count();
 		if (nbCategories == 0) return Response.status(Status.NO_CONTENT).build();
@@ -96,12 +105,14 @@ public class CategoryResource {
 
 	@POST
 	@Operation(summary = "Creates a valid category and stores it into the database")
-	@APIResponse(
-			responseCode = "201", 
-			content = @Content(
-					mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = URI.class)),
-			description = "URI of the created category")
-	@APIResponse(responseCode = "400", description = "Invalid input")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "201", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = URI.class)),
+				description = "URI of the created category"),
+		@APIResponse(responseCode = "400", description = "Invalid input")
+	})
 	public Response insertCategory(
 			@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Category.class))) 
 			@Valid Category category, @Context UriInfo uriInfo) {
@@ -113,14 +124,16 @@ public class CategoryResource {
 	@PUT
 	@Path("/{id}")
 	@Operation(summary = "Updates an existing asset category")
-	@APIResponse(responseCode = "204", description = "Category has been successfully updated")
-	@APIResponse(responseCode = "404", description = "Category to be updated does not exist in the database")
-	@APIResponse(responseCode = "415", description = "Format is not JSON")
-	@APIResponse(
-			responseCode = "409", 
-			content = @Content(
-					mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Category.class)),
-			description = "Category payload is not the same as an entity object that needed to be updated")
+	@APIResponses({
+		@APIResponse(responseCode = "204", description = "Category has been successfully updated"),
+		@APIResponse(responseCode = "404", description = "Category to be updated does not exist in the database"),
+		@APIResponse(responseCode = "415", description = "Format is not JSON"),
+		@APIResponse(
+				responseCode = "409", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Category.class)),
+				description = "Category payload is not the same as an entity object that needed to be updated")
+	})
 	public Response updateCategory(
 			@Parameter(description = "Category identifier", required = true) @PathParam("id") @NotNull @Min(1) Long categoryId, 
 			@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Category.class))) 
@@ -137,10 +150,12 @@ public class CategoryResource {
 	@DELETE
 	@Path("/{id}")
 	@Operation(summary = "Deletes an existing asset category")
-	@APIResponse(responseCode = "204", description = "Category has been successfully deleted")
-	@APIResponse(responseCode = "400", description = "Invalid input")
-	@APIResponse(responseCode = "404", description = "Category to be deleted does not exist in the database")
-	@APIResponse(responseCode = "500", description = "Category not found")
+	@APIResponses({
+		@APIResponse(responseCode = "204", description = "Category has been successfully deleted"),
+		@APIResponse(responseCode = "400", description = "Invalid input"),
+		@APIResponse(responseCode = "404", description = "Category to be deleted does not exist in the database"),
+		@APIResponse(responseCode = "500", description = "Category not found")
+	})
 	public Response deleteCategory(@Parameter(description = "Category identifier", required = true) @PathParam("id") @NotNull @Min(1) Long categoryId) {
 		return Category.deleteById(categoryId) 
 				?  Response.noContent().build() 
