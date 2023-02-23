@@ -23,7 +23,9 @@ import javax.validation.constraints.Size;
 import com.assets.management.assets.model.valueobject.QrContent;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Parameters;
+import io.quarkus.panache.common.Sort;
 
 @Entity
 @Table(
@@ -98,6 +100,14 @@ public class Asset  extends PanacheEntity {
 		return find(
 				"#Asset.getSN", Parameters.with("serialNumber", serialNumber).map())
 				.firstResultOptional().isPresent();
+	}
+	
+	public static PanacheQuery<Asset> retrieveAllOrById(Long assetId) {
+		return find("SELECT DISTINCT a FROM Asset a LEFT JOIN FETCH a.category LEFT JOIN FETCH a.label "
+				+ "LEFT JOIN FETCH a.purchase p LEFT JOIN FETCH p.supplier s LEFT JOIN FETCH s.address "
+				+ "WHERE (:assetId IS NULL OR a.id = :assetId) ",
+				Sort.by("p.purchaseDate").and("a.brand").and("a.model"), 
+				Parameters.with("assetId", assetId));
 	}
 	
 	public static QrContent projectQrContents(String sn) {

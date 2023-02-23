@@ -25,12 +25,12 @@ import javax.ws.rs.core.UriInfo;
 
 import org.jboss.logging.Logger;
 
+import com.assets.management.assets.model.entity.Asset;
 import com.assets.management.assets.model.entity.Computer;
 import com.assets.management.assets.model.entity.Purchase;
 import com.assets.management.assets.service.ComputerService;
 
 import io.quarkus.hibernate.orm.panache.Panache;
-import io.quarkus.panache.common.Parameters;
 
 @Path("/computers")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -49,14 +49,17 @@ public class ComputerResource {
 	public Response listAllComputers(
 			@QueryParam("page") @DefaultValue("0") Integer pageIndex,
 			@QueryParam("size") @DefaultValue("15") Integer pageSize) {
-		List<Computer> computers = Computer.find("SELECT DISTINCT c FROM Computer c "
-				+ "LEFT JOIN FETCH c.category "
-				+ "LEFT JOIN FETCH c.label "
-				+ "LEFT JOIN FETCH c.purchase p "
-				+ "LEFT JOIN FETCH p.supplier s "
-				+ "LEFT JOIN FETCH s.address "
-				+ "ORDER BY p.purchaseDate, c.brand, c.model")
-				.page(pageIndex, pageSize).list();
+		// NOTE: This is working
+//		List<Computer> computers = Computer.find("SELECT DISTINCT c FROM Computer c "
+//				+ "LEFT JOIN FETCH c.category "
+//				+ "LEFT JOIN FETCH c.label "
+//				+ "LEFT JOIN FETCH c.purchase p "
+//				+ "LEFT JOIN FETCH p.supplier s "
+//				+ "LEFT JOIN FETCH s.address "
+//				+ "ORDER BY p.purchaseDate, c.brand, c.model")
+//				.page(pageIndex, pageSize).list();
+		
+		List<Computer> computers = Asset.retrieveAllOrById(null).list();
 
 		if (computers.size() == 0) return Response.status(Status.NO_CONTENT).build();
 		return Response.ok(computers).build();
@@ -70,8 +73,6 @@ public class ComputerResource {
 //		boolean exists =  Purchase.findByIdOptional(computer.purchase.id).isPresent();
 		if (computer.purchase == null || computer.purchase.id == null)
 			return Response.status(Status.BAD_REQUEST).entity("Invalid purchase details").build();
-//		else if (!exists) 
-//			return Response.status(Status.NOT_FOUND).entity("Make sure there's purchase record for the item").build();
 
 		return Purchase.findByIdOptional(computer.purchase.id).map(
 				purchase -> {
@@ -80,25 +81,26 @@ public class ComputerResource {
 					return Response.created(computerUri).build();
 					}
 				).orElseGet(() -> Response.status(Status.NOT_FOUND).entity("Purchase record dont exists").build());
-
-//		Computer.persist(computer);
-//		URI computerUri = uriInfo.getAbsolutePathBuilder().path(Long.toString(computer.id)).build();
-//		return Response.created(computerUri).build();
 	}
 
 	@GET
 	@Path("/{id}")
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public Response findComputerById(@PathParam("id") @NotNull Long computerId) {
-		return Computer.find("SELECT DISTINCT c FROM Computer c "
-				+ "LEFT JOIN FETCH c.category "
-				+ "LEFT JOIN FETCH c.label "
-				+ "LEFT JOIN FETCH c.purchase p " 
-				+ "LEFT JOIN FETCH p.supplier s "
-				+ "LEFT JOIN FETCH s.address "
-				+ "WHERE c.id = :id", 
-				Parameters.with("id", computerId))
-				.firstResultOptional()
+		// NOTE: the OG and working 
+//		return Computer.find("SELECT DISTINCT c FROM Computer c "
+//				+ "LEFT JOIN FETCH c.category "
+//				+ "LEFT JOIN FETCH c.label "
+//				+ "LEFT JOIN FETCH c.purchase p " 
+//				+ "LEFT JOIN FETCH p.supplier s "
+//				+ "LEFT JOIN FETCH s.address "
+//				+ "WHERE c.id = :id", 
+//				Parameters.with("id", computerId))
+//				.firstResultOptional()
+//				.map(computer -> Response.ok(computer).build())
+//				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
+		
+		return Asset.retrieveAllOrById(computerId).firstResultOptional()
 				.map(computer -> Response.ok(computer).build())
 				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
@@ -109,12 +111,10 @@ public class ComputerResource {
 		if (!computerId.equals(computer.id)) 
 			return Response.status(Response.Status.CONFLICT).entity(computer).build();
 		
-		return Computer.findByIdOptional(computerId).map(
-				exists -> {
-					Panache.getEntityManager().merge(computer);
-					return Response.status(Status.NO_CONTENT).build();
-					}
-				).orElseGet(() ->  Response.status(Status.NOT_FOUND).build());
+		return Computer.findByIdOptional(computerId).map(exists -> {
+			Panache.getEntityManager().merge(computer);
+			return Response.status(Status.NO_CONTENT).build();			
+		}).orElseGet(() ->  Response.status(Status.NOT_FOUND).build());
 	}
 	
 	@DELETE

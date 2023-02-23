@@ -13,6 +13,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
@@ -31,9 +33,11 @@ import io.quarkus.panache.common.Sort;
 			name = "Department.getName", 
 			query = "FROM Department WHERE LOWER(name) = :name")
 })
+@Schema(description = "Department representation")
 public class Department extends PanacheEntity {
 
 	@NotNull
+	@Schema(required = true)
 	@Size(min = 2, max = 64)
 	@Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
 	@Column(name = "department_name", length = 64, nullable = false)
@@ -49,10 +53,8 @@ public class Department extends PanacheEntity {
 	}
 
 	public static Optional<Department> findByName(String name) {
-//		return find("LOWER(name)", name.toLowerCase())
-//				.firstResultOptional();
-//	}
-		return find("#Department.getName", Parameters.with("name", name.toLowerCase()))
+		return find(
+				"#Department.getName", Parameters.with("name", name.toLowerCase()))
 				.firstResultOptional();
 	}
 }

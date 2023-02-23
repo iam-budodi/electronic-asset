@@ -259,7 +259,7 @@ class DepartmentResourceTest {
 			.when()
 			.get("/{id}/employees")
 			.then()
-				.statusCode(OK.getStatusCode());
+				.statusCode(NO_CONTENT.getStatusCode());
 	}
 	
 	@Test

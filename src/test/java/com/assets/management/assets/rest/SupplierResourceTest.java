@@ -75,9 +75,7 @@ class SupplierResourceTest {
 			.when()
 			.get()
 			.then()
-			 	.statusCode(Status.OK.getStatusCode())
-			 	.body("isEmpty()", is(true))
-				.contentType(APPLICATION_JSON); 
+			 	.statusCode(Status.NO_CONTENT.getStatusCode());
 	}
 		
 	@Test

@@ -39,6 +39,7 @@ import com.assets.management.assets.model.entity.Department;
 import com.assets.management.assets.model.entity.Employee;
 import com.assets.management.assets.service.DepartmentService;
 
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 
@@ -119,7 +120,7 @@ public class DepartmentResource {
 				responseCode = "201", 
 				content = @Content(
 						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = URI.class)),
-				description = "URI of the created category"),
+				description = "URI of the created department"),
 		@APIResponse(responseCode = "400", description = "Invalid input"),
 		@APIResponse(
 				responseCode = "409", 
@@ -190,7 +191,7 @@ public class DepartmentResource {
 		@APIResponse(
 				responseCode = "200", 
 				content = @Content(
-						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Department.class, type = SchemaType.ARRAY)),
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Employee.class, type = SchemaType.ARRAY)),
 				description = "Lists all employees from the department identified by the department identifier"),
 		@APIResponse(responseCode = "204", description = "No employee in a specified department"),
 		@APIResponse(responseCode = "404", description = "Employee does not exist for a given work identifier query")
@@ -198,20 +199,33 @@ public class DepartmentResource {
 	public Response listAllEmployeeFromDepartment(
 			@Parameter(description = "Department identifier", required = true) @PathParam("id") @NotNull Long departmentId, 
 			@Parameter(description = "Employee work identifier", required = false) @QueryParam("workid") String workId) {
-		if (workId == null) {
-			List<Employee> employees = Employee.find("SELECT DISTINCT e FROM Employee e "
-					+ "LEFT JOIN FETCH e.department d "
-					+ "LEFT JOIN FETCH e.address "
-					+ "WHERE d.id = ?1", Sort.by("e.firstName").and("e.lastName"), departmentId).list();
-			return Response.ok(employees).build();
-		}
+//		String queryString = "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address ";
+//		List<Employee> employees = Employee.find(queryString + "WHERE d.id = ?1", 
+//				Sort.by("e.firstName").and("e.lastName"), 
+//				departmentId).list();
+
+//		if (employees.size() == 0) return Response.status(Status.NO_CONTENT).build();
+//		if (workId == null) return Response.ok(employees).build();
  
-		return Employee.find("SELECT DISTINCT e FROM Employee e "
-				+ "LEFT JOIN FETCH e.department "
-				+ "LEFT JOIN FETCH e.address "
-				+ "WHERE e.workId LIKE :workId", Parameters.with("workId", "%" + workId + "%"))
-				.firstResultOptional().map(
-						employee -> Response.ok(employee).build())
+//		return Employee.find(queryString + "WHERE e.workId LIKE :workId",
+//				Parameters.with("workId", "%" + workId + "%"))
+//				.firstResultOptional()
+//				.map(employee -> Response.ok(employee).build())
+//				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
+		
+//		TODO: TRIAL.... delete the commented when this is fully tested 
+		PanacheQuery<Employee> employeeQuery = Employee.find(
+				"FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address "
+				+ "WHERE d.id = :departmentId AND (:workId IS NULL OR e.workId = :workId)", 
+				Sort.by("e.firstName").and("e.lastName"), 
+				Parameters.with("departmentId", departmentId).and("workId", "%" + workId + "%"));
+		
+		List<Employee> employees = employeeQuery.list();
+		if (employees.size() == 0) return Response.status(Status.NO_CONTENT).build();
+		if (workId == null) return Response.ok(employees).build();
+		
+		return employeeQuery.firstResultOptional()
+				.map(employee -> Response.ok(employee).build())
 				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
 }
