@@ -177,7 +177,8 @@ public class DepartmentResource {
 		@APIResponse(responseCode = "404", description = "Department to be deleted does not exist in the database"),
 		@APIResponse(responseCode = "500", description = "Department not found")
 	})
-	public Response deleteDepartment(@Parameter(description = "Department identifier", required = true) @PathParam("id") @NotNull Long deptId) {
+	public Response deleteDepartment(
+			@Parameter(description = "Department identifier", required = true) @PathParam("id") @NotNull Long deptId) {
 		return Department.deleteById(deptId) 
 				? Response.status(Status.NO_CONTENT).build() 
 						: Response.status(Status.NOT_FOUND).build();

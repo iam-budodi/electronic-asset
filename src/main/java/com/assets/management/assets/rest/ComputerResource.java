@@ -23,12 +23,19 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 
-import com.assets.management.assets.model.entity.Asset;
 import com.assets.management.assets.model.entity.Computer;
 import com.assets.management.assets.model.entity.Purchase;
-import com.assets.management.assets.service.ComputerService;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 
@@ -36,19 +43,29 @@ import io.quarkus.hibernate.orm.panache.Panache;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional(Transactional.TxType.REQUIRED)
+@Tag(name="Computer Endpoint", description = "This API allows to keep inventory of all purchased computers")
 public class ComputerResource {
 	
 	@Inject
 	Logger LOG;
 	
-	@Inject
-	ComputerService computerService;
+//	@Inject
+//	ComputerService computerService;
 	
 	@GET
 	@Transactional(Transactional.TxType.SUPPORTS)
+	@Operation(summary = "Retrieves all available computers from the database")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "200", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Computer.class, type = SchemaType.ARRAY)),
+				description = "Lists all the computers"),
+		@APIResponse(responseCode = "204", description = "No computer to display"),
+	})
 	public Response listAllComputers(
-			@QueryParam("page") @DefaultValue("0") Integer pageIndex,
-			@QueryParam("size") @DefaultValue("15") Integer pageSize) {
+			@Parameter(description = "Page index", required = false) @QueryParam("page") @DefaultValue("0") Integer pageIndex,
+			@Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("15") Integer pageSize) {
 		// NOTE: This is working
 //		List<Computer> computers = Computer.find("SELECT DISTINCT c FROM Computer c "
 //				+ "LEFT JOIN FETCH c.category "
@@ -59,34 +76,27 @@ public class ComputerResource {
 //				+ "ORDER BY p.purchaseDate, c.brand, c.model")
 //				.page(pageIndex, pageSize).list();
 		
-		List<Computer> computers = Asset.retrieveAllOrById(null).list();
+		List<Computer> computers = Computer.retrieveAllOrById().list();
 
 		if (computers.size() == 0) return Response.status(Status.NO_CONTENT).build();
 		return Response.ok(computers).build();
-	}
-	
-	@POST
-	public Response createComputer(@Valid Computer computer, @Context UriInfo uriInfo) {
-		LOG.info("CHECKING FOR PURCHASE OBJ: " + computer.purchase.id);
-		if (Computer.checkSerialNumber(computer.serialNumber))
-			return Response.status(Status.CONFLICT).entity("Duplicate is not allow!").build();
-//		boolean exists =  Purchase.findByIdOptional(computer.purchase.id).isPresent();
-		if (computer.purchase == null || computer.purchase.id == null)
-			return Response.status(Status.BAD_REQUEST).entity("Invalid purchase details").build();
-
-		return Purchase.findByIdOptional(computer.purchase.id).map(
-				purchase -> {
-					Computer.persist(computer);
-					URI computerUri = uriInfo.getAbsolutePathBuilder().path(Long.toString(computer.id)).build();
-					return Response.created(computerUri).build();
-					}
-				).orElseGet(() -> Response.status(Status.NOT_FOUND).entity("Purchase record dont exists").build());
 	}
 
 	@GET
 	@Path("/{id}")
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public Response findComputerById(@PathParam("id") @NotNull Long computerId) {
+	@Operation(summary = "Returns the computer for a given identifier")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "200", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Computer.class)),
+				description = "Returns a found computer"),
+		@APIResponse(responseCode = "400", description = "Invalid input"),                       
+		@APIResponse(responseCode = "404", description = "computer is not found for a given identifier")
+	})
+	public Response findComputer(
+			@Parameter(description = "Computer identifier", required = true) @PathParam("id") @NotNull Long computerId) {
 		// NOTE: the OG and working 
 //		return Computer.find("SELECT DISTINCT c FROM Computer c "
 //				+ "LEFT JOIN FETCH c.category "
@@ -100,14 +110,60 @@ public class ComputerResource {
 //				.map(computer -> Response.ok(computer).build())
 //				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 		
-		return Asset.retrieveAllOrById(computerId).firstResultOptional()
+		return Computer.retrieveAllOrById(computerId).firstResultOptional()
 				.map(computer -> Response.ok(computer).build())
 				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
 	
+	@POST
+	@Operation(summary = "Creates a valid computer and stores it into the database")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "201", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = URI.class)),
+				description = "URI of the created computer"),
+		@APIResponse(responseCode = "400", description = "Invalid input"),
+		@APIResponse(
+				responseCode = "409", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Computer.class)),
+				description = "Computer duplications is not allowed"),
+		@APIResponse(responseCode = "404", description = "Purchase order for the computer item does not exist in the database")
+	})
+	public Response createComputer(
+			@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Computer.class))) 
+			@Valid Computer computer, @Context UriInfo uriInfo) {
+		LOG.info("CHECKING FOR PURCHASE OBJ: " + computer.purchase.id);
+		if (Computer.checkSerialNumber(computer.serialNumber))
+			return Response.status(Status.CONFLICT).entity("Duplicate is not allow!").build();
+		if (computer.purchase == null || computer.purchase.id == null)
+			return Response.status(Status.BAD_REQUEST).entity("Invalid purchase details").build();
+
+		return Purchase.findByIdOptional(computer.purchase.id).map(purchase -> {
+			Computer.persist(computer);
+			URI computerUri = uriInfo.getAbsolutePathBuilder().path(Long.toString(computer.id)).build();
+			return Response.created(computerUri).build();
+		}).orElseGet(() -> Response.status(Status.NOT_FOUND).entity("Purchase record dont exists").build());
+	}
+	
 	@PUT
 	@Path("/{id}")
-	public Response updateComputer(@PathParam("id") @NotNull Long computerId, @Valid Computer computer) {
+	@Operation(summary = "Updates an existing computer")
+	@APIResponses({
+		@APIResponse(responseCode = "204", description = "Computer has been successfully updated"),
+		@APIResponse(responseCode = "404", description = "Computer to be updated does not exist in the database"),
+		@APIResponse(responseCode = "415", description = "Format is not JSON"),
+		@APIResponse(
+				responseCode = "409", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Computer.class)),
+				description = "Computer payload is not the same as an entity object that needed to be updated")
+	})
+	public Response updateComputer(
+			@Parameter(description = "Computer identifier", required = true) @PathParam("id") @NotNull Long computerId, 
+			@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Computer.class))) 
+			@Valid Computer computer) {
 		if (!computerId.equals(computer.id)) 
 			return Response.status(Response.Status.CONFLICT).entity(computer).build();
 		
@@ -119,7 +175,15 @@ public class ComputerResource {
 	
 	@DELETE
 	@Path("/{id}")
-	public Response deleteComputer(@PathParam("id") @NotNull Long computerId) {
+	@Operation(summary = "Deletes an existing computer")
+	@APIResponses({
+		@APIResponse(responseCode = "204", description = "Computer has been successfully deleted"),
+		@APIResponse(responseCode = "400", description = "Invalid input"),
+		@APIResponse(responseCode = "404", description = "Computer to be deleted does not exist in the database"),
+		@APIResponse(responseCode = "500", description = "Computer not found")
+	})
+	public Response deleteComputer(
+			@Parameter(description = "Computer identifier", required = true) @PathParam("id") @NotNull Long computerId) {
 				return Computer.deleteById(computerId) 
 						? Response.status(Status.NO_CONTENT).build() 
 								: Response.status(Status.NOT_FOUND).build();
