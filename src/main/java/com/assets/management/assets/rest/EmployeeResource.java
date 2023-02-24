@@ -29,6 +29,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.entity.Allocation;
@@ -227,6 +230,13 @@ public class EmployeeResource {
 
 	@DELETE
 	@Path("/{id}")
+	@Operation(summary = "Deletes an existing employee")
+	@APIResponses({
+		@APIResponse(responseCode = "204", description = "Purchase record has been successfully deleted"),
+		@APIResponse(responseCode = "400", description = "Invalid input"),
+		@APIResponse(responseCode = "404", description = "Purchase record to be deleted does not exist in the database"),
+		@APIResponse(responseCode = "500", description = "Purchase record not found")
+	})
 	public Response deleteEmployee(@PathParam("id") @NotNull Long empId) {
 		try {
 			employeeService.deleteEmployee(empId);

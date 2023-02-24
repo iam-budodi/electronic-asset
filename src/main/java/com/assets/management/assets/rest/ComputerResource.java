@@ -49,9 +49,6 @@ public class ComputerResource {
 	@Inject
 	Logger LOG;
 	
-//	@Inject
-//	ComputerService computerService;
-	
 	@GET
 	@Transactional(Transactional.TxType.SUPPORTS)
 	@Operation(summary = "Retrieves all available computers from the database")
@@ -65,17 +62,7 @@ public class ComputerResource {
 	})
 	public Response listAllComputers(
 			@Parameter(description = "Page index", required = false) @QueryParam("page") @DefaultValue("0") Integer pageIndex,
-			@Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("15") Integer pageSize) {
-		// NOTE: This is working
-//		List<Computer> computers = Computer.find("SELECT DISTINCT c FROM Computer c "
-//				+ "LEFT JOIN FETCH c.category "
-//				+ "LEFT JOIN FETCH c.label "
-//				+ "LEFT JOIN FETCH c.purchase p "
-//				+ "LEFT JOIN FETCH p.supplier s "
-//				+ "LEFT JOIN FETCH s.address "
-//				+ "ORDER BY p.purchaseDate, c.brand, c.model")
-//				.page(pageIndex, pageSize).list();
-		
+			@Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("15") Integer pageSize) {		
 		List<Computer> computers = Computer.retrieveAllOrById().list();
 
 		if (computers.size() == 0) return Response.status(Status.NO_CONTENT).build();
@@ -96,20 +83,7 @@ public class ComputerResource {
 		@APIResponse(responseCode = "404", description = "computer is not found for a given identifier")
 	})
 	public Response findComputer(
-			@Parameter(description = "Computer identifier", required = true) @PathParam("id") @NotNull Long computerId) {
-		// NOTE: the OG and working 
-//		return Computer.find("SELECT DISTINCT c FROM Computer c "
-//				+ "LEFT JOIN FETCH c.category "
-//				+ "LEFT JOIN FETCH c.label "
-//				+ "LEFT JOIN FETCH c.purchase p " 
-//				+ "LEFT JOIN FETCH p.supplier s "
-//				+ "LEFT JOIN FETCH s.address "
-//				+ "WHERE c.id = :id", 
-//				Parameters.with("id", computerId))
-//				.firstResultOptional()
-//				.map(computer -> Response.ok(computer).build())
-//				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
-		
+			@Parameter(description = "Computer identifier", required = true) @PathParam("id") @NotNull Long computerId) {		
 		return Computer.retrieveAllOrById(computerId).firstResultOptional()
 				.map(computer -> Response.ok(computer).build())
 				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());

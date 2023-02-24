@@ -12,10 +12,13 @@ import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.validation.constraints.NotNull;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 import com.assets.management.assets.model.valueobject.Peripheral;
 
 @Entity
 @DiscriminatorValue("COMPUTER")
+@Schema(description = "Computer representation")
 //@Table(
 //		name = "computers", 
 //		uniqueConstraints = {
@@ -53,14 +56,17 @@ public class Computer extends Asset /*  extends PanacheEntity */{
 //	public String manufacturer;
 
 	@NotNull
+	@Schema(required = true)
 	@Column(name = "computer_processor", nullable = false)
 	public String processor;
 
 	@NotNull
+	@Schema(required = true)
 	@Column(name = "computer_memory", nullable = false)
 	public Integer memory;
 
 	@NotNull
+	@Schema(required = true)
 	@Column(name = "computer_storage", nullable = false)
 	public Integer storage;
 
@@ -68,6 +74,7 @@ public class Computer extends Asset /*  extends PanacheEntity */{
 	public String operatingSystem;
 
 	@NotNull
+	@Schema(required = true)
 	@Column(name = "display_size", nullable = false)
 	public Double displaySize;
 
@@ -75,6 +82,7 @@ public class Computer extends Asset /*  extends PanacheEntity */{
 	public Integer graphicsCard;
 
 	@NotNull
+	@Schema(required = true)
 	@ElementCollection
 	@Enumerated(EnumType.STRING)
 	@JoinColumn(
