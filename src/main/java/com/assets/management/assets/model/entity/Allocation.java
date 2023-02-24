@@ -18,6 +18,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.assets.management.assets.model.valueobject.AllocationStatus;
@@ -43,6 +44,7 @@ import io.quarkus.panache.common.Parameters;
 					+ "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
 					+ "LEFT JOIN FETCH s.address WHERE e.id = :employeeId AND a.id = :allocationId")
 })
+@Schema(description = "Allocation representation")
 public class Allocation extends PanacheEntity {
 
 	@CreationTimestamp

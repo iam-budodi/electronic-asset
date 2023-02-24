@@ -18,6 +18,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -45,6 +46,7 @@ import io.quarkus.panache.common.Parameters;
 					+ "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
 					+ "LEFT JOIN FETCH s.address WHERE to.id = :employeeId AND t.id = :transferId")
 })
+@Schema(description = "Transfer representation")
 public class Transfer extends PanacheEntity {
 
 	@CreationTimestamp

@@ -25,6 +25,8 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 import com.assets.management.assets.model.valueobject.EmploymentStatus;
 
 import io.quarkus.panache.common.Parameters;
@@ -45,21 +47,26 @@ import io.quarkus.panache.common.Parameters;
 			name = "Employee.getEmailOrPhone", 
 			query = "FROM Employee WHERE email = :email OR mobile = :mobile")
 })
+@Schema(description = "Employee representation")
 public class Employee extends Person {
  
 	@NotNull
+	@Schema(required = true)
 	@Column(name = "work_id")
 	public String workId;
 
 	@NotNull
+	@Schema(required = true)
 	@Column(name = "birthdate")
 	public LocalDate dateOfBirth;
 
 	@NotNull
+	@Schema(required = true)
 	@Column(name = "hire_date", nullable = false)
 	public LocalDate hireDate;
 
 	@NotNull
+	@Schema(required = true)
 	@ElementCollection
 	@Enumerated(EnumType.STRING)
 	@Column(name = "employment_status", nullable = false)

@@ -30,22 +30,29 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.entity.Allocation;
+import com.assets.management.assets.model.entity.Computer;
 import com.assets.management.assets.model.entity.Department;
 import com.assets.management.assets.model.entity.Employee;
 import com.assets.management.assets.model.entity.Transfer;
 import com.assets.management.assets.model.valueobject.AllocationStatus;
 import com.assets.management.assets.service.EmployeeService;
-import com.assets.management.assets.util.QRGenerator;
 import com.google.zxing.WriterException;
 
 @Path("/employees")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Tag(name="Employee Endpoint", description = "This API allows to keep track of all the employees assigned the assets")
 public class EmployeeResource {
 
 	@Inject
@@ -53,18 +60,20 @@ public class EmployeeResource {
 
 	@Inject
 	EmployeeService employeeService;
-	
-	@Inject
-	QRGenerator qrGenerator;
-	
-//	@Inject
-//	@RestClient
-//	QrProxy qrProxy;
 
 	@GET
+	@Operation(summary = "Retrieves all available employees from the database")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "200", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Employee.class, type = SchemaType.ARRAY)),
+				description = "Lists all the employees"),
+		@APIResponse(responseCode = "204", description = "No employee to display"),
+	})
 	public Response listEmployees(
-			@QueryParam("page") @DefaultValue("0") Integer pageIndex,
-			@QueryParam("size") @DefaultValue("15") Integer pageSize) {	
+			@Parameter(description = "Page index", required = false) @QueryParam("page") @DefaultValue("0") Integer pageIndex,
+			@Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("15") Integer pageSize) {	
 		List<Employee> employees = employeeService.listEmployees(pageIndex, pageSize);
 		if (employees.size() == 0) return Response.status(Status.NO_CONTENT).build();
 		return Response.ok(employees).build();
@@ -73,15 +82,34 @@ public class EmployeeResource {
 	@GET
 	@Path("/{id}")
 	@Transactional(Transactional.TxType.SUPPORTS)
-	public Response findEmployee(@PathParam("id") @NotNull Long empId) {
-		return employeeService.findById(empId)
-				.map(employee -> Response.ok(employee).build())
+	@Operation(summary = "Returns the employee for a given identifier")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "200", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Employee.class)),
+				description = "Returns a found employee"),
+		@APIResponse(responseCode = "400", description = "Invalid input"),                       
+		@APIResponse(responseCode = "404", description = "Employee is not found for a given identifier")
+	})
+	public Response findEmployee(
+			@Parameter(description = "Employee Identifier", required = true) @PathParam("id") @NotNull Long empId) {
+		return employeeService.findById(empId).map(employee -> Response.ok(employee).build())
 				.orElseGet(() -> Response.status(Status.NOT_FOUND).build());
 	}
 
 	@GET
 	@Path("/count")
 	@Transactional(Transactional.TxType.SUPPORTS)
+	@Operation(summary = "Counts all employees in the database")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "200", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Long.class)),
+				description = "Number of all employees available"),
+		@APIResponse(responseCode = "204", description = "No employee available in the database")
+	})
 	public Response countEmployees() {
 		Long nbEmployees = Employee.count();
 		if (nbEmployees == 0) return Response.status(Status.NO_CONTENT).build();
@@ -89,7 +117,28 @@ public class EmployeeResource {
 	}
 
 	@POST
-	public Response createEmployee(@Valid Employee employee, @Context UriInfo uriInfo) {
+	@Operation(summary = "Creates a valid employee and stores it into the database")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "201", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = URI.class)),
+				description = "URI of the created employee"),
+		@APIResponse(responseCode = "400", description = "Invalid input"),
+		@APIResponse(
+				responseCode = "409", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = String.class)),
+				description = "Employee duplications is not allowed"),
+		@APIResponse(
+				responseCode = "404", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = String.class)),
+				description = "Specified department does not exist in the database")
+	})
+	public Response createEmployee(
+			@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Employee.class))) 
+			@Valid Employee employee, @Context UriInfo uriInfo) {
 		if (employee.address == null || employee.department == null)
 			return Response.status(Status.BAD_REQUEST).build();
 		else if (Employee.checkByEmailAndPhone(employee.email, employee.mobile))
@@ -104,12 +153,30 @@ public class EmployeeResource {
 	
 	@POST
 	@Path("/{id}/allocates")
-	@Transactional(Transactional.TxType.REQUIRED)
+	@Operation(summary = "Allocates an asset to employee")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "201", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = URI.class)),
+				description = "URI of the allocation record"),
+		@APIResponse(responseCode = "400", description = "Invalid input"),
+		@APIResponse(
+				responseCode = "409", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = String.class)),
+				description = "Duplicates is not allowed"),
+		@APIResponse(
+				responseCode = "404", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = String.class)),
+				description = "Employee to be assigned an asset or the asset does not exist")
+	})
 	public Response allocateAsset(
-			@PathParam("id") @NotNull Long employeeId, 
+			@Parameter(description = "Employee Identifier", required = true) @PathParam("id") @NotNull Long employeeId, 
+			@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Allocation.class))) 
 			@Valid Allocation allocation,
 			@Context UriInfo uriInfo) {
-
 		if (allocation.asset == null || allocation.asset.id == null)
 			return Response.status(Status.BAD_REQUEST).build();
 		else if (allocation.employee != null && !employeeId.equals(allocation.employee.id)) 
@@ -133,8 +200,28 @@ public class EmployeeResource {
 	 
 	@POST
 	@Path("/{id}/transfers")
+	@Operation(summary = "Transfers an asset to another employee")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "201", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = URI.class)),
+				description = "URI of the transfer record"),
+		@APIResponse(responseCode = "400", description = "Invalid input"),
+		@APIResponse(
+				responseCode = "409", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = String.class)),
+				description = "Duplicates is not allowed"),
+		@APIResponse(
+				responseCode = "404", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = String.class)),
+				description = "Employee or asset does not exist")
+	})
 	public Response transferAsset(
-			@PathParam("id") @NotNull Long fromEmployeeId,
+			@Parameter(description = "Employee Identifier", required = true) @PathParam("id") @NotNull Long fromEmployeeId,
+			@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Transfer.class))) 
 			@Valid Transfer transfer,
 			@Context UriInfo uriInfo) {
 		if (transfer.asset == null || transfer.asset.id == null)
@@ -170,10 +257,19 @@ public class EmployeeResource {
 	
 	@GET
 	@Path("{id}/allocates")
-	@Transactional(Transactional.TxType.SUPPORTS)
+	@Operation(summary = "Retrieves details of all allocations per employee")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "200", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Employee.class, type = SchemaType.ARRAY)),
+				description = "Lists all the employee's allocations"),
+		@APIResponse(responseCode = "204", description = "Nothing to display"),
+		@APIResponse(responseCode = "400", description = "Invalid input")
+	})
 	public Response employeeAllAssets(
-			@PathParam("id") Long employeeId,
-			@QueryParam("status") AllocationStatus filteredStatus) {
+			@Parameter(description = "Employee Identifier", required = true) @PathParam("id") @NotNull Long employeeId,
+			@Parameter(description = "Parameter for querying status", required = false) @QueryParam("status") AllocationStatus filteredStatus) {
 		List<Object> allocationsOrTransfers = employeeService.employeeAssets(filteredStatus, employeeId);
 		if (allocationsOrTransfers.size() == 0)
 			return Response.status(Status.NO_CONTENT).build();
@@ -185,9 +281,19 @@ public class EmployeeResource {
 	@Produces("image/png")
 	@Path("{employeeId}/assets/{assetId}") 
 	@Transactional(Transactional.TxType.SUPPORTS)
+	@Operation(summary = "Previews the QR Code image")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "200", 
+				content = @Content(
+						mediaType = "image/png", schema = @Schema(implementation = String.class, format = "binary")),
+				description = "QR code image"),
+		@APIResponse(responseCode = "204", description = "Nothing to display"),
+		@APIResponse(responseCode = "400", description = "Invalid input")
+	})
 	public Response employeeQRPreview(
-			@PathParam("employeeId") @NotNull Long employeeId,
-			@PathParam("assetId") @NotNull Long assetId) {
+			@Parameter(description = "Employee Identifier", required = true) @PathParam("employeeId") @NotNull Long employeeId,
+			@Parameter(description = "Asset Identifier", required = true) @PathParam("assetId") @NotNull Long assetId) {
 		Allocation allocated = Allocation.assetForQRPreview(employeeId, assetId);
 		Transfer transfered = Transfer.assetForQRPreview(employeeId, assetId);
 		
@@ -200,13 +306,22 @@ public class EmployeeResource {
 	@GET
 	@Path("/{employeeId}/allocates/{id}")
 	@Transactional(Transactional.TxType.SUPPORTS)
+	@Operation(summary = "Returns the scanned QR Code details")
+	@APIResponses({
+		@APIResponse(
+				responseCode = "200", 
+				content = 
+						@Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(oneOf = {Allocation.class, Transfer.class})),
+				description = "Encoded QR Code details"),
+		@APIResponse(responseCode = "204", description = "No record found"),
+	})
 	public Response getQRDetails(
-			@PathParam("employeeId") @NotNull Long employeeId,
-			@PathParam("id") @NotNull Long id) {
+			@Parameter(description = "Employee identifier", required = true) @PathParam("employeeId") @NotNull Long employeeId,
+			@Parameter(description = "Transfer or Allocation identifier", required = true)  @PathParam("id") @NotNull Long id) {
 		Allocation allocated = Allocation.qrPreviewDetails(employeeId, id);
 		Transfer transfered = Transfer.qrPreviewDetails(employeeId, id);
 		
-		if (allocated == null && transfered == null) return Response.status(Status.NOT_FOUND).build();
+		if (allocated == null && transfered == null) return Response.status(Status.NO_CONTENT).build();
 		 return allocated == null 
 				 ? Response.ok(transfered).build() 
 						 : Response.ok(allocated).build();
@@ -214,7 +329,22 @@ public class EmployeeResource {
 		
 	@PUT
 	@Path("/{id}")
-	public Response updateEmployee(@PathParam("id") @NotNull Long empId, @Valid Employee employee) {
+	@Operation(summary = "Updates an existing employee")
+	@APIResponses({
+		@APIResponse(responseCode = "204", description = "Employee has been successfully updated"),
+		@APIResponse(responseCode = "400", description = "Invalid input"),
+		@APIResponse(responseCode = "404", description = "Employee to be updated does not exist in the database"),
+		@APIResponse(responseCode = "415", description = "Format is not JSON"),
+		@APIResponse(
+				responseCode = "409", 
+				content = @Content(
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Computer.class)),
+				description = "Employee payload is not the same as an entity object that needed to be updated")
+	})
+	public Response updateEmployee(
+			@Parameter(description = "Employee identifier", required = true) @PathParam("id") @NotNull Long empId, 
+			@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Employee.class))) 
+			@Valid Employee employee) {
 		if (!empId.equals(employee.id)) return Response.status(Response.Status.CONFLICT).entity(employee).build();
 		else 	if (employee.department == null) return Response.status(Status.BAD_REQUEST).build();
 
@@ -232,12 +362,13 @@ public class EmployeeResource {
 	@Path("/{id}")
 	@Operation(summary = "Deletes an existing employee")
 	@APIResponses({
-		@APIResponse(responseCode = "204", description = "Purchase record has been successfully deleted"),
+		@APIResponse(responseCode = "204", description = "Employee has been successfully deleted"),
 		@APIResponse(responseCode = "400", description = "Invalid input"),
-		@APIResponse(responseCode = "404", description = "Purchase record to be deleted does not exist in the database"),
-		@APIResponse(responseCode = "500", description = "Purchase record not found")
+		@APIResponse(responseCode = "404", description = "Employee to be deleted does not exist in the database"),
+		@APIResponse(responseCode = "500", description = "Employee not found")
 	})
-	public Response deleteEmployee(@PathParam("id") @NotNull Long empId) {
+	public Response deleteEmployee(
+			@Parameter(description = "Employee identifier", required = true) @PathParam("id") @NotNull Long empId) {
 		try {
 			employeeService.deleteEmployee(empId);
 		} catch (EntityNotFoundException nfe) {

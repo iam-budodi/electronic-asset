@@ -7,7 +7,7 @@ import javax.validation.constraints.Size;
 
 import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
 
-//@RegisterForReflection
+// reqistered for reflection in a sepalate file under resource folder
 public class PurchasePerSupplier {
 	
 	@NotNull
