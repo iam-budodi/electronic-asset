@@ -1,6 +1,5 @@
 package com.assets.management.assets.rest;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -41,13 +40,11 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 
 import com.assets.management.assets.model.entity.Allocation;
-import com.assets.management.assets.model.entity.Computer;
 import com.assets.management.assets.model.entity.Department;
 import com.assets.management.assets.model.entity.Employee;
 import com.assets.management.assets.model.entity.Transfer;
 import com.assets.management.assets.model.valueobject.AllocationStatus;
 import com.assets.management.assets.service.EmployeeService;
-import com.google.zxing.WriterException;
 
 @Path("/employees")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -186,14 +183,14 @@ public class EmployeeResource {
 		try {
 			employeeService.allocateAsset(allocation, employeeId);
 			allocationURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(allocation.id)).build();
+
+			LOG.info("ALLOCATED ASSET ID: " + allocation.asset.id);
 			employeeService.updateAssetWithlabel(allocation.asset, allocationURI);
 		} catch (NotFoundException nf) {
 			return Response.status(Response.Status.NOT_FOUND).entity("Employee/Asset don't exist").build();
 		} catch (ClientErrorException ce) {
 			return Response.status(Status.CONFLICT).entity("Asset is already taken!").build();
-		} catch (WriterException | IOException ex) {
-			return Response.status(Status.BAD_REQUEST).build();
-		}
+		} 
 
 		return Response.created(allocationURI).build();
 	}
@@ -247,9 +244,7 @@ public class EmployeeResource {
 			return Response.status(Status.BAD_REQUEST).entity("Ensure Asset is transfered from the current custodian").build();
 		} catch (ClientErrorException ce) {
 			return Response.status(Status.CONFLICT).entity("Asset cannot be transfered!").build();
-		} catch (WriterException | IOException ex) {
-			return Response.status(Status.BAD_REQUEST).build();
-		}
+		} 
 		
 		if (transfer == null) return Response.status(Response.Status.NOT_FOUND).entity("Asset was not found").build();
 		return Response.created(transferURI).build();
@@ -262,7 +257,7 @@ public class EmployeeResource {
 		@APIResponse(
 				responseCode = "200", 
 				content = @Content(
-						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Employee.class, type = SchemaType.ARRAY)),
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(oneOf = {Allocation.class, Transfer.class}, type = SchemaType.ARRAY)),
 				description = "Lists all the employee's allocations"),
 		@APIResponse(responseCode = "204", description = "Nothing to display"),
 		@APIResponse(responseCode = "400", description = "Invalid input")
@@ -338,7 +333,7 @@ public class EmployeeResource {
 		@APIResponse(
 				responseCode = "409", 
 				content = @Content(
-						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Computer.class)),
+						mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Employee.class)),
 				description = "Employee payload is not the same as an entity object that needed to be updated")
 	})
 	public Response updateEmployee(

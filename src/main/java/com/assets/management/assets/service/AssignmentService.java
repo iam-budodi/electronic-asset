@@ -16,7 +16,6 @@ import com.assets.management.assets.model.entity.Item;
 import com.assets.management.assets.model.entity.ItemAssignment;
 import com.assets.management.assets.model.entity.QRCode;
 import com.assets.management.assets.model.valueobject.Status;
-import com.assets.management.assets.util.QrCodeClient;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 
@@ -26,9 +25,6 @@ public class AssignmentService {
 
 	@Inject
 	Logger LOG;
- 
-	@Inject
-	QrCodeClient qrCodeClient;
 	
 	@Transactional(Transactional.TxType.SUPPORTS)
 	public List<ItemAssignment> getAllAssignments(Integer page, Integer size) {

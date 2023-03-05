@@ -1,6 +1,5 @@
 package com.assets.management.assets.service;
 
-import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -18,16 +17,16 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.NotFoundException;
 
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
+import com.assets.management.assets.client.QrProxy;
 import com.assets.management.assets.model.entity.Allocation;
 import com.assets.management.assets.model.entity.Asset;
 import com.assets.management.assets.model.entity.Employee;
 import com.assets.management.assets.model.entity.QRCode;
 import com.assets.management.assets.model.entity.Transfer;
 import com.assets.management.assets.model.valueobject.AllocationStatus;
-import com.assets.management.assets.util.QRGenerator;
-import com.google.zxing.WriterException;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.panache.common.Parameters;
@@ -36,9 +35,10 @@ import io.quarkus.panache.common.Sort;
 @ApplicationScoped
 @Transactional(Transactional.TxType.REQUIRED)
 public class EmployeeService {
-
+	
 	@Inject
-	QRGenerator qrGenerator;
+	@RestClient
+	QrProxy generatorProxy;
 	
 	@Inject
 	Logger LOG;
@@ -170,19 +170,26 @@ public class EmployeeService {
 			.delete();
 	}
 	
-	// TODO: MOVE THE GENERATE QR METHOD TO OTHER SERVICE AND REMOVE THESE EXCEPTION
-	public void updateAssetWithlabel(@Valid Asset asset, URI allocationUri) throws WriterException, IOException {
+	// TODO: FIND A WAY TO OPTIMIZE THESE TWO METHODS
+	public void updateAssetWithlabel(@Valid Asset asset, URI allocationUri) {
 		QRCode label = new QRCode();
-		label.qrByteString = qrGenerator.generateQrString(allocationUri);
+		label.qrByteString = generatorProxy.generateQrString(allocationUri);
 		QRCode.persist(label);
+
+		LOG.info("CREATED LABEL ID: " + label.id);
 		asset.label = label; 
-	}
-	
-	public void updateTranferedAssetWithlabel(@Valid Transfer transfered, URI transferURI) throws WriterException, IOException {
-		transfered.asset.label.qrByteString = qrGenerator.generateQrString(transferURI);
-		QRCode.findByIdOptional(transfered.asset.label.id)
-		.map(found -> Panache.getEntityManager().merge(transfered.asset.label))
+		QRCode.findByIdOptional(label.id)
+		.map(found -> Panache.getEntityManager().merge(asset))
 		.orElseThrow(() -> new NotFoundException("Label dont exist"));
 	}
+	
+	public void updateTranferedAssetWithlabel(@Valid Transfer transfered, URI transferURI) {
+		transfered.asset.label.qrByteString = generatorProxy.generateQrString(transferURI);
+		QRCode.findByIdOptional(transfered.asset.label.id)
+				.map(found -> Panache.getEntityManager().merge(transfered.asset.label))
+				.orElseThrow(() -> new NotFoundException("Label dont exist"));
+	}
+	
+	
 
 }
