@@ -36,12 +36,14 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import com.assets.management.assets.client.WireMockQRGeneratorServiceProxy;
 import com.assets.management.assets.model.entity.Address;
 import com.assets.management.assets.model.entity.Department;
 import com.assets.management.assets.model.entity.Employee;
 import com.assets.management.assets.model.valueobject.EmploymentStatus;
 import com.assets.management.assets.model.valueobject.Gender;
 
+import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
@@ -51,6 +53,7 @@ import io.restassured.http.ContentType;
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestHTTPEndpoint(EmployeeResource.class)
+@QuarkusTestResource(WireMockQRGeneratorServiceProxy.class)
 class EmployeeResourceTest {
 	private static final String DEFAULT_FNAME = "Japhet";
 	private static final String DEFAULT_LNAME = "Sebastian";
