@@ -20,7 +20,7 @@ import javax.ws.rs.NotFoundException;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
-import com.assets.management.assets.client.QrProxy;
+import com.assets.management.assets.client.QRGeneratorServiceProxy;
 import com.assets.management.assets.model.entity.Allocation;
 import com.assets.management.assets.model.entity.Asset;
 import com.assets.management.assets.model.entity.Employee;
@@ -38,7 +38,7 @@ public class EmployeeService {
 	
 	@Inject
 	@RestClient
-	QrProxy generatorProxy;
+	QRGeneratorServiceProxy generatorProxy;
 	
 	@Inject
 	Logger LOG;

@@ -10,18 +10,13 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-import io.quarkus.runtime.annotations.RegisterForReflection;
-
 @Path("/generates")
 @RegisterRestClient
-@RegisterForReflection
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public interface QrProxy {
+public interface QRGeneratorServiceProxy {
 
 	@POST
 	@Path("/qrcode")
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces("image/png") 
 	byte[] generateQrString(URI collectionOrTransferURI);
 }
