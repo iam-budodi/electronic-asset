@@ -109,18 +109,18 @@ class ComputerResourceTest {
 //	@TestHTTPResource("computers")
 //	@TestHTTPEndpoint(PurchaseResource.class)
 //	URL computersEndpoint;
-//	
-//	@Test
-//	@Order(1)
-//	void shouldRetrieveNoComputers() {
-//		given()
-//			.header(ACCEPT, APPLICATION_JSON)
-//			.when()
-//			.get()
-//			.then()
-//			 	.statusCode(NO_CONTENT.getStatusCode());
-//	}
-//		
+	
+	@Test
+	@Order(1)
+	void shouldRetrieveNoComputers() {
+		given()
+			.header(ACCEPT, APPLICATION_JSON)
+			.when()
+			.get()
+			.then()
+			 	.statusCode(NO_CONTENT.getStatusCode());
+	}
+		
 	@Test
 	@Order(2)
 	void shouldNotFindRandomComputer() {

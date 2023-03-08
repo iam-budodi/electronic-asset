@@ -63,7 +63,7 @@ public class ComputerResource {
 	public Response listAllComputers(
 			@Parameter(description = "Page index", required = false) @QueryParam("page") @DefaultValue("0") Integer pageIndex,
 			@Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("15") Integer pageSize) {		
-		List<Computer> computers = Computer.retrieveAllOrById(null).list();
+		List<Computer> computers = Computer.retrieveAllOrById().list();
 
 		if (computers.size() == 0) return Response.status(Status.NO_CONTENT).build();
 		return Response.ok(computers).build();

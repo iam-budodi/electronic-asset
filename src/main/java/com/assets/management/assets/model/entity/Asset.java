@@ -112,9 +112,9 @@ public class Asset  extends PanacheEntity {
 	}
 	
 	// method overloading
-//	public static PanacheQuery<Asset> retrieveAllOrById() {
-//		return retrieveAllOrById(null);
-//	}
+	public static PanacheQuery<Asset> retrieveAllOrById() {
+		return retrieveAllOrById(null);
+	}
 	
 	public static PanacheQuery<Asset> retrieveAllOrById(Long assetId) {
 		return find("SELECT DISTINCT a FROM Asset a LEFT JOIN FETCH a.category LEFT JOIN FETCH a.label "
