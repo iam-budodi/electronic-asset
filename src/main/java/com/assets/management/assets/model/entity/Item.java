@@ -24,41 +24,41 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 //@Table(name = "items")
 public class Item extends PanacheEntity {
 
-	@NotNull
-	@Column(name = "item_name", length = 64, nullable = false)
-	public String itemName;
+    @NotNull
+    @Column(name = "item_name", length = 64, nullable = false)
+    public String itemName;
 
-	// moved to assignment and transfer
+    // moved to assignment and transfer
 //	@NotNull
 //	@Column(name = "serial_number", length = 32, nullable = false)
 //	public String serialNumber;
 
-	@NotNull
-	@Min(1)
-	@Column(name = "quantity", nullable = false)
-	public Integer qtyBought;
+    @NotNull
+    @Min(1)
+    @Column(name = "quantity", nullable = false)
+    public Integer qtyBought;
 
-	@ColumnDefault(value = "'New'")
+    @ColumnDefault(value = "'New'")
 //	@Generated(GenerationTime.INSERT) // substituted by @DynamicInsert
-	@Enumerated(EnumType.STRING)
-	@Column(name = "item_status", nullable = false)
-	public Status status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "item_status", nullable = false)
+    public Status status;
 
-	@NotNull
-	@Column(name = "date_purchased")
-	public LocalDate datePurchased;
+    @NotNull
+    @Column(name = "date_purchased")
+    public LocalDate datePurchased;
 
-	@Column(name = "tranfer_count")
-	public Integer transferCount;
+    @Column(name = "tranfer_count")
+    public Integer transferCount;
 
-	@Column(length = 1000)
-	public String description;
+    @Column(length = 1000)
+    public String description;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	public Category category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    public Category category;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	public Supplier supplier;
+    @ManyToOne(fetch = FetchType.LAZY)
+    public Supplier supplier;
 
 //  should be generated and mapped on the assignment and transfer table
 //	@OneToOne(

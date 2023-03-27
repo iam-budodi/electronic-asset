@@ -1,4 +1,5 @@
 package com.assets.management.assets.rest;
+
 //
 //import static io.restassured.RestAssured.given;
 //import static javax.ws.rs.core.HttpHeaders.ACCEPT;
@@ -34,7 +35,7 @@ package com.assets.management.assets.rest;
 ////@QuarkusTest
 ////@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 //////@TestHTTPEndpoint(EndUserResource.class)
-class EndUserResourceTest { 
+class EndUserResourceTest {
 //	
 //	// end user
 //	private static final String    DEFAULT_FIRST_NAME = "Japhet";

@@ -9,18 +9,18 @@ import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
 
 // reqistered for reflection in a sepalate file under resource folder
 public class PurchasePerSupplier {
-	
-	@NotNull
-	@Size(min = 2, max = 64)
-	@Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
-	public final String supplierName;
-	
-	@Min(1)
-	@NotNull
-	public final Long purchaseCount;
-	
-	public PurchasePerSupplier(@ProjectedFieldName("supplier.name") String supplierName, Long purchaseCount) {
-		this.supplierName = supplierName;
-		this.purchaseCount = purchaseCount;
-	}
+
+    @NotNull
+    @Size(min = 2, max = 64)
+    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
+    public final String supplierName;
+
+    @Min(1)
+    @NotNull
+    public final Long purchaseCount;
+
+    public PurchasePerSupplier(@ProjectedFieldName("supplier.name") String supplierName, Long purchaseCount) {
+        this.supplierName = supplierName;
+        this.purchaseCount = purchaseCount;
+    }
 }

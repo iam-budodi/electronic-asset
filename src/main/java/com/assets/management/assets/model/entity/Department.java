@@ -21,40 +21,40 @@ import io.quarkus.panache.common.Sort;
 
 @Entity
 @Table(
-		name = "departments", 
-		uniqueConstraints = {
-				@UniqueConstraint(
-						name = "unique_department_name", 
-						columnNames = { "department_name" }) 
-				}
-		)
+        name = "departments",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "unique_department_name",
+                        columnNames = {"department_name"})
+        }
+)
 @NamedQueries({
-	@NamedQuery(
-			name = "Department.getName", 
-			query = "FROM Department WHERE LOWER(name) = :name")
+        @NamedQuery(
+                name = "Department.getName",
+                query = "FROM Department WHERE LOWER(name) = :name")
 })
 @Schema(description = "Department representation")
 public class Department extends PanacheEntity {
 
-	@NotNull
-	@Schema(required = true)
-	@Size(min = 2, max = 64)
-	@Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
-	@Column(name = "department_name", length = 64, nullable = false)
-	public String name;
+    @NotNull
+    @Schema(required = true)
+    @Size(min = 2, max = 64)
+    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
+    @Column(name = "department_name", length = 64, nullable = false)
+    public String name;
 
-	@Size(min = 1, max = 400)
-	@Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
-	@Column(length = 400)
-	public String description;
+    @Size(min = 1, max = 400)
+    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
+    @Column(length = 400)
+    public String description;
 
-	public static List<Department> findAllOrderByName() {
-		return listAll(Sort.by("name"));
-	}
+    public static List<Department> findAllOrderByName() {
+        return listAll(Sort.by("name"));
+    }
 
-	public static Optional<Department> findByName(String name) {
-		return find(
-				"#Department.getName", Parameters.with("name", name.toLowerCase()))
-				.firstResultOptional();
-	}
+    public static Optional<Department> findByName(String name) {
+        return find(
+                "#Department.getName", Parameters.with("name", name.toLowerCase()))
+                .firstResultOptional();
+    }
 }

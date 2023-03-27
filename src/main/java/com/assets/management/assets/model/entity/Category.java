@@ -18,19 +18,19 @@ import io.quarkus.panache.common.Sort;
 @Schema(description = "Category representation")
 public class Category extends PanacheEntity {
 
-	@NotNull
-	@Schema(required = true)
-	@Column(name = "category_name", length = 64, nullable = false)
-	public String name;
+    @NotNull
+    @Schema(required = true)
+    @Column(name = "category_name", length = 64, nullable = false)
+    public String name;
 
-	@Column(length = 1000)
-	public String description;
+    @Column(length = 1000)
+    public String description;
 
-	public static List<Category> findAllOrderByName() {
-		return listAll(Sort.by("name"));
-	}
+    public static List<Category> findAllOrderByName() {
+        return listAll(Sort.by("name"));
+    }
 
-	public static Optional<Category> findByName(String name) {
-		return find("LOWER(name)", name.toLowerCase()).firstResultOptional();
-	}
+    public static Optional<Category> findByName(String name) {
+        return find("LOWER(name)", name.toLowerCase()).firstResultOptional();
+    }
 }

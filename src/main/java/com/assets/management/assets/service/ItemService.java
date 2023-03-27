@@ -21,62 +21,62 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 @Transactional(Transactional.TxType.REQUIRED)
 public class ItemService {
 
-	@Inject
-	Logger LOG;
+    @Inject
+    Logger LOG;
 
 
-	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<Item> getAllItems(Integer page, Integer size) {
-		return Item.find("ORDER BY itemName, qtyBought")
-				.page(page, size)
-				.list();
-	}
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public List<Item> getAllItems(Integer page, Integer size) {
+        return Item.find("ORDER BY itemName, qtyBought")
+                .page(page, size)
+                .list();
+    }
 
-	public Item addItem(@Valid Item item) {
-		LOG.info("It got here...");
-		return Supplier.findByIdOptional(item.supplier.id)
-				.map(supplier -> {
-					Item.persist(item);
-					return item;
-					}
-				).orElseThrow(() -> 
-				new NotFoundException("Supplier dont exist"));
-	}
+    public Item addItem(@Valid Item item) {
+        LOG.info("It got here...");
+        return Supplier.findByIdOptional(item.supplier.id)
+                .map(supplier -> {
+                            Item.persist(item);
+                            return item;
+                        }
+                ).orElseThrow(() ->
+                        new NotFoundException("Supplier dont exist"));
+    }
 
-	public void updateItem(@Valid Item item, @NotNull Long itemId) {
-		Item.findByIdOptional(itemId).map(
-		        itemFound -> Panache.getEntityManager().merge(item)
-		).orElseThrow(
-				() -> new NotFoundException("Item dont exist"));
-	} 
+    public void updateItem(@Valid Item item, @NotNull Long itemId) {
+        Item.findByIdOptional(itemId).map(
+                itemFound -> Panache.getEntityManager().merge(item)
+        ).orElseThrow(
+                () -> new NotFoundException("Item dont exist"));
+    }
 
-	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<PanacheEntityBase> countItemPerSupplier() {
-		return Item
-				.find(
-				"SELECT i.supplier.title, "
-				+ "COUNT(i.supplier) AS total "
-				+ "FROM Item i "
-				+ "GROUP BY i.supplier.title"
-				)
-				.list();
-	}
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public List<PanacheEntityBase> countItemPerSupplier() {
+        return Item
+                .find(
+                        "SELECT i.supplier.title, "
+                                + "COUNT(i.supplier) AS total "
+                                + "FROM Item i "
+                                + "GROUP BY i.supplier.title"
+                )
+                .list();
+    }
 
-	@Transactional(Transactional.TxType.SUPPORTS)
-	public List<PanacheEntityBase> countItemPerStatus() {
-		return Item
-				.find(
-				"SELECT i.status, COUNT(i.status) AS total "
-				+ "FROM Item i "
-				+ "GROUP BY i.status"
-				)
-				.list();
-	}
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public List<PanacheEntityBase> countItemPerStatus() {
+        return Item
+                .find(
+                        "SELECT i.status, COUNT(i.status) AS total "
+                                + "FROM Item i "
+                                + "GROUP BY i.status"
+                )
+                .list();
+    }
 
-	public void deleteById(@NotNull Long itemId) {
-		Panache.getEntityManager()
-			.getReference(Item.class, itemId)
-			.delete();
-	}
+    public void deleteById(@NotNull Long itemId) {
+        Panache.getEntityManager()
+                .getReference(Item.class, itemId)
+                .delete();
+    }
 
 }

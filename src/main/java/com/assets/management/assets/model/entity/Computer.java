@@ -29,7 +29,7 @@ import com.assets.management.assets.model.valueobject.Peripheral;
 //	@NamedQuery(
 //			name = "Computer.getSN", 
 //			query = "FROM Computer WHERE serialNumber = :serialNumber")})
-public class Computer extends Asset /*  extends PanacheEntity */{
+public class Computer extends Asset /*  extends PanacheEntity */ {
 //
 //	@NotNull
 //	@Size(min = 2, max = 64)
@@ -55,44 +55,44 @@ public class Computer extends Asset /*  extends PanacheEntity */{
 //	@Column(nullable = false)
 //	public String manufacturer;
 
-	@NotNull
-	@Schema(required = true)
-	@Column(name = "computer_processor", nullable = false)
-	public String processor;
+    @NotNull
+    @Schema(required = true)
+    @Column(name = "computer_processor", nullable = false)
+    public String processor;
 
-	@NotNull
-	@Schema(required = true)
-	@Column(name = "computer_memory", nullable = false)
-	public Integer memory;
+    @NotNull
+    @Schema(required = true)
+    @Column(name = "computer_memory", nullable = false)
+    public Integer memory;
 
-	@NotNull
-	@Schema(required = true)
-	@Column(name = "computer_storage", nullable = false)
-	public Integer storage;
+    @NotNull
+    @Schema(required = true)
+    @Column(name = "computer_storage", nullable = false)
+    public Integer storage;
 
-	@Column(name = "operating_system")
-	public String operatingSystem;
+    @Column(name = "operating_system")
+    public String operatingSystem;
 
-	@NotNull
-	@Schema(required = true)
-	@Column(name = "display_size", nullable = false)
-	public Double displaySize;
+    @NotNull
+    @Schema(required = true)
+    @Column(name = "display_size", nullable = false)
+    public Double displaySize;
 
-	@Column(name = "graphics_card")
-	public Integer graphicsCard;
+    @Column(name = "graphics_card")
+    public Integer graphicsCard;
 
-	@NotNull
-	@Schema(required = true)
-	@ElementCollection
-	@Enumerated(EnumType.STRING)
-	@JoinColumn(
-			name = "peripherals",
-			nullable = false,
-			foreignKey = @ForeignKey(
-					name = "device_peripherals_fk_constraint", 
-					foreignKeyDefinition = ""))
-	public Set<Peripheral> peripherals;
-	
+    @NotNull
+    @Schema(required = true)
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    @JoinColumn(
+            name = "peripherals",
+            nullable = false,
+            foreignKey = @ForeignKey(
+                    name = "device_peripherals_fk_constraint",
+                    foreignKeyDefinition = ""))
+    public Set<Peripheral> peripherals;
+
 //	@JoinColumn(
 //			name = "category_fk", 
 //			foreignKey = @ForeignKey(

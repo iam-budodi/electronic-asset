@@ -31,33 +31,33 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 //@Table(name = "item_assignments")
 public class ItemAssignment extends PanacheEntity {
 
-	@NotNull
-	@Column(name = "item_serial_number", length = 32, nullable = false)
-	public String itemSerialNumber;
+    @NotNull
+    @Column(name = "item_serial_number", length = 32, nullable = false)
+    public String itemSerialNumber;
 
-	@NotNull
-	@Min(1)
-	@Column(name = "quantity_assigned", nullable = false)
-	public Integer qtyAssigned;
- 
-	@CreationTimestamp
-	@Column(name = "date_assigned", nullable = false)
-	public LocalDateTime dateAssigned;
-	
+    @NotNull
+    @Min(1)
+    @Column(name = "quantity_assigned", nullable = false)
+    public Integer qtyAssigned;
 
-	@ColumnDefault(value = "'Assigned'")
-	@Enumerated(EnumType.STRING)
-	@Column(name = "assignment_status", nullable = false)
-	public AllocationStatus status;
+    @CreationTimestamp
+    @Column(name = "date_assigned", nullable = false)
+    public LocalDateTime dateAssigned;
 
-	@Column(length = 4000)
-	public String remarks;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	public Item item;
+    @ColumnDefault(value = "'Assigned'")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "assignment_status", nullable = false)
+    public AllocationStatus status;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	public Employee employee;
+    @Column(length = 4000)
+    public String remarks;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    public Item item;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    public Employee employee;
 //	 
 //	@OneToOne(
 //	        mappedBy = "itemAssignment", 
@@ -66,25 +66,26 @@ public class ItemAssignment extends PanacheEntity {
 //	)
 //	public Label label;
 
-	public static Boolean isItemAssigned(Long itemId) {
-		return find("item.id = ?1", itemId)
-				.firstResultOptional()
-				.isPresent();
-	}
-	public static Boolean isEmployeeExists(Long empId) {
-		return find("employee.id = ?1", empId)
-				.firstResultOptional()
-				.isPresent();
-	}
-	
-	public static PanacheQuery<PanacheEntityBase> hasItem(Long itemId) {
-		return find(
-			"item.id = ?1 AND item.status <> ?2",
-			itemId, Status.Transfered);
-	}
+    public static Boolean isItemAssigned(Long itemId) {
+        return find("item.id = ?1", itemId)
+                .firstResultOptional()
+                .isPresent();
+    }
 
-	public static QrContent projectQrContents(String sn) {
-		// Query projection
-		return find("itemSerialNumber", sn).project(QrContent.class).singleResult();
-	}
+    public static Boolean isEmployeeExists(Long empId) {
+        return find("employee.id = ?1", empId)
+                .firstResultOptional()
+                .isPresent();
+    }
+
+    public static PanacheQuery<PanacheEntityBase> hasItem(Long itemId) {
+        return find(
+                "item.id = ?1 AND item.status <> ?2",
+                itemId, Status.Transfered);
+    }
+
+    public static QrContent projectQrContents(String sn) {
+        // Query projection
+        return find("itemSerialNumber", sn).project(QrContent.class).singleResult();
+    }
 }

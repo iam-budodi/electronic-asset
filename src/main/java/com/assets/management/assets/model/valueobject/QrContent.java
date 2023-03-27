@@ -10,19 +10,19 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @RegisterForReflection
 public class QrContent {
 
-	@NotNull
-	public final String itemSerialNumber;
+    @NotNull
+    public final String itemSerialNumber;
 
-	@NotNull
-	public final String workId;
+    @NotNull
+    public final String workId;
 
-	@NotNull
-	public final LocalDateTime dateAssigned;
+    @NotNull
+    public final LocalDateTime dateAssigned;
 
-	public QrContent(String itemSerialNumber, LocalDateTime dateAssigned,
-			@ProjectedFieldName("employee.workId") String workId) {
-		this.itemSerialNumber = itemSerialNumber;
-		this.workId = workId;
-		this.dateAssigned = dateAssigned;
-	}
+    public QrContent(String itemSerialNumber, LocalDateTime dateAssigned,
+                     @ProjectedFieldName("employee.workId") String workId) {
+        this.itemSerialNumber = itemSerialNumber;
+        this.workId = workId;
+        this.dateAssigned = dateAssigned;
+    }
 }

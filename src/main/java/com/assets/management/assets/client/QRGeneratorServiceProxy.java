@@ -16,7 +16,7 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 @Produces(MediaType.APPLICATION_JSON)
 public interface QRGeneratorServiceProxy {
 
-	@POST
-	@Path("/qrcode")
-	byte[] generateQrString(URI collectionOrTransferURI);
+    @POST
+    @Path("/qrcode")
+    byte[] generateQrString(URI collectionOrTransferURI);
 }
