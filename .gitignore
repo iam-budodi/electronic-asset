@@ -41,3 +41,4 @@ nb-configuration.xml
 
 # system
 src/main/resources/application.properties
+src/main/resources/import.sql

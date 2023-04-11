@@ -75,7 +75,7 @@ public class Supplier extends BaseEntity {
     @NotNull
     @Schema(required = true)
     @Enumerated(EnumType.STRING)
-    @Column(name = "company_type", nullable = false)
+    @Column(name = "supplier_type", nullable = false)
     public SupplierType supplierType;
 
     @NotNull

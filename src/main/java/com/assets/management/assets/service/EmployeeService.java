@@ -17,15 +17,12 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.NotFoundException;
 
+import com.assets.management.assets.model.entity.*;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
 import com.assets.management.assets.client.QRGeneratorServiceProxy;
-import com.assets.management.assets.model.entity.Allocation;
-import com.assets.management.assets.model.entity.Asset;
-import com.assets.management.assets.model.entity.Employee;
-import com.assets.management.assets.model.entity.QRCode;
-import com.assets.management.assets.model.entity.Transfer;
 import com.assets.management.assets.model.valueobject.AllocationStatus;
 
 import io.quarkus.hibernate.orm.panache.Panache;
@@ -50,13 +47,20 @@ public class EmployeeService {
         return employee;
     }
 
+//    @Transactional(Transactional.TxType.SUPPORTS)
+//    public List<Employee> listEmployees(Integer page, Integer size) {
+//        return Employee.find(
+//                        "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address ",
+//                        Sort.by("d.name").and("e.hireDate").and("e.firstName").and("e.lastName"))
+//                .page(page, size)
+//                .list();
+//    }
+
     @Transactional(Transactional.TxType.SUPPORTS)
-    public List<Employee> listEmployees(Integer page, Integer size) {
+    public PanacheQuery<Employee> listEmployees() {
         return Employee.find(
-                        "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address ",
-                        Sort.by("d.name").and("e.hireDate").and("e.firstName").and("e.lastName"))
-                .page(page, size)
-                .list();
+                "SELECT e FROM Employee e LEFT JOIN e.department LEFT JOIN e.address ",
+                Sort.by("e.hireDate").and("e.firstName").and("e.lastName"));
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
@@ -188,6 +192,4 @@ public class EmployeeService {
                 .map(found -> Panache.getEntityManager().merge(transfered.asset.label))
                 .orElseThrow(() -> new NotFoundException("Label dont exist"));
     }
-
-
 }
