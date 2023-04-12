@@ -2,10 +2,7 @@ package com.assets.management.assets.service;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -47,20 +44,17 @@ public class EmployeeService {
         return employee;
     }
 
-//    @Transactional(Transactional.TxType.SUPPORTS)
-//    public List<Employee> listEmployees(Integer page, Integer size) {
-//        return Employee.find(
-//                        "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address ",
-//                        Sort.by("d.name").and("e.hireDate").and("e.firstName").and("e.lastName"))
-//                .page(page, size)
-//                .list();
-//    }
-
     @Transactional(Transactional.TxType.SUPPORTS)
-    public PanacheQuery<Employee> listEmployees() {
+    public PanacheQuery<Employee> listEmployees(String searchValue) {
+        String searchString = searchValue == null ? "%" : "%" + searchValue.toLowerCase(Locale.ROOT) + "%";
         return Employee.find(
-                "SELECT e FROM Employee e LEFT JOIN e.department LEFT JOIN e.address ",
-                Sort.by("e.hireDate").and("e.firstName").and("e.lastName"));
+                "SELECT e FROM Employee e LEFT JOIN e.department d LEFT JOIN e.address a " +
+                        "WHERE LOWER(e.firstName) LIKE :searchValue " +
+                        "OR LOWER(e.firstName) || ' ' || LOWER(e.lastName) LIKE :searchValue " +
+                        "OR LOWER(e.email) LIKE :searchValue ",
+                Sort.by("e.hireDate").and("e.firstName").and("e.lastName"),
+                Parameters.with("searchValue", searchString)
+        );
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)

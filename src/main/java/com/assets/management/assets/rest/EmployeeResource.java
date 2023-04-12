@@ -54,9 +54,19 @@ public class EmployeeResource {
 
     @GET
     @Operation(summary = "Retrieves all available employees from the database")
-    @APIResponses({@APIResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Employee.class, type = SchemaType.ARRAY)), description = "Lists all the employees"), @APIResponse(responseCode = "204", description = "No employee to display"),})
-    public Response listEmployees(@Parameter(description = "Page index", required = false) @QueryParam("page") @DefaultValue("0") Integer pageIndex, @Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("15") Integer pageSize) {
-        PanacheQuery<Employee> query = employeeService.listEmployees();
+    @APIResponses(
+            { @APIResponse(responseCode = "200",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = Employee.class, type = SchemaType.ARRAY)),
+                    description = "Lists all the employees"),
+                    @APIResponse(responseCode = "204", description = "No employee to display"),
+            })
+    public Response listEmployees(
+            @Parameter(description = "Page index", required = false) @QueryParam("page") @DefaultValue("0") Integer pageIndex,
+            @Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("15") Integer pageSize,
+            @Parameter(description = "Search term", required = false) @QueryParam("search") String searchValue
+    ) {
+        PanacheQuery<Employee> query = employeeService.listEmployees(searchValue);
         Page currentPage = Page.of(pageIndex, pageSize);
         query.page(currentPage);
 
