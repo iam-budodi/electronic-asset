@@ -7,6 +7,7 @@ import com.assets.management.assets.model.entity.Transfer;
 import com.assets.management.assets.model.valueobject.AllocationStatus;
 import com.assets.management.assets.service.EmployeeService;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -19,6 +20,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.reactive.DateFormat;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -33,6 +35,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 @Path("/employees")
@@ -64,9 +67,11 @@ public class EmployeeResource {
     public Response listEmployees(
             @Parameter(description = "Page index", required = false) @QueryParam("page") @DefaultValue("0") Integer pageIndex,
             @Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("15") Integer pageSize,
-            @Parameter(description = "Search term", required = false) @QueryParam("search") String searchValue
+            @Parameter(description = "Search string", required = false) @QueryParam("search") String search,
+            @Parameter(description = "Search date", required = false) @QueryParam("date") LocalDate date
     ) {
-        PanacheQuery<Employee> query = employeeService.listEmployees(searchValue);
+        LOG.info("date : " + date);
+        PanacheQuery<Employee> query = employeeService.listEmployees(search, date);
         Page currentPage = Page.of(pageIndex, pageSize);
         query.page(currentPage);
 

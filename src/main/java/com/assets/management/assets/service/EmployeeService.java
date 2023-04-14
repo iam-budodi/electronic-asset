@@ -2,6 +2,7 @@ package com.assets.management.assets.service;
 
 import java.net.URI;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.*;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -45,15 +46,23 @@ public class EmployeeService {
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public PanacheQuery<Employee> listEmployees(String searchValue) {
-        String searchString = searchValue == null ? "%" : "%" + searchValue.toLowerCase(Locale.ROOT) + "%";
+    public PanacheQuery<Employee> listEmployees(String searchValue, LocalDate date) {
+        if (searchValue != null ) searchValue = "%" + searchValue.toLowerCase(Locale.ROOT) + "%";
+
+        String queryString = "SELECT e FROM Employee e LEFT JOIN e.department d LEFT JOIN e.address a " +
+                "WHERE (:searchValue IS NULL OR LOWER(e.firstName) LIKE :searchValue " +
+                "OR :searchValue IS NULL OR LOWER(e.lastName) LIKE :searchValue " +
+                "OR :searchValue IS NULL OR LOWER(e.workId) LIKE :searchValue " +
+                "OR LOWER(e.firstName) || ' ' || LOWER(e.lastName) LIKE :searchValue " +
+                "OR LOWER(e.email) LIKE :searchValue) ";
+
+        if (date != null) queryString += "AND e.hireDate = :date";
+        else queryString += "AND (:date IS NULL OR e.hireDate = :date)";
+
         return Employee.find(
-                "SELECT e FROM Employee e LEFT JOIN e.department d LEFT JOIN e.address a " +
-                        "WHERE LOWER(e.firstName) LIKE :searchValue " +
-                        "OR LOWER(e.firstName) || ' ' || LOWER(e.lastName) LIKE :searchValue " +
-                        "OR LOWER(e.email) LIKE :searchValue ",
+                queryString,
                 Sort.by("e.hireDate").and("e.firstName").and("e.lastName"),
-                Parameters.with("searchValue", searchString)
+                Parameters.with("searchValue", searchValue).and("date", date)
         );
     }
 
