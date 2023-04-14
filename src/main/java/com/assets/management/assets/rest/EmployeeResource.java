@@ -68,10 +68,12 @@ public class EmployeeResource {
             @Parameter(description = "Page index", required = false) @QueryParam("page") @DefaultValue("0") Integer pageIndex,
             @Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("15") Integer pageSize,
             @Parameter(description = "Search string", required = false) @QueryParam("search") String search,
-            @Parameter(description = "Search date", required = false) @QueryParam("date") LocalDate date
+            @Parameter(description = "Search date", required = false) @QueryParam("date") LocalDate date,
+            @Parameter(description = "Order property", required = false) @QueryParam("prop") @DefaultValue("firstName") String column,
+            @Parameter(description = "Order direction", required = false) @QueryParam("order") @DefaultValue("asc") String direction
     ) {
         LOG.info("date : " + date);
-        PanacheQuery<Employee> query = employeeService.listEmployees(search, date);
+        PanacheQuery<Employee> query = employeeService.listEmployees(search, date, column, direction);
         Page currentPage = Page.of(pageIndex, pageSize);
         query.page(currentPage);
 

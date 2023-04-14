@@ -46,9 +46,11 @@ public class EmployeeService {
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public PanacheQuery<Employee> listEmployees(String searchValue, LocalDate date) {
+    public PanacheQuery<Employee> listEmployees(String searchValue, LocalDate date, String column, String direction) {
         if (searchValue != null ) searchValue = "%" + searchValue.toLowerCase(Locale.ROOT) + "%";
 
+        String sortVariable = String.format("e.%s", column);
+        Sort.Direction sortDirection = Objects.equals(direction.toLowerCase(Locale.ROOT), "desc") ? Sort.Direction.Descending : Sort.Direction.Ascending ;
         String queryString = "SELECT e FROM Employee e LEFT JOIN e.department d LEFT JOIN e.address a " +
                 "WHERE (:searchValue IS NULL OR LOWER(e.firstName) LIKE :searchValue " +
                 "OR :searchValue IS NULL OR LOWER(e.lastName) LIKE :searchValue " +
@@ -59,9 +61,11 @@ public class EmployeeService {
         if (date != null) queryString += "AND e.hireDate = :date";
         else queryString += "AND (:date IS NULL OR e.hireDate = :date)";
 
+        LOG.info("SORT VARIABLE : " + sortVariable + " AND DIRECTION " + sortDirection);
         return Employee.find(
                 queryString,
-                Sort.by("e.hireDate").and("e.firstName").and("e.lastName"),
+//                Sort.by("e.firstName").and("e.lastName").and("e.hireDate"),
+                Sort.by(sortVariable, sortDirection),
                 Parameters.with("searchValue", searchValue).and("date", date)
         );
     }
