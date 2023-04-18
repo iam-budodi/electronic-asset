@@ -21,25 +21,25 @@ public class Address extends PanacheEntity {
 
     @NotNull
     @Size(min = 2, max = 32)
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "should include only letters ' and - special characters")
     @Column(name = "street_name", length = 32, nullable = false)
     public String street;
 
     @NotNull
     @Size(min = 2, max = 32)
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "should include only letters ' and - special characters")
     @Column(name = "ward_name", length = 32, nullable = false)
     public String ward;
 
     @NotNull
     @Size(min = 2, max = 32)
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "should include only letters ' and - special characters")
     @Column(name = "district_name", length = 32, nullable = false)
     public String district;
 
     @NotNull
     @Size(min = 2, max = 32)
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "should include only letters ' and - special characters")
     @Column(length = 32, nullable = false)
     public String city;
 
@@ -50,7 +50,7 @@ public class Address extends PanacheEntity {
 
     @NotNull
     @Size(min = 2, max = 32)
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "should include only letters ' and - special characters")
     @Column(length = 32, nullable = false)
     public String country;
 

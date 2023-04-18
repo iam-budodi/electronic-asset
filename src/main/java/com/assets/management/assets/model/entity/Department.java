@@ -3,12 +3,7 @@ package com.assets.management.assets.model.entity;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -43,10 +38,20 @@ public class Department extends PanacheEntity {
     @Column(name = "department_name", length = 64, nullable = false)
     public String name;
 
+    @NotNull
+    @Schema(required = true)
+    @Column(name = "department_code")
+    public String code;
+
     @Size(min = 1, max = 400)
     @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
     @Column(length = 400)
     public String description;
+
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "location_id", foreignKey = @ForeignKey(name = "department_address_fk_constraint", foreignKeyDefinition = ""))
+    public Address location;
 
     public static List<Department> findAllOrderByName() {
         return listAll(Sort.by("name"));

@@ -1,6 +1,7 @@
 package com.assets.management.assets.rest;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -8,22 +9,15 @@ import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import com.assets.management.assets.util.metadata.LinkHeaderPagination;
+import io.quarkus.panache.common.Page;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -55,6 +49,9 @@ public class DepartmentResource {
     @Inject
     DepartmentService departmentService;
 
+    @Inject
+    LinkHeaderPagination headerPagination;
+
     @GET
     @Transactional(Transactional.TxType.SUPPORTS)
     @Operation(summary = "Retrieves all available deparments from the database")
@@ -67,14 +64,35 @@ public class DepartmentResource {
             @APIResponse(responseCode = "204", description = "No department to display"),
             @APIResponse(responseCode = "404", description = "Department is not found for a given name query")
     })
-    public Response allDepartments(@Parameter(description = "Department name query parameter", required = false) @QueryParam("name") String deptName) {
-        List<Department> departments = Department.findAllOrderByName();
-        if (departments.size() == 0) return Response.status(Status.NO_CONTENT).build();
-        if (deptName == null) return Response.ok(departments).build();
+    public Response allDepartments(
+            @Context UriInfo uriInfo,
+            @Parameter(description = "Page index", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
+            @Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("5") Integer size,
+            @Parameter(description = "Search string", required = false) @QueryParam("search") String search,
+            @Parameter(description = "Order property", required = false) @QueryParam("prop") @DefaultValue("name") String column,
+            @Parameter(description = "Order direction", required = false) @QueryParam("order") @DefaultValue("asc") String direction) {
+//        List<Department> departments = Department.findAllOrderByName();
 
-        return Department.findByName(deptName)
-                .map(department -> Response.ok(department).build())
-                .orElseGet(() -> Response.status(Status.NOT_FOUND).build());
+        PanacheQuery<Employee> query = departmentService.listDepartments(search, column, direction);
+        Page currentPage = Page.of(page, size);
+        query.page(currentPage);
+
+        Long totalCount = query.count();
+        List<Employee> departmentForCurrentPage = query.list();
+        int lastPage = query.pageCount();
+        if (departmentForCurrentPage.size() == 0)
+            return Response.status(Status.NO_CONTENT).build();
+
+        String linkHeader = headerPagination.linkStream(uriInfo, currentPage, size, lastPage);
+
+        return Response.ok(departmentForCurrentPage)
+                .header("Link", linkHeader)
+                .header("X-Total-Count", totalCount)
+                .build();
+
+//        return Department.findByName(deptName)
+//                .map(department -> Response.ok(department).build())
+//                .orElseGet(() -> Response.status(Status.NOT_FOUND).build());
     }
 
     @GET

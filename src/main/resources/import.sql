@@ -1,37 +1,43 @@
+-- ADDRESSES
+insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name)
+VALUES (490, 'Dar es Salaam', 'Tanzania', 'kinondoni', '091919', 'sayansi', 'kijitonyama');
+
 -- DEPARTMENT TABLE - add 4 more dept
-insert into departments (id, description, department_name) VALUES (100, 'Computer science and Engeneering', 'CSE');
-insert into departments (id, description, department_name) VALUES (101, 'Telecomunication engineering', 'TE');
+insert into departments (id, department_code, description, department_name, location_id)
+VALUES (100, 'CSE', 'Computer science and Engineering', 'CSE', 490);
+insert into departments (id, department_code, description, department_name, location_id)
+VALUES (101, 'TE', 'Telecommunication engineering', 'Telecom', 490);
 
 -- EMPLOYEE TABLE - add at least 19 more employee
 insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name, phone_number, birthdate, hire_date, work_id, department_fk)
-VALUES (200,'2023-03-30', 'Habiba','hellen@gmail.com','hellen', 'FEMALE', 'John','Malaba','255716656596','1990-01-02','2022-07-28', '19-04-20022', 100);
+VALUES (200,'2023-03-30', 'Habiba','hellen@gmail.com','hellen', 'F', 'John','Malaba','255716656596','1990-01-02','2022-07-28', '19-04-20022', 100);
 insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name, phone_number, birthdate, hire_date, work_id, department_fk)
-VALUES (201,'2023-03-30', 'Habiba',  'lu3@gmail.com', 'Michael', 'MALE', 'Mbaga', 'Joseph','255713333396','1970-09-09','2017-12-01','19-04-02349', 100);
+VALUES (201,'2023-03-30', 'Habiba',  'lu3@gmail.com', 'Michael', 'M', 'Mbaga', 'Joseph','255713333396','1970-09-09','2017-12-01','19-04-02349', 100);
 insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name, phone_number, birthdate, hire_date, work_id, department_fk)
-VALUES (202, '2023-02-20', 'Lulu', 'burhan@gmail.com', 'Burhan', 'MALE', 'Kihambwe', 'Salum', '255673320098', '1991-06-12', '2017-12-01', '19-04-00341', 100);
+VALUES (202, '2023-02-20', 'Lulu', 'burhan@gmail.com', 'Burhan', 'M', 'Kihambwe', 'Salum', '255673320098', '1991-06-12', '2017-12-01', '19-04-00341', 100);
 insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name, phone_number, birthdate, hire_date, work_id, department_fk)
-VALUES (203, '2023-02-20', 'Lulu', 'amina12@gmail.com', 'Amina', 'FEMALE', 'Mtei', 'Harun', '255621344355', '1972-11-09', '2010-10-10', '19-04-00098', 100);
+VALUES (203, '2023-02-20', 'Lulu', 'amina12@gmail.com', 'Amina', 'F', 'Mtei', 'Harun', '255621344355', '1972-11-09', '2010-10-10', '19-04-00098', 100);
 insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name, phone_number, birthdate, hire_date, work_id, department_fk)
-VALUES (204, '2023-02-20', 'Lulu', 'zahoro@gmail.com', 'zahoro', 'MALE', 'Kuga', 'Leonard', '255768900123', '1992-07-07', '2016-11-11', '19-04-00041', 100);
+VALUES (204, '2023-02-20', 'Lulu', 'zahoro@gmail.com', 'zahoro', 'M', 'Kuga', 'Leonard', '255768900123', '1992-07-07', '2016-11-11', '19-04-00041', 100);
 insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name, phone_number, birthdate, hire_date, work_id, department_fk)
-VALUES (205, '2023-02-20', 'Lulu', 'elviselly@gmail.com', 'Elvis', 'MALE', 'Sechaga', 'Kel', '255768123456', '1960-12-10', '2019-12-04', '19-04-00012', 100);
+VALUES (205, '2023-02-20', 'Lulu', 'elviselly@gmail.com', 'Elvis', 'M', 'Sechaga', 'Kel', '255768123456', '1960-12-10', '2019-12-04', '19-04-00012', 100);
 insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name, phone_number, birthdate, hire_date, work_id, department_fk)
-VALUES (206, '2023-02-20', 'Lulu', 'michaelmoo@gmail.com', 'Michael', 'MALE', 'Joha', 'Leo', '255687000077', '1985-09-08', '2017-11-01', '19-04-00348', 100);
+VALUES (206, '2023-02-20', 'Lulu', 'michaelmoo@gmail.com', 'Michael', 'M', 'Joha', 'Leo', '255687000077', '1985-09-08', '2017-11-01', '19-04-00348', 100);
 
 insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name, phone_number, birthdate, hire_date, work_id, department_fk)
-VALUES (208, '2023-01-21', 'Lulu', 'Mohamed@gmail.com', 'Mohamed', 'MALE', 'Mtalila', 'Hillal', '25577100200', '1995-07-07', '2019-11-01', '2019-04-02348', 101);
+VALUES (208, '2023-01-21', 'Lulu', 'Mohamed@gmail.com', 'Mohamed', 'M', 'Mtalila', 'Hillal', '25577100200', '1995-07-07', '2019-11-01', '2019-04-02348', 101);
 insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name, phone_number, birthdate, hire_date, work_id, department_fk)
-VALUES (209, '2023-01-21', 'Habiba', 'emmanuel44@gmail.com', 'Emmanuel', 'MALE', 'Boshe', 'Prince', '255711890344', '1963-11-12', '1980-11-01', '2012-04-000111', 101);
+VALUES (209, '2023-01-21', 'Habiba', 'emmanuel44@gmail.com', 'Emmanuel', 'M', 'Boshe', 'Prince', '255711890344', '1963-11-12', '1980-11-01', '2012-04-000111', 101);
 insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name, phone_number, birthdate, hire_date, work_id, department_fk)
-VALUES (210, '2023-01-21', 'Habiba', 'allansam@gmail.com', 'Allan', 'MALE', 'Samuel', 'Mfure', '2557109898765', '1955-03-04', '1976-11-06', '1976-04-00981', 101);
+VALUES (210, '2023-01-21', 'Habiba', 'allansam@gmail.com', 'Allan', 'M', 'Samuel', 'Mfure', '2557109898765', '1955-03-04', '1976-11-06', '1976-04-00981', 101);
 insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name, phone_number, birthdate, hire_date, work_id, department_fk)
-VALUES (213, '2023-01-20', 'Habiba', 'aisam3@gmail.com', 'Aisa', 'FEMALE', 'Chamasi', 'Frank', '255734545465', '1980-05-05', '2000-11-01', '2000-04-00323', 101);
+VALUES (213, '2023-01-20', 'Habiba', 'aisam3@gmail.com', 'Aisa', 'F', 'Chamasi', 'Frank', '255734545465', '1980-05-05', '2000-11-01', '2000-04-00323', 101);
 insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name, phone_number, birthdate, hire_date, work_id, department_fk)
-VALUES (214, '2023-03-31', 'Habiba', 'happiness@gmail.com', 'Happiness', 'FEMALE', 'Henry', '', '255712345678', '1978-02-01', '1991-01-01', '1991-04-00001', 101);
+VALUES (214, '2023-03-31', 'Habiba', 'happiness@gmail.com', 'Happiness', 'F', 'Henry', '', '255712345678', '1978-02-01', '1991-01-01', '1991-04-00001', 101);
 insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name, phone_number, birthdate, hire_date, work_id, department_fk)
-VALUES (215, '2023-04-03', 'Lulu','missmassaba@gmail.com', 'Gwantwa', 'FEMALE', 'Massaba', 'Bakari', '255789765432', '1978-10-12', '2003-09-09', '2003-04-00012', 101);
+VALUES (215, '2023-04-03', 'Lulu','missmassaba@gmail.com', 'Gwantwa', 'F', 'Massaba', 'Bakari', '255789765432', '1978-10-12', '2003-09-09', '2003-04-00012', 101);
 insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name, phone_number, birthdate, hire_date, work_id, department_fk)
-VALUES (216, '2023-05-06', 'Lulu', 'revocatuswaa@gmail.com', 'Revocatus', 'MALE', 'Waangu', 'Elly', '25573456789', '1993-07-07', '2022-10-01', '2022-04-02001', 101);
+VALUES (216, '2023-05-06', 'Lulu', 'revocatuswaa@gmail.com', 'Revocatus', 'M', 'Waangu', 'Elly', '25573456789', '1993-07-07', '2022-10-01', '2022-04-02001', 101);
 
 
 

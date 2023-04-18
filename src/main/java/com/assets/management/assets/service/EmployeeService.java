@@ -1,9 +1,14 @@
 package com.assets.management.assets.service;
 
-import java.net.URI;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.*;
+import com.assets.management.assets.client.QRGeneratorServiceProxy;
+import com.assets.management.assets.model.entity.*;
+import com.assets.management.assets.model.valueobject.AllocationStatus;
+import io.quarkus.hibernate.orm.panache.Panache;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Parameters;
+import io.quarkus.panache.common.Sort;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -14,18 +19,10 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.NotFoundException;
-
-import com.assets.management.assets.model.entity.*;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.jboss.logging.Logger;
-
-import com.assets.management.assets.client.QRGeneratorServiceProxy;
-import com.assets.management.assets.model.valueobject.AllocationStatus;
-
-import io.quarkus.hibernate.orm.panache.Panache;
-import io.quarkus.panache.common.Parameters;
-import io.quarkus.panache.common.Sort;
+import java.net.URI;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.*;
 
 @ApplicationScoped
 @Transactional(Transactional.TxType.REQUIRED)
@@ -47,10 +44,13 @@ public class EmployeeService {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public PanacheQuery<Employee> listEmployees(String searchValue, LocalDate date, String column, String direction) {
-        if (searchValue != null ) searchValue = "%" + searchValue.toLowerCase(Locale.ROOT) + "%";
+        if (searchValue != null) searchValue = "%" + searchValue.toLowerCase(Locale.ROOT) + "%";
 
         String sortVariable = String.format("e.%s", column);
-        Sort.Direction sortDirection = Objects.equals(direction.toLowerCase(Locale.ROOT), "desc") ? Sort.Direction.Descending : Sort.Direction.Ascending ;
+        Sort.Direction sortDirection = Objects.equals(direction.toLowerCase(Locale.ROOT), "desc")
+                ? Sort.Direction.Descending
+                : Sort.Direction.Ascending;
+
         String queryString = "SELECT e FROM Employee e LEFT JOIN e.department d LEFT JOIN e.address a " +
                 "WHERE (:searchValue IS NULL OR LOWER(e.firstName) LIKE :searchValue " +
                 "OR :searchValue IS NULL OR LOWER(e.lastName) LIKE :searchValue " +
@@ -129,7 +129,7 @@ public class EmployeeService {
                 .setParameter("assetId", transfer.asset.id)
                 .setParameter("transferStatus", AllocationStatus.ALLOCATED)
                 .setParameter("secondAllocationStatus", Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.TRANSFERED))
-                .setParameter("allocationStatus", Arrays.asList(AllocationStatus.ALLOCATED))
+                .setParameter("allocationStatus", List.of(AllocationStatus.ALLOCATED))
                 .getSingleResult();
 
         Allocation allocated = (Allocation) allocationTransfer.get("allocation");
@@ -148,7 +148,7 @@ public class EmployeeService {
             transfered.status.addAll(transferedStatus);
             transfer.status.add(AllocationStatus.ALLOCATED);
             Transfer.persist(transfer);
-            LOG.info("PERSISTED 2ND  PARAM OBJ : " + transfer.toString());
+            LOG.info("PERSISTED 2ND  PARAM OBJ : " + transfer);
             return transfer;
         }
 

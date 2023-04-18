@@ -72,7 +72,6 @@ public class EmployeeResource {
             @Parameter(description = "Order property", required = false) @QueryParam("prop") @DefaultValue("firstName") String column,
             @Parameter(description = "Order direction", required = false) @QueryParam("order") @DefaultValue("asc") String direction
     ) {
-        LOG.info("date : " + date);
         PanacheQuery<Employee> query = employeeService.listEmployees(search, date, column, direction);
         Page currentPage = Page.of(pageIndex, pageSize);
         query.page(currentPage);
