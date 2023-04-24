@@ -23,8 +23,9 @@ public class BaseEntity extends PanacheEntity {
     @Column(name = "updated_at")
     public LocalDate updatedAt;
 
-    @NotNull
-    @Column(name = "registered_by", length = 64, nullable = false)
+//    @NotNull
+//    @Column(name = "registered_by", length = 64, nullable = false) // should be uncommented
+    @Column(name = "registered_by", length = 64)
     @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
     public String registeredBy;
 

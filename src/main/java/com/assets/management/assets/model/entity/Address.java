@@ -43,9 +43,9 @@ public class Address extends PanacheEntity {
     @Column(length = 32, nullable = false)
     public String city;
 
-    @Size(min = 1, max = 10)
+    @Size(min = 5, max = 5)
     @Pattern(regexp = "^\\d{5}$", message = "should include only five digits number")
-    @Column(name = "postal_code", length = 10, nullable = false)
+    @Column(name = "postal_code", length = 5, nullable = false)
     public String postalCode;
 
     @NotNull

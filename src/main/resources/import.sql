@@ -1,6 +1,6 @@
 -- ADDRESSES
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name)
-VALUES (490, 'Dar es Salaam', 'Tanzania', 'kinondoni', '091919', 'sayansi', 'kijitonyama');
+VALUES (490, 'Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi', 'kijitonyama');
 
 -- DEPARTMENT TABLE - add 4 more dept
 insert into departments (id, department_code, description, department_name, location_id)
@@ -58,28 +58,28 @@ VALUES (400, 'Dar es Salaam', 'Tanzania', 'Masaki', '11001', 'UZR', 'Mpakani', 2
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
 VALUES (401, 'Dar es Salaam', 'Tanzania', 'Ubungo', '11451', 'santika', 'Mpakani', 201);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
-VALUES (402, 'Dar es Salaam', 'Tanzania', 'Morocco', '100000', 'light', 'uhuru', 202);
+VALUES (402, 'Dar es Salaam', 'Tanzania', 'Morocco', '10000', 'light', 'uhuru', 202);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
-VALUES (403, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '090909', 'bluegreen', 'Madaa', 203);
+VALUES (403, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '09099', 'bluegreen', 'Madaa', 203);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
-VALUES (404, 'Dar es Salaam', 'Tanzania', 'Msimbazi', '234567', 'zebra', 'peace', 204);
+VALUES (404, 'Dar es Salaam', 'Tanzania', 'Msimbazi', '23456', 'zebra', 'peace', 204);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
 VALUES (405, 'Dar es Salaam', 'Tanzania', 'Mwenge', '09876', 'green', 'mapambano', 205);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
-VALUES (406, 'Dar es Salaam', 'Tanzania', 'kariakoo', '089976', 'elephant', 'elephant', 206);
+VALUES (406, 'Dar es Salaam', 'Tanzania', 'kariakoo', '08976', 'elephant', 'elephant', 206);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
-VALUES (407, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '090909', 'bluegreen', 'Madaa', 208);
+VALUES (407, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '90909', 'bluegreen', 'Madaa', 208);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
-VALUES (408, 'Dar es Salaam', 'Tanzania', 'oysterbay', '123459', 'upendo', 'upendo', 209);
+VALUES (408, 'Dar es Salaam', 'Tanzania', 'oysterbay', '13459', 'upendo', 'upendo', 209);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
-VALUES (409, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '123458', 'umoja', 'umoja', 210);
+VALUES (409, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '12348', 'umoja', 'umoja', 210);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
-VALUES (412, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '090909', 'bluegreen', 'Madaa', 213);insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
+VALUES (412, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '09909', 'bluegreen', 'Madaa', 213);insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
                                                                                             VALUES (410, 'Dar es Salaam', 'Tanzania', 'Morroco', '090909', 'bluegreen', 'Madaa', 214);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
-VALUES (411, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '090909', 'bluegreen', 'Madaa', 215);
+VALUES (411, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '09099', 'bluegreen', 'Madaa', 215);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
-VALUES (413, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '090909', 'bluegreen', 'Madaa', 216);
+VALUES (413, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '90909', 'bluegreen', 'Madaa', 216);
 
 
 -- -- for supplier address
@@ -88,9 +88,9 @@ VALUES (450, 'Dar es Salaam', 'Tanzania', 'Masaki', '11001', 'UZR', 'Mpakani', 3
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, supplier_fk)
 VALUES (451, 'Dar es Salaam', 'Tanzania', 'Ubungo', '11451', 'santika', 'Mpakani', 301);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, supplier_fk)
-VALUES (452, 'Dar es Salaam', 'Tanzania', 'Morocco', '100000', 'light', 'uhuru', 302);
+VALUES (452, 'Dar es Salaam', 'Tanzania', 'Morocco', '10000', 'light', 'uhuru', 302);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, supplier_fk)
-VALUES (453, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '090909', 'bluegreen', 'Madaa', 303);
+VALUES (453, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '09009', 'bluegreen', 'Madaa', 303);
 
 -- CATEGORY TABLE - different categories i.e Laptop, Desktop, Router, Switch etc
 insert into categories (id, description, category_name) VALUES (500, 'Laptop computer', 'Laptop');

@@ -1,18 +1,16 @@
 package com.assets.management.assets.model.entity;
 
-import java.util.List;
-import java.util.Optional;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.panache.common.Parameters;
+import io.quarkus.panache.common.Sort;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
-
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import io.quarkus.panache.common.Parameters;
-import io.quarkus.panache.common.Sort;
+import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(
@@ -34,17 +32,17 @@ public class Department extends PanacheEntity {
     @NotNull
     @Schema(required = true)
     @Size(min = 2, max = 64)
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "should include only letters ' and - special characters")
     @Column(name = "department_name", length = 64, nullable = false)
     public String name;
 
-    @NotNull
-    @Schema(required = true)
+    @Size(min = 2, max = 10)
+    @Pattern(regexp = "^[\\p{L}\\p{Nd} _]+$", message = "should include only letters, digit, space and underscore")
     @Column(name = "department_code")
     public String code;
 
     @Size(min = 1, max = 400)
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "should include only letters ' and - special characters")
     @Column(length = 400)
     public String description;
 

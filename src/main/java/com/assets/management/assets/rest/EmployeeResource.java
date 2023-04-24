@@ -151,10 +151,26 @@ public class EmployeeResource {
 
     @POST
     @Operation(summary = "Creates a valid employee and stores it into the database")
-    @APIResponses({@APIResponse(responseCode = "201", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = URI.class)), description = "URI of the created employee"), @APIResponse(responseCode = "400", description = "Invalid input"), @APIResponse(responseCode = "409", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = String.class)), description = "Employee duplications is not allowed"), @APIResponse(responseCode = "404", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = String.class)), description = "Specified department does not exist in the database")})
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "201",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = URI.class)),
+                    description = "URI of the created employee"),
+            @APIResponse(responseCode = "400", description = "Invalid input"),
+            @APIResponse(
+                    responseCode = "409",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = String.class)),
+                    description = "Employee duplications is not allowed"),
+            @APIResponse(
+                    responseCode = "404",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = String.class)),
+                    description = "Specified department does not exist in the database")})
     public Response createEmployee(@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Employee.class))) @Valid Employee employee, @Context UriInfo uriInfo) {
         if (employee.address == null || employee.department == null) return Response.status(Status.BAD_REQUEST).build();
         else if (Employee.checkByEmailAndPhone(employee.email, employee.mobile))
+        if (Employee.checkByEmailAndPhone(employee.email, employee.mobile))
             return Response.status(Status.CONFLICT).entity("Email or Phone number is already taken").build();
         else if (!Department.findByIdOptional(employee.department.id).isPresent())
             return Response.status(Status.NOT_FOUND).entity("Department dont exists").build();

@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import com.assets.management.assets.model.valueobject.DepartmentSelectOptions;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
 import io.quarkus.panache.common.Page;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -114,21 +115,22 @@ public class DepartmentResource {
     }
 
     @GET
-    @Path("/count")
+    @Path("/select")
     @Transactional(Transactional.TxType.SUPPORTS)
-    @Operation(summary = "Counts all departments available in the database")
+    @Operation(summary = "Fetch only department ID and name for all departments available to be used for client side selection options")
     @APIResponses({
             @APIResponse(
                     responseCode = "200",
                     content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Long.class)),
-                    description = "Number of all departments available"),
+                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = DepartmentSelectOptions.class, type = SchemaType.ARRAY)),
+                    description = "Department ID and name as key value pair objects for the departments available"),
             @APIResponse(responseCode = "204", description = "No department available in the database")
     })
-    public Response countDepartment() {
-        Long nbDepartment = Department.count();
-        if (nbDepartment == 0) return Response.status(Status.NO_CONTENT).build();
-        return Response.ok(nbDepartment).build();
+    public Response departmentSelectOptions() {
+        List<DepartmentSelectOptions> dept = Department.find("SELECT d.id, d.name FROM Department d")
+                .project(DepartmentSelectOptions.class).list();
+        if (dept.size() == 0) return Response.status(Status.NO_CONTENT).build();
+        return Response.ok(dept).build();
     }
 
     @POST
