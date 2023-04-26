@@ -37,7 +37,7 @@ class EmployeeTest {
     private static final String DEFAULT_LNAME = "Shaban";
     private static final String DEFAULT_EMAIL = "luluyshaban@gmail.com";
     private static final String DEFAULT_PHONE = "0716 656 596";
-    private static final Gender DEFAULT_GENDER = Gender.FEMALE;
+    private static final Gender DEFAULT_GENDER = Gender.F;
     private static final String DEFAULT_WORK_ID = "UDSM-2013-00001";
     private static final LocalDate DEFAULT_BIRTH_DATE = LocalDate.of(1997, Month.SEPTEMBER, 12);
     private static final LocalDate DEFAULT_HIRE_DATE = LocalDate.of(2022, Month.JUNE, 04);

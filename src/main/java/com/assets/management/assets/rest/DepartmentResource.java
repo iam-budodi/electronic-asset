@@ -1,7 +1,6 @@
 package com.assets.management.assets.rest;
 
 import java.net.URI;
-import java.time.LocalDate;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -16,7 +15,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import com.assets.management.assets.model.valueobject.DepartmentSelectOptions;
+import com.assets.management.assets.model.valueobject.SelectOptions;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
 import io.quarkus.panache.common.Page;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -122,13 +121,13 @@ public class DepartmentResource {
             @APIResponse(
                     responseCode = "200",
                     content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = DepartmentSelectOptions.class, type = SchemaType.ARRAY)),
+                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY)),
                     description = "Department ID and name as key value pair objects for the departments available"),
             @APIResponse(responseCode = "204", description = "No department available in the database")
     })
     public Response departmentSelectOptions() {
-        List<DepartmentSelectOptions> dept = Department.find("SELECT d.id, d.name FROM Department d")
-                .project(DepartmentSelectOptions.class).list();
+        List<SelectOptions> dept = Department.find("SELECT d.id, d.name FROM Department d")
+                .project(SelectOptions.class).list();
         if (dept.size() == 0) return Response.status(Status.NO_CONTENT).build();
         return Response.ok(dept).build();
     }

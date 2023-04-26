@@ -1,18 +1,19 @@
 package com.assets.management.assets.service;
 
-import java.util.List;
-import java.util.Optional;
+import com.assets.management.assets.model.entity.Supplier;
+import io.quarkus.hibernate.orm.panache.Panache;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Parameters;
+import io.quarkus.panache.common.Sort;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
-
-import com.assets.management.assets.model.entity.Supplier;
-
-import io.quarkus.hibernate.orm.panache.Panache;
-import io.quarkus.panache.common.Parameters;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
 
 @ApplicationScoped
 @Transactional(Transactional.TxType.REQUIRED)
@@ -41,12 +42,24 @@ public class SupplierService {
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public List<Supplier> listSuppliers(Integer index, Integer size) {
-        return Supplier.find("FROM Supplier s "
-                        + "LEFT JOIN FETCH s.address "
-                        + "ORDER BY s.name")
-                .page(index, size)
-                .list();
+    public PanacheQuery<Supplier> listSuppliers(String searchValue, String column, String direction) {
+        if (searchValue != null) searchValue = "%" + searchValue.toLowerCase(Locale.ROOT) + "%";
+
+        String sortVariable = String.format("s.%s", column);
+        Sort.Direction sortDirection = Objects.equals(direction.toLowerCase(Locale.ROOT), "desc")
+                ? Sort.Direction.Descending
+                : Sort.Direction.Ascending;
+
+        String queryString = "SELECT s FROM Supplier s LEFT JOIN s.address a " +
+                "WHERE (:searchValue IS NULL OR LOWER(s.name) LIKE :searchValue " +
+                "OR :searchValue IS NULL OR LOWER(s.phone) LIKE :searchValue " +
+                "OR :searchValue IS NULL OR LOWER(s.website) LIKE :searchValue " +
+                "OR LOWER(s.email) LIKE :searchValue) ";
+
+        return Supplier.find(queryString,
+                Sort.by(sortVariable, sortDirection),
+                Parameters.with("searchValue", searchValue)
+        );
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)

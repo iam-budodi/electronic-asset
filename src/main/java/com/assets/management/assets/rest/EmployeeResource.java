@@ -90,45 +90,6 @@ public class EmployeeResource {
                 .build();
     }
 
-//        @GET
-//    public Response listEmployees(@QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("size") @DefaultValue("15") Integer size) {
-//
-//            PanacheQuery<Employee> query = employeeService.listEmployees();
-//            Page currentPage = Page.of(page, size);
-//            query.page(currentPage);
-//
-//            Long totalCount = query.count();
-//            List<Employee> employeesForCurrentPage = query.list();
-////            int lastPage = (int) ((totalCount + size - 1)); // uncomment to test
-//            int lastPage = query.pageCount();
-//
-////            Stream<Link> linkStream = Stream.of(
-////                    createLinkHeader(currentPage.previous(), "prev"),
-////                    createLinkHeader(currentPage.next(), "next"),
-////                    createLinkHeader(Page.ofSize(size), "first"),
-////                    createLinkHeader(Page.of(lastPage, size), "last")
-////            ).filter(Objects::nonNull);
-////
-////            String linkHeader = linkStream.map(Link::toString).collect(Collectors.joining(","));
-//            String linkHeader = headerPagination.linkStream(uriInfo, currentPage, size, lastPage);
-//
-//            return Response.ok(employeesForCurrentPage)
-//                    .header("Link", linkHeader)
-//                    .header("X-Total-Count", totalCount)
-//                    .build();
-//    }
-//
-//    private Link createLinkHeader(Page page, String rel) {
-//            if (page == null) return null;
-//
-//            return Link.fromUriBuilder(
-//                    uriInfo.getRequestUriBuilder()
-//                            .replaceQueryParam("page", page.index)
-//                            .replaceQueryParam("size", page.size))
-//                    .rel(rel)
-//                    .build();
-//    }
-
     @GET
     @Path("/{id}")
     @Transactional(Transactional.TxType.SUPPORTS)

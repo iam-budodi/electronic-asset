@@ -1,6 +1,7 @@
 package com.assets.management.assets.rest;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -26,6 +27,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import com.assets.management.assets.model.valueobject.SelectOptions;
+import com.assets.management.assets.util.metadata.LinkHeaderPagination;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Page;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -45,8 +50,14 @@ import com.assets.management.assets.service.SupplierService;
 @Tag(name = "Supplier Endpoint", description = "This API allows to keep record of asset suppliers")
 public class SupplierResource {
 
+    @Context
+    UriInfo uriInfo;
+
     @Inject
     SupplierService supplierService;
+
+    @Inject
+    LinkHeaderPagination headerPagination;
 
     @GET
     @Operation(summary = "Retrieves all available suppliers from the database")
@@ -60,10 +71,26 @@ public class SupplierResource {
     })
     public Response listSuppliers(
             @Parameter(description = "Page index", required = false) @QueryParam("page") @DefaultValue("0") Integer index,
-            @Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("15") Integer size) {
-        List<Supplier> suppliers = supplierService.listSuppliers(index, size);
-        if (suppliers.size() == 0) return Response.status(Status.NO_CONTENT).build();
-        return Response.ok(suppliers).build();
+            @Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("10") Integer size,
+            @Parameter(description = "Search string", required = false) @QueryParam("search") String search,
+            @Parameter(description = "Order property", required = false) @QueryParam("prop") @DefaultValue("name") String column,
+            @Parameter(description = "Order direction", required = false) @QueryParam("order") @DefaultValue("asc") String direction
+    ) {
+        PanacheQuery<Supplier> query = supplierService.listSuppliers(search, column, direction);
+        Page currentPage = Page.of(index, size);
+        query.page(currentPage);
+
+        Long totalCount = query.count();
+        List<Supplier> suppliersForCurrentPage = query.list();
+        int lastPage = query.pageCount();
+        if (suppliersForCurrentPage.size() == 0) return Response.status(Status.NO_CONTENT).build();
+
+
+        String linkHeader = headerPagination.linkStream(uriInfo, currentPage, size, lastPage);
+        return Response.ok(suppliersForCurrentPage)
+                .header("Link", linkHeader)
+                .header("X-Total-Count", totalCount)
+                .build();
     }
 
     @GET
@@ -113,21 +140,22 @@ public class SupplierResource {
     }
 
     @GET
-    @Path("/count")
+    @Path("/select")
     @Transactional(Transactional.TxType.SUPPORTS)
-    @Operation(summary = "Counts all suppliers available in the database")
+    @Operation(summary = "Retrieve only suppliers ID and names for all available suppliers in the database")
     @APIResponses({
             @APIResponse(
                     responseCode = "200",
                     content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Long.class)),
-                    description = "Number of all suppliers available"),
+                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY)),
+                    description = "Supplier ID and name as key value pair objects for suppliers available"),
             @APIResponse(responseCode = "204", description = "No supplier available in the database")
     })
-    public Response countAll() {
-        Long nbSuppliers = Supplier.count();
-        if (nbSuppliers == 0) return Response.status(Status.NO_CONTENT).build();
-        return Response.ok(nbSuppliers).build();
+    public Response supplierSelectOptions() {
+        List<SelectOptions> suppliers = Supplier.find("SELECT s.id, s.name FROM Supplier s")
+                .project(SelectOptions.class).list();
+        if (suppliers.size() == 0) return Response.status(Status.NO_CONTENT).build();
+        return Response.ok(suppliers).build();
     }
 
     @PUT

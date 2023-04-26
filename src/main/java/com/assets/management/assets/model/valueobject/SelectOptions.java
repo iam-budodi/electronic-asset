@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @RegisterForReflection
-public class DepartmentSelectOptions {
+public class SelectOptions {
 
     @Min(1)
     @NotNull
@@ -19,7 +19,7 @@ public class DepartmentSelectOptions {
     @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
     public final String label;
 
-    public DepartmentSelectOptions(Long value, String label) {
+    public SelectOptions(Long value, String label) {
         this.value = value;
         this.label = label;
     }

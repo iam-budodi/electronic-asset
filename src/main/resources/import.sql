@@ -43,13 +43,13 @@ VALUES (216, '2023-05-06', 'Lulu', 'revocatuswaa@gmail.com', 'Revocatus', 'M', '
 
 -- SUPPLIER TABLE - at least 4 more supplier
 insert into suppliers (id, registered_at, registered_by, description, company_email, company_name, company_phone, supplier_type, company_website)
-VALUES (300, '2020-09-12', 'Habiba', 'Supplies Office enablers like routers and switch', 'support@networkassociate.co.tz', 'Network Associate', '+255222111777', 'WHOLESELLER', 'https://www.networkassociate.co.tz');
+VALUES (300, '2020-09-12', 'Habiba', 'Supplies Office enablers like routers and switch', 'support@networkassociate.co.tz', 'Network Associate', '+255222111777', 'WHOLESALER', 'https://www.networkassociate.co.tz');
 insert into suppliers (id, registered_at, registered_by, description, company_email, company_name, company_phone, supplier_type, company_website)
-VALUES (301, '2020-03-28', 'Habiba', 'Supplies Office enablers like computers and printers', 'support@qualityassociate.co.tz', 'Quality Associate', '+255222333555', 'WHOLESELLER', 'https://www.qualityassociate.co.tz');
+VALUES (301, '2020-03-28', 'Habiba', 'Supplies Office enablers like computers and printers', 'support@qualityassociate.co.tz', 'Quality Associate', '+255222333555', 'RETAILER', 'https://www.qualityassociate.co.tz');
 insert into suppliers (id, registered_at, registered_by, description, company_email, company_name, company_phone, supplier_type, company_website)
-VALUES (302, '2022-08-20', 'Lulu', 'Supplies Office enablers like routers and switch', 'support@uhakikassociate.co.tz', 'Uhakika Associate', '+255222332111', 'WHOLESELLER', 'https://www.uhakikaassociate.co.tz');
+VALUES (302, '2022-08-20', 'Lulu', 'Supplies Office enablers like routers and switch', 'support@uhakikassociate.co.tz', 'Uhakika Associate', '+255222332111', 'RETAILER', 'https://www.uhakikaassociate.co.tz');
 insert into suppliers (id, registered_at, registered_by, description, company_email, company_name, company_phone, supplier_type, company_website)
-VALUES (303, '2020-06-28', 'Lulu', 'Supplies Office enablers like computers,scanner and printers', 'support@technologyassociate.co.tz', 'Technology Associate', '+255222333444', 'WHOLESELLER', 'https://www.technologyassociate.co.tz');
+VALUES (303, '2020-06-28', 'Lulu', 'Supplies Office enablers like computers,scanner and printers', 'support@technologyassociate.co.tz', 'Technology Associate', '+255222333444', 'MANUFACTURER', 'https://www.technologyassociate.co.tz');
 
 -- -- ADDRESS TABLE - add at least 15 addresses
 -- -- for employee address
@@ -74,8 +74,9 @@ VALUES (408, 'Dar es Salaam', 'Tanzania', 'oysterbay', '13459', 'upendo', 'upend
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
 VALUES (409, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '12348', 'umoja', 'umoja', 210);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
-VALUES (412, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '09909', 'bluegreen', 'Madaa', 213);insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
-                                                                                            VALUES (410, 'Dar es Salaam', 'Tanzania', 'Morroco', '090909', 'bluegreen', 'Madaa', 214);
+VALUES (412, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '09909', 'bluegreen', 'Madaa', 213);
+insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
+VALUES (410, 'Dar es Salaam', 'Tanzania', 'Morroco', '09091', 'bluegreen', 'Madaa', 214);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
 VALUES (411, 'Dar es Salaam', 'Tanzania', 'Mikocheni', '09099', 'bluegreen', 'Madaa', 215);
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name, employee_fk)
@@ -100,16 +101,16 @@ insert into categories (id, description, category_name) VALUES (503, 'All router
 insert into categories (id, description, category_name) VALUES (504, 'scanner', 'scanner');
 
 -- PURCHASE TABLE - five perchase max
-insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
-VALUES (550, 'RPC4-123456', '2022-09-12', 35000000, 15, 300);
-insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
-VALUES (551, 'RPC4-987654', '2022-09-12', 55000000, 16, 301);
-insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
-VALUES (552, 'JPC4-123456', '2023-10-12', 40000000, 15, 302);
-insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
-VALUES (553, 'JPC4-676543', '2022-01-12', 15000000, 15, 303);
-insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
-VALUES (554, 'HPC4-123456', '2021-09-12', 35000000, 10, 300);
+-- insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
+-- VALUES (550, 'RPC4-123456', '2022-09-12', 35000000, 15, 300);
+-- insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
+-- VALUES (551, 'RPC4-987654', '2022-09-12', 55000000, 16, 301);
+-- insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
+-- VALUES (552, 'JPC4-123456', '2023-10-12', 40000000, 15, 302);
+-- insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
+-- VALUES (553, 'JPC4-676543', '2022-01-12', 15000000, 15, 303);
+-- insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
+-- VALUES (554, 'HPC4-123456', '2021-09-12', 35000000, 10, 300);
 
 -- ASSETS TABLE - add at least 20 computers
 insert into assets (asset_discriminator, id, brand_name, manufacturer, model_name, model_number, serial_number, display_size, graphics_card, computer_memory, operating_system, computer_processor, computer_storage, category_fk, purchase_invoice_number)
