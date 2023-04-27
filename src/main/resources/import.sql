@@ -101,16 +101,16 @@ insert into categories (id, description, category_name) VALUES (503, 'All router
 insert into categories (id, description, category_name) VALUES (504, 'scanner', 'scanner');
 
 -- PURCHASE TABLE - five perchase max
--- insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
--- VALUES (550, 'RPC4-123456', '2022-09-12', 35000000, 15, 300);
--- insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
--- VALUES (551, 'RPC4-987654', '2022-09-12', 55000000, 16, 301);
--- insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
--- VALUES (552, 'JPC4-123456', '2023-10-12', 40000000, 15, 302);
--- insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
--- VALUES (553, 'JPC4-676543', '2022-01-12', 15000000, 15, 303);
--- insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
--- VALUES (554, 'HPC4-123456', '2021-09-12', 35000000, 10, 300);
+insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
+VALUES (550, 'RPC4-123456', '2022-09-12', 35000000, 15, 300);
+insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
+VALUES (551, 'RPC4-987654', '2022-09-12', 55000000, 16, 301);
+insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
+VALUES (552, 'JPC4-123456', '2023-10-12', 40000000, 15, 302);
+insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
+VALUES (553, 'JPC4-676543', '2022-01-12', 15000000, 15, 303);
+insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
+VALUES (554, 'HPC4-123456', '2021-09-12', 35000000, 10, 300);
 
 -- ASSETS TABLE - add at least 20 computers
 insert into assets (asset_discriminator, id, brand_name, manufacturer, model_name, model_number, serial_number, display_size, graphics_card, computer_memory, operating_system, computer_processor, computer_storage, category_fk, purchase_invoice_number)

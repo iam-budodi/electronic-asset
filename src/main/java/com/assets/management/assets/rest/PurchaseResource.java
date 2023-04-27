@@ -1,8 +1,10 @@
 package com.assets.management.assets.rest;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -22,6 +24,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import com.assets.management.assets.model.valueobject.SelectOptions;
+import com.assets.management.assets.util.metadata.LinkHeaderPagination;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Page;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -47,6 +53,12 @@ import io.quarkus.hibernate.orm.panache.Panache;
 @Tag(name = "Purchase Endpoint", description = "This API allows to keep track of all the purchases")
 public class PurchaseResource {
 
+    @Context
+    UriInfo uriInfo;
+
+    @Inject
+    LinkHeaderPagination headerPagination;
+
     @GET
     @Transactional(Transactional.TxType.SUPPORTS)
     @Operation(summary = "Retrieves all available purchases from the database")
@@ -60,10 +72,28 @@ public class PurchaseResource {
     })
     public Response listAllPurchases(
             @Parameter(description = "Page index", required = false) @QueryParam("page") @DefaultValue("0") Integer pageIndex,
-            @Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("15") Integer pageSize) {
-        List<Purchase> purchases = Purchase.retrieveAllOrById().page(pageIndex, pageSize).list();
-        if (purchases.size() == 0) return Response.status(Status.NO_CONTENT).build();
-        return Response.ok(purchases).build();
+            @Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("15") Integer pageSize,
+            @Parameter(description = "Search string", required = false) @QueryParam("search") String search,
+            @Parameter(description = "Search date", required = false) @QueryParam("date") LocalDate date,
+            @Parameter(description = "Order property", required = false) @QueryParam("prop") @DefaultValue("invoiceNumber") String column,
+            @Parameter(description = "Order direction", required = false) @QueryParam("order") @DefaultValue("asc") String direction
+    ) {
+        PanacheQuery<Purchase> query = Purchase.getAll(search, date, column, direction);
+        Page currentPage = Page.of(pageIndex, pageSize);
+        query.page(currentPage);
+
+        Long totalCount = query.count();
+        List<Purchase> purchasesForCurrentPage = query.list();
+        int lastPage = query.pageCount();
+
+        if (purchasesForCurrentPage.size() == 0) return Response.status(Status.NO_CONTENT).build();
+
+        String linkHeader = headerPagination.linkStream(uriInfo, currentPage, pageSize, lastPage);
+
+        return Response.ok(purchasesForCurrentPage)
+                .header("Link", linkHeader)
+                .header("X-Total-Count", totalCount)
+                .build();
     }
 
     @GET
@@ -81,7 +111,7 @@ public class PurchaseResource {
     })
     public Response findPurchase(
             @Parameter(description = "Purchase identifier", required = true) @PathParam("id") @NotNull Long purchaseId) {
-        return Purchase.retrieveAllOrById(purchaseId).firstResultOptional()
+        return Purchase.getById(purchaseId).firstResultOptional()
                 .map(purchase -> Response.ok(purchase).build())
                 .orElseGet(() -> Response.status(Status.NOT_FOUND).build());
     }
@@ -104,6 +134,24 @@ public class PurchaseResource {
         return Response.ok(purchasesPerSupplier).build();
     }
 
+    @GET
+    @Path("/select")
+    @Transactional(Transactional.TxType.SUPPORTS)
+    @Operation(summary = "Fetch only purchase ID and name for all purchases available to be used for client side selection options")
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY)),
+                    description = "Purchase ID and name as key value pair objects for the purchases available"),
+            @APIResponse(responseCode = "204", description = "No purchase available in the database")
+    })
+    public Response purchaseSelectOptions() {
+        List<SelectOptions> selectOptions = Purchase.find("SELECT p.id, p.invoiceNumber FROM Purchase p")
+                .project(SelectOptions.class).list();
+        if (selectOptions.size() == 0) return Response.status(Status.NO_CONTENT).build();
+        return Response.ok(selectOptions).build();
+    }
     @GET
     @Path("/{invoice}/assets")
     @Transactional(Transactional.TxType.SUPPORTS)
@@ -176,7 +224,7 @@ public class PurchaseResource {
             @Valid Purchase purchase) {
         if (!purchaseId.equals(purchase.id)) return Response.status(Response.Status.CONFLICT).entity(purchase).build();
         else if (purchase.supplier == null)
-            return Response.status(Status.BAD_REQUEST).entity("Supplier details should be encluded").build();
+            return Response.status(Status.BAD_REQUEST).entity("Supplier details should be included").build();
 
         return Purchase.findByIdOptional(purchaseId).map(exists -> {
             Panache.getEntityManager().merge(purchase);

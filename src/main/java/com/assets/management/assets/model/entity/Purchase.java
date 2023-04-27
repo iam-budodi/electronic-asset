@@ -1,35 +1,24 @@
 package com.assets.management.assets.model.entity;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.PostLoad;
-import javax.persistence.PostPersist;
-import javax.persistence.PostUpdate;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PastOrPresent;
-
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
-
 import com.assets.management.assets.model.valueobject.PurchasePerSupplier;
-
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
+import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
+import java.io.Serial;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 @Table(
@@ -44,6 +33,7 @@ import io.quarkus.panache.common.Sort;
 @Schema(description = "Purchase representation")
 public class Purchase extends PanacheEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @NotNull
@@ -76,8 +66,8 @@ public class Purchase extends PanacheEntity implements Serializable {
     @JoinColumn(
             name = "supplier_fk",
             foreignKey = @ForeignKey(
-                    name = "purchase_supplier_fk_constraint",
-                    foreignKeyDefinition = ""))
+                    name = "purchase_supplier_fk_constraint")
+    )
     public Supplier supplier;
 
     @Transient
@@ -93,22 +83,39 @@ public class Purchase extends PanacheEntity implements Serializable {
                 + "FROM Purchase p GROUP BY p.supplier.name").project(PurchasePerSupplier.class).list();
     }
 
-    // method overloading
-    public static PanacheQuery<Purchase> retrieveAllOrById() {
-        return retrieveAllOrById(null);
+    public static PanacheQuery<Purchase> getAll(String searchValue, LocalDate date, String column, String direction) {
+        if (searchValue != null) searchValue = "%" + searchValue.toLowerCase(Locale.ROOT) + "%";
+
+        String sortVariable = String.format("p.%s", column);
+        Sort.Direction sortDirection = Objects.equals(direction.toLowerCase(Locale.ROOT), "desc")
+                ? Sort.Direction.Descending
+                : Sort.Direction.Ascending;
+
+        String queryString = "SELECT p FROM Purchase p LEFT JOIN p.supplier s LEFT JOIN s.address " +
+                "WHERE (:searchValue IS NULL OR LOWER(p.invoiceNumber) LIKE :searchValue " +
+                "OR :searchValue IS NULL OR LOWER(p.supplier.name) LIKE :searchValue) ";
+
+        if (date != null) queryString += "AND p.purchaseDate = :date";
+        else queryString += "AND (:date IS NULL OR p.purchaseDate = :date)";
+
+        return find(
+                queryString,
+                Sort.by(sortVariable, sortDirection),
+                Parameters.with("searchValue", searchValue).and("date", date)
+        );
     }
 
-    public static PanacheQuery<Purchase> retrieveAllOrById(Long purchaseId) {
+    public static PanacheQuery<Purchase> getById(Long purchaseId) {
+
         return find("FROM Purchase p LEFT JOIN FETCH p.supplier s LEFT JOIN FETCH s.address "
-                        + "WHERE (:purchaseId IS NULL OR p.id = :purchaseId) ",
-                Sort.by("p.purchaseDate").and("p.purchaseQty", Sort.Direction.Descending),
+                        + "WHERE p.id = :purchaseId ",
                 Parameters.with("purchaseId", purchaseId));
     }
 
     @PostLoad
     @PostPersist
     @PostUpdate
-    protected void calculateAgeAndRetireDate() {
+    protected void totalPurchaseCost() {
         if (purchaseQty == null || purchasePrice == null) {
             totalPurchaseCost = BigDecimal.ZERO;
             return;

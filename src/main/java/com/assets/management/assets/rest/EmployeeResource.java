@@ -190,9 +190,9 @@ public class EmployeeResource {
         } catch (NotFoundException nf) {
             return Response.status(Response.Status.NOT_FOUND).entity("Employee don't exist").build();
         } catch (BadRequestException br) {
-            return Response.status(Status.BAD_REQUEST).entity("Ensure Asset is transfered from the current custodian").build();
+            return Response.status(Status.BAD_REQUEST).entity("Ensure Asset is transferred from the current custodian").build();
         } catch (ClientErrorException ce) {
-            return Response.status(Status.CONFLICT).entity("Asset cannot be transfered!").build();
+            return Response.status(Status.CONFLICT).entity("Asset cannot be transferred!").build();
         }
 
         if (transfer == null) return Response.status(Response.Status.NOT_FOUND).entity("Asset was not found").build();
@@ -218,10 +218,10 @@ public class EmployeeResource {
     @APIResponses({@APIResponse(responseCode = "200", content = @Content(mediaType = "image/png", schema = @Schema(implementation = String.class, format = "binary")), description = "QR code image"), @APIResponse(responseCode = "204", description = "Nothing to display"), @APIResponse(responseCode = "400", description = "Invalid input")})
     public Response employeeQRPreview(@Parameter(description = "Employee Identifier", required = true) @PathParam("employeeId") @NotNull Long employeeId, @Parameter(description = "Asset Identifier", required = true) @PathParam("assetId") @NotNull Long assetId) {
         Allocation allocated = Allocation.assetForQRPreview(employeeId, assetId);
-        Transfer transfered = Transfer.assetForQRPreview(employeeId, assetId);
+        Transfer transferred = Transfer.assetForQRPreview(employeeId, assetId);
 
-        if (allocated == null && transfered == null) return Response.status(Status.NO_CONTENT).build();
-        return allocated == null ? Response.ok(transfered.asset.label.qrByteString).build() : Response.ok(allocated.asset.label.qrByteString).build();
+        if (allocated == null && transferred == null) return Response.status(Status.NO_CONTENT).build();
+        return allocated == null ? Response.ok(transferred.asset.label.qrByteString).build() : Response.ok(allocated.asset.label.qrByteString).build();
     }
 
     @GET
