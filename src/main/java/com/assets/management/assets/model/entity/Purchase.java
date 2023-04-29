@@ -91,7 +91,7 @@ public class Purchase extends PanacheEntity implements Serializable {
                 ? Sort.Direction.Descending
                 : Sort.Direction.Ascending;
 
-        String queryString = "SELECT p FROM Purchase p LEFT JOIN p.supplier s LEFT JOIN s.address " +
+        String queryString = "SELECT DISTINCT p FROM Purchase p LEFT JOIN p.supplier s LEFT JOIN s.address " +
                 "WHERE (:searchValue IS NULL OR LOWER(p.invoiceNumber) LIKE :searchValue " +
                 "OR :searchValue IS NULL OR LOWER(p.supplier.name) LIKE :searchValue) ";
 

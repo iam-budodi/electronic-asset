@@ -29,6 +29,10 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 
+import java.time.LocalDate;
+import java.util.Locale;
+import java.util.Objects;
+
 @Entity
 @Table(
         name = "assets",
@@ -94,9 +98,9 @@ public class Asset extends PanacheEntity {
     @NotNull
     @Schema(required = true)
     @JoinColumn(
-            name = "purchase_invoice_number",
+            name = "purchase_fk",
             nullable = false,
-            referencedColumnName = "purchase_invoice_number",
+//            referencedColumnName = "purchase_invoice_number",
             foreignKey = @ForeignKey(
                     name = "asset_purchase_fk_constraint",
                     foreignKeyDefinition = ""))
@@ -111,12 +115,35 @@ public class Asset extends PanacheEntity {
                 .firstResultOptional().isPresent();
     }
 
-    // method overloading
-    public static PanacheQuery<Asset> retrieveAllOrById() {
-        return retrieveAllOrById(null);
+    public static PanacheQuery<Asset> getAll(String searchValue, LocalDate date, String column, String direction) {
+        if (searchValue != null) searchValue = "%" + searchValue.toLowerCase(Locale.ROOT) + "%";
+
+        String sortVariable = String.format("a.%s", column);
+        Sort.Direction sortDirection = Objects.equals(direction.toLowerCase(Locale.ROOT), "desc")
+                ? Sort.Direction.Descending
+                : Sort.Direction.Ascending;
+
+        String queryString = "SELECT DISTINCT a FROM Asset a LEFT JOIN a.category LEFT JOIN a.label "
+                + "LEFT JOIN a.purchase p LEFT JOIN p.supplier s LEFT JOIN s.address "
+                + "WHERE (:searchValue IS NULL OR LOWER(a.brand) LIKE :searchValue " +
+                "OR :searchValue IS NULL OR LOWER(a.model) LIKE :searchValue " +
+                "OR :searchValue IS NULL OR LOWER(a.modelNumber) LIKE :searchValue " +
+                "OR :searchValue IS NULL OR LOWER(a.serialNumber) LIKE :searchValue " +
+                "OR LOWER(a.category.name) LIKE :searchValue) ";
+
+        if (date != null) queryString += "AND p.purchaseDate = :date";
+        else queryString += "AND (:date IS NULL OR p.purchaseDate = :date)";
+
+
+        return find(
+                queryString,
+                Sort.by(sortVariable, sortDirection),
+                Parameters.with("searchValue", searchValue).and("date", date)
+        );
     }
 
-    public static PanacheQuery<Asset> retrieveAllOrById(Long assetId) {
+
+    public static PanacheQuery<Asset> findById(Long assetId) {
         return find("SELECT DISTINCT a FROM Asset a LEFT JOIN FETCH a.category LEFT JOIN FETCH a.label "
                         + "LEFT JOIN FETCH a.purchase p LEFT JOIN FETCH p.supplier s LEFT JOIN FETCH s.address "
                         + "WHERE (:assetId IS NULL OR a.id = :assetId) ",

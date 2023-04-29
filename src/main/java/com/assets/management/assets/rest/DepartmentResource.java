@@ -114,7 +114,7 @@ public class DepartmentResource {
     }
 
     @GET
-    @Path("/count")
+    @Path("/select")
     @Transactional(Transactional.TxType.SUPPORTS)
     @Operation(summary = "Fetch only department ID and name for all departments available to be used for client side selection options")
     @APIResponses({

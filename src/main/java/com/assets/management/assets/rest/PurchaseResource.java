@@ -39,7 +39,6 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import com.assets.management.assets.model.entity.Asset;
-import com.assets.management.assets.model.entity.Computer;
 import com.assets.management.assets.model.entity.Purchase;
 import com.assets.management.assets.model.entity.Supplier;
 import com.assets.management.assets.model.valueobject.PurchasePerSupplier;
@@ -66,7 +65,7 @@ public class PurchaseResource {
             @APIResponse(
                     responseCode = "200",
                     content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Computer.class, type = SchemaType.ARRAY)),
+                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Purchase.class, type = SchemaType.ARRAY)),
                     description = "Lists all the purchases"),
             @APIResponse(responseCode = "204", description = "No purchase to display"),
     })
@@ -104,7 +103,7 @@ public class PurchaseResource {
             @APIResponse(
                     responseCode = "200",
                     content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Computer.class)),
+                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Purchase.class)),
                     description = "Returns a found purchase record"),
             @APIResponse(responseCode = "400", description = "Invalid input"),
             @APIResponse(responseCode = "404", description = "Purchase record is not found for a given identifier")
@@ -185,7 +184,7 @@ public class PurchaseResource {
             @APIResponse(
                     responseCode = "409",
                     content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Computer.class)),
+                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Purchase.class)),
                     description = "Purchase record duplications is not allowed"),
             @APIResponse(responseCode = "404", description = "Supplier for the purchase does not exist in the database")
     })
@@ -215,7 +214,7 @@ public class PurchaseResource {
             @APIResponse(
                     responseCode = "409",
                     content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Computer.class)),
+                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Purchase.class)),
                     description = "Purchase record payload is not the same as an entity object that needed to be updated")
     })
     public Response updatePurchase(

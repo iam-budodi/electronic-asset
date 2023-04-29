@@ -98,7 +98,7 @@ public class EmployeeService {
         LOG.info("ALLOCATED OBJ : " + allocated.orElse(allocation).toString());
 
         Employee employee = Employee.findById(employeeId);
-        Asset asset = Asset.findById(allocation.asset.id);
+        Asset asset = Asset.findById(allocation.asset.id).firstResult();
 
         if (employee == null || asset == null) throw new NotFoundException();
 

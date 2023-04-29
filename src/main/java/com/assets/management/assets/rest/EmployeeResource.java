@@ -7,7 +7,6 @@ import com.assets.management.assets.model.entity.Transfer;
 import com.assets.management.assets.model.valueobject.AllocationStatus;
 import com.assets.management.assets.service.EmployeeService;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -20,7 +19,6 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
-import org.jboss.resteasy.reactive.DateFormat;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;

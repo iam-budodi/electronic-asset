@@ -1,6 +1,7 @@
 package com.assets.management.assets.rest;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -23,6 +24,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import com.assets.management.assets.model.entity.Asset;
+import com.assets.management.assets.model.entity.Employee;
+import com.assets.management.assets.util.metadata.LinkHeaderPagination;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Page;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -49,6 +55,12 @@ public class ComputerResource {
     @Inject
     Logger LOG;
 
+    @Context
+    UriInfo uriInfo;
+
+    @Inject
+    LinkHeaderPagination headerPagination;
+
     @GET
     @Transactional(Transactional.TxType.SUPPORTS)
     @Operation(summary = "Retrieves all available computers from the database")
@@ -62,11 +74,27 @@ public class ComputerResource {
     })
     public Response listAllComputers(
             @Parameter(description = "Page index", required = false) @QueryParam("page") @DefaultValue("0") Integer pageIndex,
-            @Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("15") Integer pageSize) {
-        List<Computer> computers = Computer.retrieveAllOrById().list();
+            @Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("15") Integer pageSize,
+            @Parameter(description = "Search string", required = false) @QueryParam("search") String search,
+            @Parameter(description = "Search date", required = false) @QueryParam("date") LocalDate date,
+            @Parameter(description = "Order property", required = false) @QueryParam("prop") @DefaultValue("brand") String column,
+            @Parameter(description = "Order direction", required = false) @QueryParam("order") @DefaultValue("asc") String direction
+    ) {
+        PanacheQuery<Asset> query = Computer.getAll(search, date, column, direction);
+        Page currentPage = Page.of(pageIndex, pageSize);
+        query.page(currentPage);
 
-        if (computers.size() == 0) return Response.status(Status.NO_CONTENT).build();
-        return Response.ok(computers).build();
+        Long totalCount = query.count();
+        List<Computer> computersForCurrentPage = query.list();
+        int lastPage = query.pageCount();
+        if (computersForCurrentPage.size() == 0) return Response.status(Status.NO_CONTENT).build();
+
+        String linkHeader = headerPagination.linkStream(uriInfo, currentPage, pageSize, lastPage);
+
+        return Response.ok(computersForCurrentPage)
+                .header("Link", linkHeader)
+                .header("X-Total-Count", totalCount)
+                .build();
     }
 
     @GET
@@ -84,7 +112,7 @@ public class ComputerResource {
     })
     public Response findComputer(
             @Parameter(description = "Computer identifier", required = true) @PathParam("id") @NotNull Long computerId) {
-        return Computer.retrieveAllOrById(computerId).firstResultOptional()
+        return Computer.findById(computerId).firstResultOptional()
                 .map(computer -> Response.ok(computer).build())
                 .orElseGet(() -> Response.status(Status.NOT_FOUND).build());
     }

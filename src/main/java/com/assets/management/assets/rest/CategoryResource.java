@@ -22,6 +22,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import com.assets.management.assets.model.entity.Department;
+import com.assets.management.assets.model.valueobject.SelectOptions;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -41,7 +43,7 @@ import io.quarkus.hibernate.orm.panache.Panache;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional(Transactional.TxType.REQUIRED)
-@Tag(name = "Category Endpoint", description = "This API allows to group and CRUD related assets")
+@Tag(name = "Category Endpoint", description = "This API allows to group and CRUD related assets categories")
 public class CategoryResource {
 
     @GET
@@ -86,21 +88,22 @@ public class CategoryResource {
     }
 
     @GET
-    @Path("/count")
+    @Path("/select")
     @Transactional(Transactional.TxType.SUPPORTS)
-    @Operation(summary = "Counts all asset categories available in the database")
+    @Operation(summary = "Fetch only categories ID and name for all categories available to be used for client side selection options")
     @APIResponses({
             @APIResponse(
                     responseCode = "200",
                     content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Long.class)),
-                    description = "Number of all categories available"),
-            @APIResponse(responseCode = "204", description = "No categories available in the database")
+                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY)),
+                    description = "Categories ID and name as key value pair objects for the categories available"),
+            @APIResponse(responseCode = "204", description = "No category available in the database")
     })
-    public Response countCategory() {
-        Long nbCategories = Category.count();
-        if (nbCategories == 0) return Response.status(Status.NO_CONTENT).build();
-        return Response.ok(nbCategories).build();
+    public Response categorySelectOptions() {
+        List<SelectOptions> categories = Category.find("SELECT c.id, c.name FROM Category c")
+                .project(SelectOptions.class).list();
+        if (categories.size() == 0) return Response.status(Status.NO_CONTENT).build();
+        return Response.ok(categories).build();
     }
 
     @POST
