@@ -143,7 +143,7 @@ public class Asset extends PanacheEntity {
     }
 
 
-    public static PanacheQuery<Asset> findById(Long assetId) {
+    public static PanacheQuery<Asset> getById(Long assetId) {
         return find("SELECT DISTINCT a FROM Asset a LEFT JOIN FETCH a.category LEFT JOIN FETCH a.label "
                         + "LEFT JOIN FETCH a.purchase p LEFT JOIN FETCH p.supplier s LEFT JOIN FETCH s.address "
                         + "WHERE (:assetId IS NULL OR a.id = :assetId) ",

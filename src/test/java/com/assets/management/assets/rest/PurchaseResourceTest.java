@@ -351,7 +351,7 @@ class PurchaseResourceTest {
     @Test
     @Order(14)
     void shouldNotUpdateSupplierWhileUpdatingPurchase() {
-        supplier.supplierType = SupplierType.WHOLESELLER; // Updating supplier
+        supplier.supplierType = SupplierType.WHOLESALER; // Updating supplier
         Purchase purchase = new Purchase();
         purchase.id = Long.valueOf(purchaseId);
         purchase.purchaseDate = UPDATED_PURCHASE_DATE;

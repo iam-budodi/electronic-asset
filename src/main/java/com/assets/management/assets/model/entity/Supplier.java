@@ -1,28 +1,15 @@
 package com.assets.management.assets.model.entity;
 
-import java.util.Optional;
+import com.assets.management.assets.model.valueobject.SupplierType;
+import io.quarkus.panache.common.Parameters;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
-
-import com.assets.management.assets.model.valueobject.SupplierType;
-
-import io.quarkus.panache.common.Parameters;
+import java.util.Optional;
 
 @Entity
 @Table(
@@ -30,15 +17,16 @@ import io.quarkus.panache.common.Parameters;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uniqueEmailandPhone",
-                        columnNames = {"company_email", "company_phone"})
+                        columnNames = {"company_email", "company_phone"
+                        }
+                )
         }
 )
 @NamedQueries({
         @NamedQuery(
                 name = "Supplier.getEmailOrPhone",
                 query = "FROM Supplier WHERE email = :email OR phone = :phone")
-}
-)
+})
 @Schema(description = "Supplier representation")
 public class Supplier extends BaseEntity {
 
@@ -58,12 +46,11 @@ public class Supplier extends BaseEntity {
     @Column(name = "company_email", nullable = false)
     public String email;
 
-    // ^(((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3}$
     @NotNull
     @Schema(required = true)
     @Pattern(
             regexp = "^[((((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3})]{10,18}$",
-            message = "must any of the following format (255) 744 608 510, (255) 744 608-510, (255) 744-608-510, (255)-744-608-510, "
+            message = "must be in any of the following format (255) 744 608 510, (255) 744 608-510, (255) 744-608-510, (255)-744-608-510, "
                     + "+(255)-744-608-510, 0744 608 510, 0744-608-510, 0744608510 and length btn 10 to 18 characters including space")
     @Column(name = "company_phone", length = 18, nullable = false)
     public String phone;
@@ -93,19 +80,9 @@ public class Supplier extends BaseEntity {
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
     public Address address;
-//
-//	@JsonIgnore	
-//	@OneToOne(
-//			mappedBy = "supplier", 
-//			orphanRemoval = true,
-//			cascade = CascadeType.ALL, 
-//			fetch = FetchType.LAZY)
-//	public Purchase purchase;
 
     public static Optional<Supplier> findByEmailAndPhone(String email, String phone) {
-        return find(
-                "#Supplier.getEmailOrPhone",
-                Parameters.with("email", email).and("phone", phone).map())
+        return find("#Supplier.getEmailOrPhone", Parameters.with("email", email).and("phone", phone).map())
                 .firstResultOptional();
     }
 }

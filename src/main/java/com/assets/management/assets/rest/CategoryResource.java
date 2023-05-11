@@ -3,19 +3,12 @@ package com.assets.management.assets.rest;
 import java.net.URI;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -23,7 +16,11 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import com.assets.management.assets.model.entity.Department;
+import com.assets.management.assets.model.entity.Employee;
 import com.assets.management.assets.model.valueobject.SelectOptions;
+import com.assets.management.assets.util.metadata.LinkHeaderPagination;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Page;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -46,6 +43,9 @@ import io.quarkus.hibernate.orm.panache.Panache;
 @Tag(name = "Category Endpoint", description = "This API allows to group and CRUD related assets categories")
 public class CategoryResource {
 
+    @Inject
+    LinkHeaderPagination headerPagination;
+
     @GET
     @Transactional(Transactional.TxType.SUPPORTS)
     @Operation(summary = "Retrieves all asset categories from the database")
@@ -58,14 +58,30 @@ public class CategoryResource {
             @APIResponse(responseCode = "204", description = "No categories to display"),
             @APIResponse(responseCode = "404", description = "Categories is not found for a given name query")
     })
-    public Response listCategories(@Parameter(description = "Category name query parameter", required = false) @QueryParam("name") String catName) {
-        List<Category> categories = Category.findAllOrderByName();
-        if (categories.size() == 0) return Response.status(Status.NO_CONTENT).build();
-        if (catName == null) return Response.ok(categories).build();
+    public Response listCategories(
+            @Context UriInfo uriInfo,
+            @Parameter(description = "Page index", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
+            @Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("5") Integer size,
+            @Parameter(description = "Search string", required = false) @QueryParam("search") String search,
+            @Parameter(description = "Order property", required = false) @QueryParam("prop") @DefaultValue("name") String column,
+            @Parameter(description = "Order direction", required = false) @QueryParam("order") @DefaultValue("asc") String direction) {
 
-        return Category.findByName(catName)
-                .map(category -> Response.ok(category).build())
-                .orElseGet(() -> Response.status(Status.NOT_FOUND).build());
+        PanacheQuery<Category> query = Category.listCategories(search, column, direction);
+        Page currentPage = Page.of(page, size);
+        query.page(currentPage);
+
+        Long totalCount = query.count();
+        List<Category> categoryForCurrentPage = query.list();
+        int lastPage = query.pageCount();
+        if (categoryForCurrentPage.size() == 0)
+            return Response.status(Status.NO_CONTENT).build();
+
+        String linkHeader = headerPagination.linkStream(uriInfo, currentPage, size, lastPage);
+
+        return Response.ok(categoryForCurrentPage)
+                .header("Link", linkHeader)
+                .header("X-Total-Count", totalCount)
+                .build();
     }
 
     @GET

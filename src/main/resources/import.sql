@@ -149,3 +149,9 @@ insert into assets (asset_discriminator, id, brand_name, manufacturer, model_nam
 VALUES ('COMPUTER', 616, 'DELL', 'Dell', 'Thinkbook 14 G2 ITL', 'OPNXB19270K78', 'NP23//WJ', '14', '4115', '8192', 'Windows 11 Enterprise 64-bit (10.0, Build 22621) (22621.ni_release.220506-1250)', '11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz   2.42 GHz', '2000000', 500, '554');
 insert into assets (asset_discriminator, id, brand_name, manufacturer, model_name, model_number, serial_number, display_size, graphics_card, computer_memory, operating_system, computer_processor, computer_storage, category_fk, purchase_fk)
 VALUES ('COMPUTER', 617, 'LENOVO', 'Lenovo', 'Thinkbook 14 G2 ITL', 'kjNXB192709Z', 'MBP//XB192700', '14', '4115', '8192', 'Windows 11 Enterprise 64-bit (10.0, Build 22621) (22621.ni_release.220506-1250)', '11th Gen Intel(R) Core(TM) i-1135G7 @ 2.40GHz   2.42 GHz', '1000000', 500, '554');
+
+-- ALLOCATIONS
+insert into asset_allocations (id, allocation_date, allocation_remarks, asset_fk, employee_fk)
+VALUES (700, '2023-05-03', 'testing queries', 617, 200);
+
+insert into allocation_status (allocation_id, status) VALUES (700, 'ALLOCATED');

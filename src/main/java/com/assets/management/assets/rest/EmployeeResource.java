@@ -5,6 +5,7 @@ import com.assets.management.assets.model.entity.Department;
 import com.assets.management.assets.model.entity.Employee;
 import com.assets.management.assets.model.entity.Transfer;
 import com.assets.management.assets.model.valueobject.AllocationStatus;
+import com.assets.management.assets.model.valueobject.SelectOptions;
 import com.assets.management.assets.service.EmployeeService;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
@@ -98,14 +99,21 @@ public class EmployeeResource {
     }
 
     @GET
-    @Path("/count")
+    @Path("/select")
     @Transactional(Transactional.TxType.SUPPORTS)
-    @Operation(summary = "Counts all employees in the database")
-    @APIResponses({@APIResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Long.class)), description = "Number of all employees available"), @APIResponse(responseCode = "204", description = "No employee available in the database")})
-    public Response countEmployees() {
-        Long nbEmployees = Employee.count();
-        if (nbEmployees == 0) return Response.status(Status.NO_CONTENT).build();
-        return Response.ok(nbEmployees).build();
+    @Operation(summary = "Retrieve only employee ID and first name from all employees in the database")
+    @APIResponses({
+            @APIResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY)),
+                    description = "ID and first name for all employees available"),
+            @APIResponse(responseCode = "204", description = "No employee available in the database")
+    })
+    public Response employeesSelectOptions() {
+        List<SelectOptions> employees = Employee.find("SELECT e.id, e.firstName FROM Employee e LEFT JOIN e.department d LEFT JOIN e.address LEFT JOIN d.location")
+                .project(SelectOptions.class).list();
+        if (employees.size() == 0) return Response.status(Status.NO_CONTENT).build();
+
+        return Response.ok(employees).build();
     }
 
     @POST

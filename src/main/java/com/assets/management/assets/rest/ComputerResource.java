@@ -2,7 +2,10 @@ package com.assets.management.assets.rest;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -24,11 +27,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import com.assets.management.assets.model.entity.Asset;
-import com.assets.management.assets.model.entity.Employee;
+import com.assets.management.assets.model.entity.*;
+import com.assets.management.assets.model.valueobject.AllocationStatus;
+import com.assets.management.assets.model.valueobject.SelectOptions;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
+import io.quarkus.panache.common.Parameters;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -39,9 +44,6 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
-
-import com.assets.management.assets.model.entity.Computer;
-import com.assets.management.assets.model.entity.Purchase;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 
@@ -112,9 +114,36 @@ public class ComputerResource {
     })
     public Response findComputer(
             @Parameter(description = "Computer identifier", required = true) @PathParam("id") @NotNull Long computerId) {
-        return Computer.findById(computerId).firstResultOptional()
+        return Computer.getById(computerId).firstResultOptional()
                 .map(computer -> Response.ok(computer).build())
                 .orElseGet(() -> Response.status(Status.NOT_FOUND).build());
+    }
+
+    @GET
+    @Path("/select")
+    @Transactional(Transactional.TxType.SUPPORTS)
+    @Operation(summary = "Fetch only computer ID and brand for all computers available to be used for client side selection options")
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY)),
+                    description = "Computer ID and model as key value pair objects for the computers available"),
+            @APIResponse(responseCode = "204", description = "No computer available in the database")
+    })
+    public Response computerSelectOptions() {
+        List<SelectOptions> allocates = Asset.find(
+                        "SELECT c.id, c.model FROM Computer c " +
+                                "WHERE c.id NOT IN " +
+                                "(SELECT a.asset.id FROM Allocation a WHERE :allocated MEMBER OF a.status OR :retired MEMBER OF a.status) " +
+                                "AND c.id NOT IN " +
+                                "(SELECT t.asset.id FROM Transfer t WHERE :transferStatuses MEMBER OF t.status)",
+                        Parameters.with("allocated", Set.of(AllocationStatus.ALLOCATED)).and("retired", Set.of(AllocationStatus.RETIRED))
+                                .and("transferStatuses", List.of(AllocationStatus.ALLOCATED))
+                ).project(SelectOptions.class).list();
+
+        if (allocates.size() == 0) return Response.status(Status.NO_CONTENT).build();
+        return Response.ok(allocates).build();
     }
 
     @POST

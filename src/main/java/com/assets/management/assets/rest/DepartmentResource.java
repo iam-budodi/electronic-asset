@@ -71,7 +71,6 @@ public class DepartmentResource {
             @Parameter(description = "Search string", required = false) @QueryParam("search") String search,
             @Parameter(description = "Order property", required = false) @QueryParam("prop") @DefaultValue("name") String column,
             @Parameter(description = "Order direction", required = false) @QueryParam("order") @DefaultValue("asc") String direction) {
-//        List<Department> departments = Department.findAllOrderByName();
 
         PanacheQuery<Employee> query = departmentService.listDepartments(search, column, direction);
         Page currentPage = Page.of(page, size);

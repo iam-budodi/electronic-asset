@@ -90,7 +90,7 @@ public class EmployeeService {
 //				+ "AND a.status <> :status",  original and working
                         Parameters.with("assetId", allocation.asset.id)
                                 .and("allocationStatus", AllocationStatus.RETIRED)
-                                .and("transferStatus", Arrays.asList(AllocationStatus.TRANSFERED, AllocationStatus.RETIRED)))
+                                .and("transferStatus", Arrays.asList(AllocationStatus.TRANSFERRED, AllocationStatus.RETIRED)))
                 .firstResultOptional();
 
         if (allocated.isPresent()) throw new ClientErrorException(409);
@@ -98,7 +98,7 @@ public class EmployeeService {
         LOG.info("ALLOCATED OBJ : " + allocated.orElse(allocation).toString());
 
         Employee employee = Employee.findById(employeeId);
-        Asset asset = Asset.findById(allocation.asset.id).firstResult();
+        Asset asset = Asset.getById(allocation.asset.id).firstResult();
 
         if (employee == null || asset == null) throw new NotFoundException();
 
@@ -128,24 +128,24 @@ public class EmployeeService {
                 .setParameter("fromEmployeeId", transfer.fromEmployee.id)
                 .setParameter("assetId", transfer.asset.id)
                 .setParameter("transferStatus", AllocationStatus.ALLOCATED)
-                .setParameter("secondAllocationStatus", Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.TRANSFERED))
+                .setParameter("secondAllocationStatus", Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.TRANSFERRED))
                 .setParameter("allocationStatus", List.of(AllocationStatus.ALLOCATED))
                 .getSingleResult();
 
         Allocation allocated = (Allocation) allocationTransfer.get("allocation");
-        Transfer transfered = (Transfer) allocationTransfer.get("transfer");
-        List<AllocationStatus> transferedStatus = Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.TRANSFERED);
+        Transfer transferred = (Transfer) allocationTransfer.get("transfer");
+        List<AllocationStatus> transferredStatus = Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.TRANSFERRED);
 
         if (allocated == null) throw new ClientErrorException(409);
         if (transfer.toEmployee == null) throw new NotFoundException();
 
         if (allocated.status.remove(AllocationStatus.ALLOCATED)) {
-            allocated.status.addAll(transferedStatus);
+            allocated.status.addAll(transferredStatus);
             allocated.deallocationDate = Instant.now();
-        } else if (transfered.status.remove(AllocationStatus.ALLOCATED)) {
-            if (!transfered.toEmployee.id.equals(transfer.fromEmployee.id)) throw new BadRequestException();
+        } else if (transferred.status.remove(AllocationStatus.ALLOCATED)) {
+            if (!transferred.toEmployee.id.equals(transfer.fromEmployee.id)) throw new BadRequestException();
 
-            transfered.status.addAll(transferedStatus);
+            transferred.status.addAll(transferredStatus);
             transfer.status.add(AllocationStatus.ALLOCATED);
             Transfer.persist(transfer);
             LOG.info("PERSISTED 2ND  PARAM OBJ : " + transfer);
