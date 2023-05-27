@@ -1,20 +1,11 @@
 package com.assets.management.assets.model.entity;
 
-import java.util.Set;
-
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.validation.constraints.NotNull;
-
+import com.assets.management.assets.model.valueobject.Peripheral;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-import com.assets.management.assets.model.valueobject.Peripheral;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 @Entity
 @DiscriminatorValue("COMPUTER")

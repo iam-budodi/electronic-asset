@@ -1,6 +1,12 @@
 package com.assets.management.assets.service;
 
-import java.util.List;
+import com.assets.management.assets.model.entity.Employee;
+import com.assets.management.assets.model.entity.Item;
+import com.assets.management.assets.model.entity.ItemAssignment;
+import com.assets.management.assets.model.entity.QRCode;
+import com.assets.management.assets.model.valueobject.Status;
+import io.quarkus.hibernate.orm.panache.Panache;
+import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -8,16 +14,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
-
-import org.jboss.logging.Logger;
-
-import com.assets.management.assets.model.entity.Employee;
-import com.assets.management.assets.model.entity.Item;
-import com.assets.management.assets.model.entity.ItemAssignment;
-import com.assets.management.assets.model.entity.QRCode;
-import com.assets.management.assets.model.valueobject.Status;
-
-import io.quarkus.hibernate.orm.panache.Panache;
+import java.util.List;
 
 @ApplicationScoped
 @Transactional(Transactional.TxType.REQUIRED)

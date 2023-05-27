@@ -1,31 +1,12 @@
 package com.assets.management.assets.rest;
 
-import java.net.URI;
-import java.time.LocalDate;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-
+import com.assets.management.assets.model.entity.Asset;
+import com.assets.management.assets.model.entity.Purchase;
+import com.assets.management.assets.model.entity.Supplier;
+import com.assets.management.assets.model.valueobject.PurchasePerSupplier;
 import com.assets.management.assets.model.valueobject.SelectOptions;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
+import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -38,12 +19,19 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
-import com.assets.management.assets.model.entity.Asset;
-import com.assets.management.assets.model.entity.Purchase;
-import com.assets.management.assets.model.entity.Supplier;
-import com.assets.management.assets.model.valueobject.PurchasePerSupplier;
-
-import io.quarkus.hibernate.orm.panache.Panache;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
+import java.time.LocalDate;
+import java.util.List;
 
 @Path("/purchases")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -151,6 +139,7 @@ public class PurchaseResource {
         if (selectOptions.size() == 0) return Response.status(Status.NO_CONTENT).build();
         return Response.ok(selectOptions).build();
     }
+
     @GET
     @Path("/{invoice}/assets")
     @Transactional(Transactional.TxType.SUPPORTS)

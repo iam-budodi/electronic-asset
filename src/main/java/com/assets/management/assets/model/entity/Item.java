@@ -1,23 +1,14 @@
 package com.assets.management.assets.model.entity;
 
-import java.time.LocalDate;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-
+import com.assets.management.assets.model.valueobject.Status;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
-import com.assets.management.assets.model.valueobject.Status;
-
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 //@Entity
 @DynamicInsert

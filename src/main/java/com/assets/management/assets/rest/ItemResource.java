@@ -1,7 +1,8 @@
 package com.assets.management.assets.rest;
 
-import java.net.URI;
-import java.util.List;
+import com.assets.management.assets.model.entity.Item;
+import com.assets.management.assets.service.ItemService;
+import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
@@ -14,13 +15,10 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
-
-import org.jboss.logging.Logger;
-
-import com.assets.management.assets.model.entity.Item;
-import com.assets.management.assets.service.ItemService;
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
+import java.util.List;
 
 @Path("/items")
 public class ItemResource {

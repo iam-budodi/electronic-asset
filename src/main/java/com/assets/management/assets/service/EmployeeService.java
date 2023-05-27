@@ -12,15 +12,10 @@ import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.persistence.Tuple;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.NotFoundException;
-import java.net.URI;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -78,95 +73,95 @@ public class EmployeeService {
                 .firstResultOptional();
     }
 
-    public Allocation allocateAsset(@Valid Allocation allocation, @NotNull Long employeeId) {
-        // TODO : I DONT KNOW HOW BUT IT WORKS ----- NEEDS MORE TESTING
-        Optional<Allocation> allocated = Allocation.find("SELECT DISTINCT a FROM Allocation a "
-                                + "LEFT JOIN FETCH a.employee e "
-                                + "LEFT JOIN FETCH a.asset c "
-                                + "LEFT JOIN Transfer t ON c.id = t.asset.id "
-                                + "WHERE c.id = :assetId "
-                                + "AND :allocationStatus NOT MEMBER OF a.status "
-                                + "AND NOT EXISTS ( SELECT 1 FROM t.status t WHERE t IN :transferStatus) ",
-//				+ "AND a.status <> :status",  original and working
-                        Parameters.with("assetId", allocation.asset.id)
-                                .and("allocationStatus", AllocationStatus.RETIRED)
-                                .and("transferStatus", Arrays.asList(AllocationStatus.TRANSFERRED, AllocationStatus.RETIRED)))
-                .firstResultOptional();
+//    public Allocation allocateAsset(@Valid Allocation allocation, @NotNull Long employeeId) {
+//        // TODO : I DONT KNOW HOW BUT IT WORKS ----- NEEDS MORE TESTING
+//        Optional<Allocation> allocated = Allocation.find("SELECT DISTINCT a FROM Allocation a "
+//                                + "LEFT JOIN FETCH a.employee e "
+//                                + "LEFT JOIN FETCH a.asset c "
+//                                + "LEFT JOIN Transfer t ON c.id = t.asset.id "
+//                                + "WHERE c.id = :assetId "
+//                                + "AND :allocationStatus NOT MEMBER OF a.status "
+//                                + "AND NOT EXISTS ( SELECT 1 FROM t.status t WHERE t IN :transferStatus) ",
+////				+ "AND a.status <> :status",  original and working
+//                        Parameters.with("assetId", allocation.asset.id)
+//                                .and("allocationStatus", AllocationStatus.RETIRED)
+//                                .and("transferStatus", Arrays.asList(AllocationStatus.TRANSFERRED, AllocationStatus.RETIRED)))
+//                .firstResultOptional();
+//
+//        if (allocated.isPresent()) throw new ClientErrorException(409);
+//
+//        LOG.info("ALLOCATED OBJ : " + allocated.orElse(allocation).toString());
+//
+//        Employee employee = Employee.findById(employeeId);
+//        Asset asset = Asset.getById(allocation.asset.id).firstResult();
+//
+//        if (employee == null || asset == null) throw new NotFoundException();
+//
+//        allocation.employee = employee;
+//        allocation.asset = asset;
+//        Allocation.persist(allocation);
+//        return allocation;
+//    }
 
-        if (allocated.isPresent()) throw new ClientErrorException(409);
+//    public Transfer transferAsset(@Valid Transfer transfer, @NotNull Long fromEmployeeId) {
+//        Tuple allocationTransfer = Panache.getEntityManager().createQuery("SELECT a AS allocation, t AS transfer FROM Allocation a "
+//                        + "LEFT JOIN FETCH a.employee e "
+//                        + "LEFT JOIN FETCH a.asset c "
+//                        + "LEFT JOIN Transfer t ON c.id = t.asset.id "
+//                        + "WHERE (c.id = :assetId AND e.id = :fromEmployeeId) "
+//                        + "AND  e.id <> :toEmployeeId "
+//                        + "AND EXISTS ( SELECT 1 FROM a.status s WHERE s IN :allocationStatus) "
+//                        + "OR  EXISTS ( "
+//                        + "SELECT 1 FROM Transfer tr "
+//                        + "WHERE tr.asset.id = :assetId "
+//                        + "AND tr.prevCustodian.id <> :fromEmployeeId "
+//                        + "AND tr.currentCustodian.id <> :toEmployeeId "
+//                        + "AND (:transferStatus  MEMBER OF t.status) "
+//                        + "AND EXISTS ( SELECT 1 FROM a.status s WHERE s IN :secondAllocationStatus)"
+//                        + ") ", Tuple.class)
+//                .setParameter("toEmployeeId", transfer.currentCustodian.id)
+//                .setParameter("fromEmployeeId", transfer.prevCustodian.id)
+//                .setParameter("assetId", transfer.asset.id)
+//                .setParameter("transferStatus", AllocationStatus.ALLOCATED)
+//                .setParameter("secondAllocationStatus", Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.TRANSFERRED))
+//                .setParameter("allocationStatus", List.of(AllocationStatus.ALLOCATED))
+//                .getSingleResult();
+//
+//        Allocation allocated = (Allocation) allocationTransfer.get("allocation");
+//        Transfer transferred = (Transfer) allocationTransfer.get("transfer");
+//        List<AllocationStatus> transferredStatus = Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.TRANSFERRED);
+//
+//        if (allocated == null) throw new ClientErrorException(409);
+//        if (transfer.currentCustodian == null) throw new NotFoundException();
+//
+//        if (allocated.status.remove(AllocationStatus.ALLOCATED)) {
+//            allocated.status.addAll(transferredStatus);
+//            allocated.deallocationDate = Instant.now();
+//        } else if (transferred.status.remove(AllocationStatus.ALLOCATED)) {
+//            if (!transferred.currentCustodian.id.equals(transfer.prevCustodian.id)) throw new BadRequestException();
+//
+//            transferred.status.addAll(transferredStatus);
+//            transfer.status.add(AllocationStatus.ALLOCATED);
+//            Transfer.persist(transfer);
+//            LOG.info("PERSISTED 2ND  PARAM OBJ : " + transfer);
+//            return transfer;
+//        }
+//
+//        transfer.status.add(AllocationStatus.ALLOCATED);
+//        Transfer.persist(transfer);
+//        return transfer;
+//    }
 
-        LOG.info("ALLOCATED OBJ : " + allocated.orElse(allocation).toString());
-
-        Employee employee = Employee.findById(employeeId);
-        Asset asset = Asset.getById(allocation.asset.id).firstResult();
-
-        if (employee == null || asset == null) throw new NotFoundException();
-
-        allocation.employee = employee;
-        allocation.asset = asset;
-        Allocation.persist(allocation);
-        return allocation;
-    }
-
-    public Transfer transferAsset(@Valid Transfer transfer, @NotNull Long fromEmployeeId) {
-        Tuple allocationTransfer = Panache.getEntityManager().createQuery("SELECT a AS allocation, t AS transfer FROM Allocation a "
-                        + "LEFT JOIN FETCH a.employee e "
-                        + "LEFT JOIN FETCH a.asset c "
-                        + "LEFT JOIN Transfer t ON c.id = t.asset.id "
-                        + "WHERE (c.id = :assetId AND e.id = :fromEmployeeId) "
-                        + "AND  e.id <> :toEmployeeId "
-                        + "AND EXISTS ( SELECT 1 FROM a.status s WHERE s IN :allocationStatus) "
-                        + "OR  EXISTS ( "
-                        + "SELECT 1 FROM Transfer tr "
-                        + "WHERE tr.asset.id = :assetId "
-                        + "AND tr.fromEmployee.id <> :fromEmployeeId "
-                        + "AND tr.toEmployee.id <> :toEmployeeId "
-                        + "AND (:transferStatus  MEMBER OF t.status) "
-                        + "AND EXISTS ( SELECT 1 FROM a.status s WHERE s IN :secondAllocationStatus)"
-                        + ") ", Tuple.class)
-                .setParameter("toEmployeeId", transfer.toEmployee.id)
-                .setParameter("fromEmployeeId", transfer.fromEmployee.id)
-                .setParameter("assetId", transfer.asset.id)
-                .setParameter("transferStatus", AllocationStatus.ALLOCATED)
-                .setParameter("secondAllocationStatus", Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.TRANSFERRED))
-                .setParameter("allocationStatus", List.of(AllocationStatus.ALLOCATED))
-                .getSingleResult();
-
-        Allocation allocated = (Allocation) allocationTransfer.get("allocation");
-        Transfer transferred = (Transfer) allocationTransfer.get("transfer");
-        List<AllocationStatus> transferredStatus = Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.TRANSFERRED);
-
-        if (allocated == null) throw new ClientErrorException(409);
-        if (transfer.toEmployee == null) throw new NotFoundException();
-
-        if (allocated.status.remove(AllocationStatus.ALLOCATED)) {
-            allocated.status.addAll(transferredStatus);
-            allocated.deallocationDate = Instant.now();
-        } else if (transferred.status.remove(AllocationStatus.ALLOCATED)) {
-            if (!transferred.toEmployee.id.equals(transfer.fromEmployee.id)) throw new BadRequestException();
-
-            transferred.status.addAll(transferredStatus);
-            transfer.status.add(AllocationStatus.ALLOCATED);
-            Transfer.persist(transfer);
-            LOG.info("PERSISTED 2ND  PARAM OBJ : " + transfer);
-            return transfer;
-        }
-
-        transfer.status.add(AllocationStatus.ALLOCATED);
-        Transfer.persist(transfer);
-        return transfer;
-    }
-
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public List<Object> employeeAssets(@Valid AllocationStatus filteredStatus, @NotNull Long employeeId) {
-        List<Allocation> allocations = Allocation.listAllandFilterQuery(filteredStatus, employeeId);
-        List<Transfer> transfers = Transfer.listAllandFilterQuery(filteredStatus, employeeId);
-        List<Object> allocationsOrTransfers = new ArrayList<>();
-        allocationsOrTransfers.addAll(allocations);
-        allocationsOrTransfers.addAll(transfers);
-
-        return allocationsOrTransfers;
-    }
+//    @Transactional(Transactional.TxType.SUPPORTS)
+//    public List<Object> employeeAssets(@Valid AllocationStatus filteredStatus, @NotNull Long employeeId) {
+//        List<Allocation> allocations = Allocation.listAll(filteredStatus, employeeId);
+//        List<Transfer> transfers = Transfer.listAll(filteredStatus, employeeId);
+//        List<Object> allocationsOrTransfers = new ArrayList<>();
+//        allocationsOrTransfers.addAll(allocations);
+//        allocationsOrTransfers.addAll(transfers);
+//
+//        return allocationsOrTransfers;
+//    }
 
     public void updateEmployee(@Valid Employee employee, @NotNull Long empId) {
         Employee.findByIdOptional(empId)
@@ -181,22 +176,22 @@ public class EmployeeService {
     }
 
     // TODO: FIND A WAY TO OPTIMIZE THESE TWO METHODS
-    public void updateAssetWithlabel(@Valid Asset asset, URI allocationUri) {
-        QRCode label = new QRCode();
-        label.qrByteString = generatorProxy.generateQrString(allocationUri);
-        QRCode.persist(label);
-
-        LOG.info("CREATED LABEL ID: " + label.id);
-        asset.label = label;
-        QRCode.findByIdOptional(label.id)
-                .map(found -> Panache.getEntityManager().merge(asset))
-                .orElseThrow(() -> new NotFoundException("Label dont exist"));
-    }
-
-    public void updateTranferedAssetWithlabel(@Valid Transfer transfered, URI transferURI) {
-        transfered.asset.label.qrByteString = generatorProxy.generateQrString(transferURI);
-        QRCode.findByIdOptional(transfered.asset.label.id)
-                .map(found -> Panache.getEntityManager().merge(transfered.asset.label))
-                .orElseThrow(() -> new NotFoundException("Label dont exist"));
-    }
+//    public void updateAssetWithlabel(@Valid Asset asset, URI allocationUri) {
+//        QRCode label = new QRCode();
+//        label.qrByteString = generatorProxy.generateQrString(allocationUri);
+//        QRCode.persist(label);
+//
+//        LOG.info("CREATED LABEL ID: " + label.id);
+//        asset.label = label;
+//        QRCode.findByIdOptional(label.id)
+//                .map(found -> Panache.getEntityManager().merge(asset))
+//                .orElseThrow(() -> new NotFoundException("Label dont exist"));
+//    }
+//
+//    public void updateTranferedAssetWithlabel(@Valid Transfer transfered, URI transferURI) {
+//        transfered.asset.label.qrByteString = generatorProxy.generateQrString(transferURI);
+//        QRCode.findByIdOptional(transfered.asset.label.id)
+//                .map(found -> Panache.getEntityManager().merge(transfered.asset.label))
+//                .orElseThrow(() -> new NotFoundException("Label dont exist"));
+//    }
 }

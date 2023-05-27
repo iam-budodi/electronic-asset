@@ -1,10 +1,15 @@
 package com.assets.management.assets.model.entity;
 
-import static org.assertj.core.api.Assertions.as;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.assets.management.assets.model.valueobject.EmploymentStatus;
+import com.assets.management.assets.model.valueobject.Gender;
+import io.quarkus.hibernate.orm.panache.Panache;
+import io.quarkus.panache.common.Sort;
+import io.quarkus.panache.common.Sort.Direction;
+import io.quarkus.test.junit.QuarkusTest;
+import org.assertj.core.api.InstanceOfAssertFactories;
+import org.junit.jupiter.api.*;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.EnumSet;
@@ -12,22 +17,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.transaction.Transactional;
-
-import org.assertj.core.api.InstanceOfAssertFactories;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-
-import com.assets.management.assets.model.valueobject.EmploymentStatus;
-import com.assets.management.assets.model.valueobject.Gender;
-
-import io.quarkus.hibernate.orm.panache.Panache;
-import io.quarkus.panache.common.Sort;
-import io.quarkus.panache.common.Sort.Direction;
-import io.quarkus.test.junit.QuarkusTest;
+import static org.assertj.core.api.Assertions.as;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 @Transactional

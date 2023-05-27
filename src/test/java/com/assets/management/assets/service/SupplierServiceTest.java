@@ -1,32 +1,25 @@
 package com.assets.management.assets.service;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-
-import javax.inject.Inject;
-import javax.persistence.EntityNotFoundException;
-import javax.validation.ConstraintViolationException;
-import javax.ws.rs.NotFoundException;
-
+import com.assets.management.assets.model.entity.Address;
+import com.assets.management.assets.model.entity.Supplier;
+import com.assets.management.assets.model.valueobject.SupplierType;
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.assets.management.assets.model.entity.Address;
-import com.assets.management.assets.model.entity.Supplier;
-import com.assets.management.assets.model.valueobject.SupplierType;
+import javax.inject.Inject;
+import javax.persistence.EntityNotFoundException;
+import javax.validation.ConstraintViolationException;
+import javax.ws.rs.NotFoundException;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
-import io.quarkus.test.junit.QuarkusTest;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

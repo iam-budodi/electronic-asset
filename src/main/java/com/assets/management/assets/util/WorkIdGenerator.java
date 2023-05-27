@@ -1,10 +1,9 @@
 package com.assets.management.assets.util;
 
-import java.time.LocalDate;
+import com.assets.management.assets.qualifier.WorkId;
 
 import javax.enterprise.context.ApplicationScoped;
-
-import com.assets.management.assets.qualifier.WorkId;
+import java.time.LocalDate;
 
 @WorkId
 @ApplicationScoped

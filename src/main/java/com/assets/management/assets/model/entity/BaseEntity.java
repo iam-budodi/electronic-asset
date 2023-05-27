@@ -1,16 +1,13 @@
 package com.assets.management.assets.model.entity;
 
-import java.time.LocalDate;
-
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
 
 @MappedSuperclass
 public class BaseEntity extends PanacheEntity {
@@ -23,7 +20,7 @@ public class BaseEntity extends PanacheEntity {
     @Column(name = "updated_at")
     public LocalDate updatedAt;
 
-//    @NotNull
+    //    @NotNull
 //    @Column(name = "registered_by", length = 64, nullable = false) // should be uncommented
     @Column(name = "registered_by", length = 64)
     @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")

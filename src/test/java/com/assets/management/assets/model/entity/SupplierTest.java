@@ -1,26 +1,20 @@
 package com.assets.management.assets.model.entity;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-import java.util.Optional;
-
-import javax.transaction.Transactional;
-
+import com.assets.management.assets.model.valueobject.SupplierType;
+import io.quarkus.hibernate.orm.panache.Panache;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.assets.management.assets.model.valueobject.SupplierType;
+import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 
-import io.quarkus.hibernate.orm.panache.Panache;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
-import io.quarkus.test.junit.QuarkusTest;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
 @Transactional
@@ -89,7 +83,7 @@ class SupplierTest {
         supplier.email = UPDATED_EMAIL;
         supplier.phone = UPDATED_PHONE;
         supplier.registeredBy = UPDATED_REGISTERED_BY;
-        supplier.supplierType = SupplierType.WHOLESELLER;
+        supplier.supplierType = SupplierType.WHOLESALER;
         supplier.description = UPDATED_DESCRIPTION;
 
         Panache.getEntityManager().merge(supplier); // this is not necessary can be commented out
@@ -98,7 +92,7 @@ class SupplierTest {
         assertEquals(UPDATED_EMAIL, supplier.email);
         assertEquals(UPDATED_PHONE, supplier.phone);
         assertEquals(UPDATED_REGISTERED_BY, supplier.registeredBy);
-        assertEquals(SupplierType.WHOLESELLER, supplier.supplierType);
+        assertEquals(SupplierType.WHOLESALER, supplier.supplierType);
         assertEquals(UPDATED_DESCRIPTION, supplier.description);
     }
 

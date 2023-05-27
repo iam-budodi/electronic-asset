@@ -1,20 +1,20 @@
 package com.assets.management.assets.rest;
 
-import static io.restassured.RestAssured.given;
-import static javax.ws.rs.core.HttpHeaders.ACCEPT;
-import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
-import static javax.ws.rs.core.Response.Status.CONFLICT;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
-import static javax.ws.rs.core.Response.Status.NO_CONTENT;
-import static javax.ws.rs.core.Response.Status.OK;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import com.assets.management.assets.model.entity.Address;
+import com.assets.management.assets.model.entity.Purchase;
+import com.assets.management.assets.model.entity.Supplier;
+import com.assets.management.assets.model.valueobject.SupplierType;
+import io.quarkus.test.common.http.TestHTTPEndpoint;
+import io.quarkus.test.common.http.TestHTTPResource;
+import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.common.mapper.TypeRef;
+import io.restassured.http.ContentType;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
+import javax.ws.rs.core.Response.Status;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -23,23 +23,14 @@ import java.time.Month;
 import java.util.List;
 import java.util.Random;
 
-import javax.ws.rs.core.Response.Status;
-
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-
-import com.assets.management.assets.model.entity.Address;
-import com.assets.management.assets.model.entity.Purchase;
-import com.assets.management.assets.model.entity.Supplier;
-import com.assets.management.assets.model.valueobject.SupplierType;
-
-import io.quarkus.test.common.http.TestHTTPEndpoint;
-import io.quarkus.test.common.http.TestHTTPResource;
-import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.common.mapper.TypeRef;
-import io.restassured.http.ContentType;
+import static io.restassured.RestAssured.given;
+import static javax.ws.rs.core.HttpHeaders.ACCEPT;
+import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.Response.Status.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.*;
 
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -77,7 +68,7 @@ class PurchaseResourceTest {
     private static Supplier supplier;
     private static String purchaseId;
     private static String supplierId;
-//	
+    //
 //	@TestHTTPResource("assets")
 //	@TestHTTPEndpoint(PurchaseResource.class)
 //	URL computersEndpoint;

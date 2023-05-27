@@ -1,36 +1,12 @@
 package com.assets.management.assets.rest;
 
-import java.net.URI;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-
-import com.assets.management.assets.model.entity.*;
+import com.assets.management.assets.model.entity.Asset;
+import com.assets.management.assets.model.entity.Computer;
+import com.assets.management.assets.model.entity.Purchase;
 import com.assets.management.assets.model.valueobject.AllocationStatus;
 import com.assets.management.assets.model.valueobject.SelectOptions;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
+import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
 import io.quarkus.panache.common.Parameters;
@@ -45,7 +21,20 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 
-import io.quarkus.hibernate.orm.panache.Panache;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 @Path("/computers")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -133,14 +122,14 @@ public class ComputerResource {
     })
     public Response computerSelectOptions() {
         List<SelectOptions> allocates = Asset.find(
-                        "SELECT c.id, c.model FROM Computer c " +
-                                "WHERE c.id NOT IN " +
-                                "(SELECT a.asset.id FROM Allocation a WHERE :allocated MEMBER OF a.status OR :retired MEMBER OF a.status) " +
-                                "AND c.id NOT IN " +
-                                "(SELECT t.asset.id FROM Transfer t WHERE :transferStatuses MEMBER OF t.status)",
-                        Parameters.with("allocated", Set.of(AllocationStatus.ALLOCATED)).and("retired", Set.of(AllocationStatus.RETIRED))
-                                .and("transferStatuses", List.of(AllocationStatus.ALLOCATED))
-                ).project(SelectOptions.class).list();
+                "SELECT c.id, c.model FROM Computer c " +
+                        "WHERE c.id NOT IN " +
+                        "(SELECT a.asset.id FROM Allocation a WHERE :allocated MEMBER OF a.status OR :retired MEMBER OF a.status) " +
+                        "AND c.id NOT IN " +
+                        "(SELECT t.asset.id FROM Transfer t WHERE :transferStatuses MEMBER OF t.status)",
+                Parameters.with("allocated", Set.of(AllocationStatus.ALLOCATED)).and("retired", Set.of(AllocationStatus.RETIRED))
+                        .and("transferStatuses", List.of(AllocationStatus.ALLOCATED))
+        ).project(SelectOptions.class).list();
 
         if (allocates.size() == 0) return Response.status(Status.NO_CONTENT).build();
         return Response.ok(allocates).build();

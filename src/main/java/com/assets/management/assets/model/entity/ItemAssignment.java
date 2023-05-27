@@ -1,30 +1,19 @@
 package com.assets.management.assets.model.entity;
 
-import java.time.LocalDateTime;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-
+import com.assets.management.assets.model.valueobject.AllocationStatus;
+import com.assets.management.assets.model.valueobject.QrContent;
+import com.assets.management.assets.model.valueobject.Status;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 
-import com.assets.management.assets.model.valueobject.AllocationStatus;
-import com.assets.management.assets.model.valueobject.QrContent;
-import com.assets.management.assets.model.valueobject.Status;
-
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 //@Entity
 @DynamicInsert

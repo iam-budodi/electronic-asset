@@ -1,11 +1,10 @@
 package com.assets.management.assets.model.valueobject;
 
-import java.time.LocalDateTime;
-
-import javax.validation.constraints.NotNull;
-
 import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @RegisterForReflection
 public class QrContent {
