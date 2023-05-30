@@ -1,11 +1,15 @@
 package com.assets.management.assets.service;
 
-import com.assets.management.assets.model.entity.Employee;
-import com.assets.management.assets.model.entity.Item;
-import com.assets.management.assets.model.entity.ItemAssignment;
-import com.assets.management.assets.model.entity.QRCode;
-import com.assets.management.assets.model.valueobject.Status;
+import com.assets.management.assets.client.QRGeneratorServiceProxy;
+import com.assets.management.assets.model.entity.*;
+import com.assets.management.assets.model.valueobject.AllocationStatus;
+import com.assets.management.assets.model.valueobject.EmployeeAsset;
+import com.assets.management.assets.util.PanacheUtils;
 import io.quarkus.hibernate.orm.panache.Panache;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Parameters;
+import io.quarkus.panache.common.Sort;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -13,75 +17,111 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.NotFoundException;
+import java.net.URI;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @ApplicationScoped
 @Transactional(Transactional.TxType.REQUIRED)
 public class AssignmentService {
 
     @Inject
+    @RestClient
+    QRGeneratorServiceProxy qrProxy;
+
+    @Inject
     Logger LOG;
 
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public List<ItemAssignment> getAllAssignments(Integer page, Integer size) {
-        return ItemAssignment.find("ORDER BY dateAssigned, qtyAssigned")
-                .page(page, size)
-                .list();
-    }
+    public Allocation allocate(@Valid Allocation allocation) {
+        // TODO : I DONT KNOW HOW BUT IT WORKS ----- NEEDS MORE TESTING
+        String queryString = "SELECT DISTINCT a FROM Allocation a LEFT JOIN FETCH a.employee e " +
+                "LEFT JOIN FETCH a.asset c LEFT JOIN Transfer t ON c.id = t.asset.id " +
+                "WHERE c.id = :assetId AND :allocationStatus NOT MEMBER OF a.status " +
+                "AND NOT EXISTS ( SELECT 1 FROM t.status t WHERE t IN :transferStatus) ";
 
-    public ItemAssignment assignItem(
-            @Valid ItemAssignment assignment, @NotNull Long empId, @NotNull Long itemId) {
-        Employee.findByIdOptional(empId).map(
-                        employee -> assignment.employee = (Employee) employee)
-                .orElseThrow(() -> new NotFoundException());
+        Optional<Allocation> allocated = Allocation.find(
+                        queryString,
+                        Parameters.with("assetId", allocation.asset.id)
+                                .and("allocationStatus", AllocationStatus.RETIRED)
+                                .and("transferStatus", Arrays.asList(AllocationStatus.TRANSFERRED, AllocationStatus.RETIRED)))
+                .firstResultOptional();
 
-        Item.findByIdOptional(itemId).map(
-                        item -> assignment.item = (Item) item)
-                .orElseThrow(() -> new NotFoundException());
+        if (allocated.isPresent()) throw new ClientErrorException(409);
 
-        QRCode label = new QRCode();
-//		label.qrByteString = "dummy".getBytes();
-//		assignment.label = label;
-        assignment.item.status = Status.InUse;
-        assignment.item.transferCount = 0;
-//		
-//		assignment.label.itemAssignment = assignment;
-//		assignment.label.id = assignment.id;
+        LOG.info("ALLOCATED OBJ : " + allocated.orElse(allocation).toString());
 
-        ItemAssignment.persist(assignment);
-//		assignment.label.itemQrString = qrCodeClient.formatQrImgToString(assignment.itemSerialNumber);
-        Panache.getEntityManager().merge(assignment);
+        Employee employee = Employee.findById(allocation.employee.id);
+        Asset asset = Asset.getById(allocation.asset.id).firstResult();
 
-        return assignment;
+        if (employee == null || asset == null) throw new NotFoundException();
+
+        allocation.employee = employee;
+        allocation.asset = asset;
+        Allocation.persist(allocation);
+        return allocation;
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public List<Item> getAssignedItems(Long empId) {
-        return ItemAssignment.find(
-                        "SELECT i.item "
-                                + "FROM ItemAssignment i "
-                                + "WHERE i.employee.id = ?1 "
-                                + "AND i.item.status <> ?2", empId, Status.Transfered)
-                .list();
+    public PanacheQuery<Allocation> listAllocations(String searchValue, LocalDate allocationDate, String column, String direction) {
+        searchValue = PanacheUtils.searchString(searchValue);
+        String sortVariable = String.format("a.%s", column);
+        Sort.Direction sortDirection = PanacheUtils.panacheSort(direction);
+
+        String queryString = "SELECT a FROM Allocation a LEFT JOIN a.employee e LEFT JOIN e.department " +
+                "LEFT JOIN e.address LEFT JOIN a.asset ast LEFT JOIN ast.category " +
+                "LEFT JOIN ast.label LEFT JOIN ast.purchase p  LEFT JOIN p.supplier s " +
+                "LEFT JOIN s.address " +
+                "WHERE (:searchValue IS NULL OR " +
+                "LOWER(e.firstName) LIKE :searchValue OR " +
+                "LOWER(e.lastName) LIKE :searchValue OR " +
+                "LOWER(e.workId) LIKE :searchValue OR " +
+                "LOWER(e.firstName || ' ' || e.lastName) LIKE :searchValue) " +
+                "AND (:date IS NULL OR a.allocationDate = :date)";
+
+        return Allocation.find(
+                queryString,
+                Sort.by(sortVariable, sortDirection),
+                Parameters.with("searchValue", searchValue).and("date", allocationDate)
+        );
     }
 
-    public void unassignItem(@NotNull Long empId, @NotNull String sNumber) {
-        ItemAssignment found = ItemAssignment.find(
-                        "employee.id = ?1 AND itemSerialNumber = ?2",
-                        empId, sNumber)
-                .firstResult();
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public List<EmployeeAsset> getEmployeeAssets(@Valid AllocationStatus filteredStatus, @NotNull Long employeeId) {
+        List<EmployeeAsset> allocatedAssets = Allocation.listAll(filteredStatus, employeeId).project(EmployeeAsset.class).list();
+        List<EmployeeAsset> transferredAsset = Transfer.listAll(filteredStatus, employeeId).project(EmployeeAsset.class).list();
+        List<EmployeeAsset> assets = new ArrayList<>();
+        assets.addAll(allocatedAssets);
+        assets.addAll(transferredAsset);
 
-        if (found == null)
-            throw new NotFoundException("Record not found!");
-
-        found.delete();
+        return assets;
     }
 
-    public void updateAssignment(@Valid ItemAssignment assignment, @NotNull Long assignmentId) {
-        ItemAssignment.findByIdOptional(assignmentId).map(
-                itemFound -> Panache.getEntityManager().merge(assignment)
-        ).orElseThrow(
-                () -> new NotFoundException("Not assigned"));
+    public void allocationQRString(@Valid Asset asset, URI allocationUri) {
+        QRCode QRLabel = new QRCode();
+        QRLabel.qrByteString = qrProxy.generateQrString(allocationUri);
+        QRCode.persist(QRLabel);
+
+        LOG.info("CREATED LABEL ID: " + QRLabel.id);
+        asset.label = QRLabel;
+        QRCode.findByIdOptional(QRLabel.id)
+                .map(found -> Panache.getEntityManager().merge(asset))
+                .orElseThrow(() -> new NotFoundException("Label dont exist"));
+    }
+
+    public void updateAllocation(@Valid Allocation allocation, @NotNull Long allocationId) {
+        Allocation.findByIdOptional(allocationId)
+                .map(found -> Panache.getEntityManager().merge(allocation))
+                .orElseThrow(() -> new NotFoundException("Allocation dont exist"));
+    }
+
+    public void deleteAllocation(@NotNull Long allocationId) {
+        Panache.getEntityManager()
+                .getReference(Allocation.class, allocationId)
+                .delete();
     }
 }

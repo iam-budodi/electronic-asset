@@ -53,6 +53,12 @@ You can then execute your native executable with: `./target/rest-book-1.0.0-runn
 
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
 
+Generate Angular Client code
+
+```shell script
+openapi-generator-cli generate -i /mnt/c/Users/japhe/OneDrive/Desktop/workspace/dev/quarkus/asset-management/electronic-asset/target/generated/openapi.yaml -g typescript-angular -o src/app/service
+```
+
 ## Related Guides
 
 - Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code
