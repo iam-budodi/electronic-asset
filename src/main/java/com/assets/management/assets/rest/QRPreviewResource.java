@@ -26,7 +26,7 @@ public class QRPreviewResource {
 
     @GET
     @Produces("image/png")
-    @Path("{employeeId}/allocation")
+    @Path("{workId}/allocation")
     @Operation(summary = "Previews the QR Code image")
     @APIResponses({
             @APIResponse(responseCode = "200", content = @Content(mediaType = "image/png",
@@ -36,11 +36,11 @@ public class QRPreviewResource {
             @APIResponse(responseCode = "400", description = "Invalid input")
     })
     public Response preview(
-            @Parameter(description = "Employee Identifier", required = true) @PathParam("employeeId") @NotNull Long employeeId,
+            @Parameter(description = "Work ID", required = true) @PathParam("workId") @NotNull String workId,
             @Parameter(description = "Search by serial number", required = true) @QueryParam("sn") @NotNull String assetSerialNumber
     ) {
-        Allocation allocated = Allocation.preview(employeeId, assetSerialNumber);
-        Transfer transferred = Transfer.preview(employeeId, assetSerialNumber);
+        Allocation allocated = Allocation.preview(workId, assetSerialNumber);
+        Transfer transferred = Transfer.preview(workId, assetSerialNumber);
 
         if (allocated == null && transferred == null)
             return Response.status(Response.Status.NO_CONTENT).build();

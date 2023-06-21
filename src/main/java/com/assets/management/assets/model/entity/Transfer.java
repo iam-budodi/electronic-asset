@@ -6,30 +6,27 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Parameters;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "asset_transfers")
 @NamedQueries({
         @NamedQuery(
                 name = "Transfer.preview",
-                query = "FROM Transfer t LEFT JOIN FETCH t.prevCustodian fro LEFT JOIN FETCH fro.department "
-                        + "LEFT JOIN FETCH fro.address LEFT JOIN FETCH t.currentCustodian to LEFT JOIN FETCH to.department "
+                query = "FROM Transfer t LEFT JOIN FETCH t.employee fro LEFT JOIN FETCH fro.department "
+                        + "LEFT JOIN FETCH fro.address LEFT JOIN FETCH t.newEmployee to LEFT JOIN FETCH to.department "
                         + "LEFT JOIN FETCH to.address LEFT JOIN FETCH t.asset  ast LEFT JOIN FETCH ast.category "
                         + "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
-                        + "LEFT JOIN FETCH s.address WHERE to.id = :employeeId  AND ast.serialNumber = :serialNumber "
-                        + "AND (:status IS NULL OR :status MEMBER OF t.status)"),
+                        + "LEFT JOIN FETCH s.address WHERE to.workId = :workId  AND ast.serialNumber = :serialNumber "
+                        + "AND (:status IS NULL OR t.status = :status)"),
         @NamedQuery(
                 name = "Transfer.details",
-                query = "FROM Transfer t LEFT JOIN FETCH t.prevCustodian fro LEFT JOIN FETCH fro.department "
-                        + "LEFT JOIN FETCH fro.address LEFT JOIN FETCH t.currentCustodian to LEFT JOIN FETCH to.department "
+                query = "FROM Transfer t LEFT JOIN FETCH t.employee fro LEFT JOIN FETCH fro.department "
+                        + "LEFT JOIN FETCH fro.address LEFT JOIN FETCH t.newEmployee to LEFT JOIN FETCH to.department "
                         + "LEFT JOIN FETCH to.address LEFT JOIN FETCH t.asset  ast LEFT JOIN FETCH ast.category "
                         + "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
                         + "LEFT JOIN FETCH s.address WHERE t.id = :transferId")
@@ -44,16 +41,18 @@ public class Transfer extends PanacheEntity {
     @Column(name = "transfer_remarks", length = 4000)
     public String transferRemark;
 
-    @ElementCollection
+//    @ElementCollection
     @Enumerated(EnumType.STRING)
-    @ColumnDefault(value = "'TRANSFERED'")
-    @JoinColumn(
-            name = "transfer_status",
-            nullable = false,
-            foreignKey = @ForeignKey(
-                    name = "transfer_status_fk_constraint",
-                    foreignKeyDefinition = ""))
-    public Set<AllocationStatus> status = new HashSet<>();
+//    @ColumnDefault(value = "'TRANSFERED'")
+//    @JoinColumn(
+//            name = "transfer_status",
+//            nullable = false,
+//            foreignKey = @ForeignKey(
+//                    name = "transfer_status_fk_constraint",
+//                    foreignKeyDefinition = ""))
+//    public Set<AllocationStatus> status = new HashSet<>();
+
+    public AllocationStatus status;
 
     @NotNull
     @JoinColumn(
@@ -62,7 +61,7 @@ public class Transfer extends PanacheEntity {
                     name = "transfer_from_employee_fk_constraint",
                     foreignKeyDefinition = ""))
     @ManyToOne(fetch = FetchType.LAZY)
-    public Employee prevCustodian;
+    public Employee employee;
 
     @NotNull
     @JoinColumn(
@@ -71,7 +70,7 @@ public class Transfer extends PanacheEntity {
                     name = "transfer_to_employee_fk_constraint",
                     foreignKeyDefinition = ""))
     @ManyToOne(fetch = FetchType.LAZY)
-    public Employee currentCustodian;
+    public Employee newEmployee;
 
     @NotNull
     @JoinColumn(
@@ -83,14 +82,14 @@ public class Transfer extends PanacheEntity {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     public Asset asset;
 
-    public static PanacheQuery<Transfer> listAll(AllocationStatus filteredStatus, Long employeeId) {
-        return find("FROM Transfer t WHERE t.currentCustodian.id = :employeeId AND (:status IS NULL OR :status MEMBER OF t.status)",
-                Parameters.with("employeeId", employeeId).and("status", filteredStatus));
+    public static PanacheQuery<Transfer> listAll(AllocationStatus filteredStatus, String workId) {
+        return find("SELECT t.asset, t.employee, t.status FROM Transfer t WHERE t.newEmployee.workId = :workId AND (:status IS NULL OR t.status = :status)",
+                Parameters.with("workId", workId).and("status", filteredStatus));
     }
 
-    public static Transfer preview(Long employeeId, String serialNumber) {
+    public static Transfer preview(String workId, String serialNumber) {
         return find("#Transfer.preview",
-                Parameters.with("employeeId", employeeId).and("serialNumber", serialNumber)
+                Parameters.with("workId", workId).and("serialNumber", serialNumber)
                         .and("status", AllocationStatus.ALLOCATED)
         ).firstResult();
     }
@@ -100,4 +99,16 @@ public class Transfer extends PanacheEntity {
                 .firstResult();
     }
 
+    @Override
+    public String toString() {
+        return "Transfer{" +
+                "id='" + id + '\'' +
+                ", transferDate=" + transferDate +
+                ", transferRemark='" + transferRemark + '\'' +
+                ", status=" + status +
+                ", employee=" + employee +
+                ", newEmployee=" + newEmployee +
+                ", asset=" + asset +
+                '}';
+    }
 }

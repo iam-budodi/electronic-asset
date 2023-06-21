@@ -22,7 +22,6 @@ import javax.ws.rs.NotFoundException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,14 +40,15 @@ public class AssignmentService {
         // TODO : I DONT KNOW HOW BUT IT WORKS ----- NEEDS MORE TESTING
         String queryString = "SELECT DISTINCT a FROM Allocation a LEFT JOIN FETCH a.employee e " +
                 "LEFT JOIN FETCH a.asset c LEFT JOIN Transfer t ON c.id = t.asset.id " +
-                "WHERE c.id = :assetId AND :allocationStatus NOT MEMBER OF a.status " +
-                "AND NOT EXISTS ( SELECT 1 FROM t.status t WHERE t IN :transferStatus) ";
+                "WHERE c.id = :assetId AND a.status = :allocationStatus " +
+                "AND NOT EXISTS ( SELECT 1 FROM t WHERE t.status = :transferStatus OR t.status = :retiredStatus) ";
 
         Optional<Allocation> allocated = Allocation.find(
                         queryString,
                         Parameters.with("assetId", allocation.asset.id)
                                 .and("allocationStatus", AllocationStatus.RETIRED)
-                                .and("transferStatus", Arrays.asList(AllocationStatus.TRANSFERRED, AllocationStatus.RETIRED)))
+                                .and("transferStatus", AllocationStatus.TRANSFERRED)
+                                .and("retiredStatus", AllocationStatus.RETIRED))
                 .firstResultOptional();
 
         if (allocated.isPresent()) throw new ClientErrorException(409);
@@ -91,9 +91,9 @@ public class AssignmentService {
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)
-    public List<EmployeeAsset> getEmployeeAssets(@Valid AllocationStatus filteredStatus, @NotNull Long employeeId) {
-        List<EmployeeAsset> allocatedAssets = Allocation.listAll(filteredStatus, employeeId).project(EmployeeAsset.class).list();
-        List<EmployeeAsset> transferredAsset = Transfer.listAll(filteredStatus, employeeId).project(EmployeeAsset.class).list();
+    public List<EmployeeAsset> getEmployeeAssets(@Valid AllocationStatus filteredStatus, @NotNull String workId) {
+        List<EmployeeAsset> allocatedAssets = Allocation.listAll(filteredStatus, workId).project(EmployeeAsset.class).list();
+        List<EmployeeAsset> transferredAsset = Transfer.listAll(filteredStatus, workId).project(EmployeeAsset.class).list();
         List<EmployeeAsset> assets = new ArrayList<>();
         assets.addAll(allocatedAssets);
         assets.addAll(transferredAsset);

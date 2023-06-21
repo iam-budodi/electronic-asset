@@ -102,7 +102,7 @@ public class EmployeeResource {
             @APIResponse(responseCode = "204", description = "No employee available in the database")
     })
     public Response employeesSelectOptions() {
-        List<SelectOptions> employees = Employee.find("SELECT e.id, e.firstName FROM Employee e LEFT JOIN e.department d LEFT JOIN e.address LEFT JOIN d.location")
+        List<SelectOptions> employees = Employee.find("SELECT e.id, e.firstName || ' ' || CONCAT(SUBSTRING(e.middleName, 1, 1), '.') || ' ' || e.lastName FROM Employee e")
                 .project(SelectOptions.class).list();
         if (employees.size() == 0) return Response.status(Status.NO_CONTENT).build();
 

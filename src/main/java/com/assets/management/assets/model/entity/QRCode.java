@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Arrays;
 
 @Entity
 @Table(
@@ -31,4 +32,11 @@ public class QRCode extends PanacheEntity implements Serializable {
     @Column(name = "qr_label", length = 4000, nullable = false)
     public byte[] qrByteString;
 
+    @Override
+    public String toString() {
+        return "QRCode{" +
+                "qrByteString=" + Arrays.toString(qrByteString) +
+                ", id=" + id +
+                '}';
+    }
 }

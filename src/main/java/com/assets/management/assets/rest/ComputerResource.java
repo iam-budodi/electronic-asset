@@ -122,13 +122,13 @@ public class ComputerResource {
     })
     public Response computerSelectOptions() {
         List<SelectOptions> allocates = Asset.find(
-                "SELECT c.id, c.model FROM Computer c " +
-                        "WHERE c.id NOT IN " +
-                        "(SELECT a.asset.id FROM Allocation a WHERE :allocated MEMBER OF a.status OR :retired MEMBER OF a.status) " +
-                        "AND c.id NOT IN " +
-                        "(SELECT t.asset.id FROM Transfer t WHERE :transferStatuses MEMBER OF t.status)",
-                Parameters.with("allocated", Set.of(AllocationStatus.ALLOCATED)).and("retired", Set.of(AllocationStatus.RETIRED))
-                        .and("transferStatuses", List.of(AllocationStatus.ALLOCATED))
+                "SELECT c.id, c.brand || ' ' || c.model FROM Computer c " //+
+//                        "WHERE c.id NOT IN " +
+//                        "(SELECT a.asset.id FROM Allocation a WHERE a.status = :allocated OR a.status = :retired) " +
+//                        "AND c.id NOT IN " +
+//                        "(SELECT t.asset.id FROM Transfer t WHERE t.status = :transferStatuses)",
+//                Parameters.with("allocated", AllocationStatus.ALLOCATED).and("retired", AllocationStatus.RETIRED)
+//                        .and("transferStatuses", AllocationStatus.ALLOCATED)
         ).project(SelectOptions.class).list();
 
         if (allocates.size() == 0) return Response.status(Status.NO_CONTENT).build();

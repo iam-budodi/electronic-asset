@@ -25,7 +25,6 @@ import javax.ws.rs.NotFoundException;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -41,45 +40,52 @@ public class TransferService {
     Logger LOG;
 
     public Transfer transfer(@Valid Transfer transfer) {
+        LOG.info("GOT IN TRANS SRV : " + transfer.toString());
         String queryString = "SELECT a AS assign, t AS transfer FROM Allocation a LEFT JOIN FETCH a.employee e " +
                 "LEFT JOIN FETCH a.asset c LEFT JOIN Transfer t ON c.id = t.asset.id " +
                 "WHERE (c.id = :assetId AND e.id = :prevCustodianId) AND  e.id <> :currentCustodianId " +
-                "AND EXISTS (SELECT 1 FROM a.status s WHERE s IN :allocationStatus) " +
-                "OR EXISTS (SELECT 1 FROM Transfer tr WHERE tr.asset.id = :assetId AND tr.prevCustodian.id <> :prevCustodianId " +
-                "AND tr.currentCustodian.id <> :currentCustodianId AND (:transferStatus  MEMBER OF t.status) " +
-                "AND EXISTS (SELECT 1 FROM a.status s WHERE s IN :secondAllocationStatus)) ";
+                "AND EXISTS (SELECT 1 FROM a WHERE a.status = :allocationStatus) " +
+//                "AND EXISTS (SELECT 1 FROM a.status s WHERE s IN :allocationStatus) " +
+                "OR EXISTS (SELECT 1 FROM Transfer tr WHERE tr.asset.id = :assetId AND tr.employee.id <> :prevCustodianId " +
+                "AND tr.newEmployee.id <> :currentCustodianId AND t.status = :transferStatus " +
+//                "AND tr.newEmployee.id <> :currentCustodianId AND (:transferStatus  MEMBER OF t.status) " +
+                "AND EXISTS (SELECT 1 FROM a WHERE a.status = :secondAllocationStatus)) ";
+//                "AND EXISTS (SELECT 1 FROM a.status s WHERE s IN :secondAllocationStatus)) ";
 
         Tuple allocation = Panache.getEntityManager().createQuery(queryString, Tuple.class)
-                .setParameter("currentCustodianId", transfer.currentCustodian.id)
-                .setParameter("prevCustodianId", transfer.prevCustodian.id)
+                .setParameter("currentCustodianId", transfer.newEmployee.id)
+                .setParameter("prevCustodianId", transfer.employee.id)
                 .setParameter("assetId", transfer.asset.id)
                 .setParameter("transferStatus", AllocationStatus.ALLOCATED)
-                .setParameter("secondAllocationStatus", Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.TRANSFERRED))
+                .setParameter("secondAllocationStatus", AllocationStatus.TRANSFERRED)
                 .setParameter("allocationStatus", List.of(AllocationStatus.ALLOCATED))
                 .getSingleResult();
 
         Allocation assigned = (Allocation) allocation.get("assign");
         Transfer transferred = (Transfer) allocation.get("transfer");
-        List<AllocationStatus> transferredStatus = Arrays.asList(AllocationStatus.DEALLOCATED, AllocationStatus.TRANSFERRED);
 
+        LOG.info("BEFORE : " + assigned.toString());
+        AllocationStatus transferredStatus = AllocationStatus.TRANSFERRED;
         if (assigned == null) throw new ClientErrorException(409);
+        transfer.asset = (transferred != null) ? transferred.asset : assigned.asset;
 
-        if (assigned.status.remove(AllocationStatus.ALLOCATED)) {
-            assigned.status.addAll(transferredStatus);
+        LOG.info("AFTER : " + transfer.toString());
+
+        if (assigned.status.equals(AllocationStatus.ALLOCATED)) {
+            assigned.status = transferredStatus;
             assigned.deallocationDate = Instant.now();
-        } else if (transferred.status.remove(AllocationStatus.ALLOCATED)) {
-            LOG.info("GOT INTO TRANSFER BLOCK");
-            if (!transferred.currentCustodian.id.equals(transfer.prevCustodian.id))
+        } else if (transferred != null && transferred.status.equals(AllocationStatus.ALLOCATED)) {
+            if (!transferred.newEmployee.id.equals(transfer.employee.id))
                 throw new BadRequestException();
 
-            transferred.status.addAll(transferredStatus);
-            transfer.status.add(AllocationStatus.ALLOCATED);
+            transferred.status = transferredStatus;
+            transfer.status = AllocationStatus.ALLOCATED;
             Transfer.persist(transfer);
             LOG.info("PERSISTED 2ND  PARAM OBJ : " + transfer);
             return transfer;
         }
 
-        transfer.status.add(AllocationStatus.ALLOCATED);
+        transfer.status = AllocationStatus.ALLOCATED;
         Transfer.persist(transfer);
         return transfer;
     }
@@ -90,8 +96,8 @@ public class TransferService {
         String sortVariable = String.format("t.%s", column);
         Sort.Direction sortDirection = PanacheUtils.panacheSort(direction);
 
-        String queryString = "SELECT t FROM Transfer t LEFT JOIN t.prevCustodian fro LEFT JOIN fro.department " +
-                "LEFT JOIN fro.address LEFT JOIN t.currentCustodian to LEFT JOIN to.department " +
+        String queryString = "SELECT t FROM Transfer t LEFT JOIN t.employee fro LEFT JOIN fro.department " +
+                "LEFT JOIN fro.address LEFT JOIN t.newEmployee to LEFT JOIN to.department " +
                 "LEFT JOIN to.address LEFT JOIN t.asset  ast LEFT JOIN ast.category " +
                 "LEFT JOIN ast.label LEFT JOIN ast.purchase p  LEFT JOIN p.supplier s " +
                 "LEFT JOIN s.address " +

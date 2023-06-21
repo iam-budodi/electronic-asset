@@ -266,8 +266,8 @@ VALUES ('COMPUTER', 617, 'LENOVO', 'Lenovo', 'Thinkbook 14 G2 ITL', 'kjNXB192709
         '11th Gen Intel(R) Core(TM) i-1135G7 @ 2.40GHz   2.42 GHz', '1000000', 500, '554');
 
 -- ALLOCATIONS
-insert into asset_allocations (id, allocation_date, allocation_remarks, asset_fk, employee_fk)
-VALUES (700, '2023-05-03', 'testing queries', 617, 200);
+insert into asset_allocations (id, allocation_date, allocation_remarks, status, asset_fk, employee_fk)
+VALUES (700, '2023-05-03', 'testing queries', 'ALLOCATED', 617, 200);
 
-insert into allocation_status (allocation_id, status)
-VALUES (700, 'ALLOCATED');
+-- insert into allocation_status (allocation_id, status)
+-- VALUES (700, 'ALLOCATED');

@@ -7,6 +7,7 @@ import com.assets.management.assets.service.AssignmentService;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -43,6 +44,9 @@ public class AssignmentResource {
 
     @Context
     UriInfo uriInfo;
+
+    @ConfigProperty(name = "client.url", defaultValue = "Check the URL in config file")
+    String clientURL;
 
     @Inject
     LinkHeaderPagination headerPagination;
@@ -82,8 +86,11 @@ public class AssignmentResource {
             allocation = assignmentService.allocate(allocation);
             allocationURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(allocation.id)).build();
 
+            URI qrRedirectURL = URI.create(clientURL + uriInfo.getPath() + "/" + allocation.id);
+
             LOG.info("ALLOCATED ASSET ID: " + allocation.asset.id);
-            assignmentService.allocationQRString(allocation.asset, allocationURI);
+            LOG.info("FRONT-END URL : " + qrRedirectURL);
+            assignmentService.allocationQRString(allocation.asset, qrRedirectURL);
         } catch (NotFoundException nf) {
             return Response.status(Response.Status.NOT_FOUND).entity("Employee/Asset don't exist").build();
         } catch (ClientErrorException ce) {
@@ -132,7 +139,8 @@ public class AssignmentResource {
 
     //    TODO: Split this twice for transfer and assignment
     @GET
-    @Path("/{employeeId}")
+//    @Path("/{employeeId}") OG
+    @Path("/assets")
     @Operation(summary = "Retrieves details of all allocations per employee")
     @APIResponses({
             @APIResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON,
@@ -142,10 +150,11 @@ public class AssignmentResource {
             @APIResponse(responseCode = "400", description = "Invalid input")})
     @Transactional(Transactional.TxType.SUPPORTS)
     public Response employeeAllAssets(
-            @Parameter(description = "Employee Identifier", required = true) @PathParam("employeeId") @NotNull Long employeeId,
+//            @Parameter(description = "Employee Identifier", required = true) @PathParam("employeeId") @NotNull Long employeeId, OG
+            @Parameter(description = "Search by work ID", required = true) @QueryParam("work-id") @NotNull String workId,
             @Parameter(description = "Status search", required = false) @QueryParam("status") AllocationStatus filteredStatus
     ) {
-        List<EmployeeAsset> assets = assignmentService.getEmployeeAssets(filteredStatus, employeeId);
+        List<EmployeeAsset> assets = assignmentService.getEmployeeAssets(filteredStatus, workId);
         if (assets.size() == 0) return Response.status(Response.Status.NO_CONTENT).build();
 
         return Response.ok(assets).build();
@@ -157,9 +166,10 @@ public class AssignmentResource {
     @Operation(summary = "Returns the scanned QR Code details for allocated assets")
     @APIResponses({
             @APIResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON,
-                    schema = @Schema(implementation = Allocation.class, type = SchemaType.ARRAY)), description = "Encoded QR Code details"),
+                    schema = @Schema(implementation = Allocation.class)), description = "Encoded QR Code details"),
             @APIResponse(responseCode = "204", description = "No record found")
     })
+    @Transactional(Transactional.TxType.SUPPORTS)
     public Response allocationDetailsScanned(
             @Parameter(description = "Allocation identifier", required = true) @PathParam("allocationId") @NotNull Long allocationId
     ) {

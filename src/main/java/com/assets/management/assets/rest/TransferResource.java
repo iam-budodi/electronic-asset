@@ -6,6 +6,7 @@ import com.assets.management.assets.service.TransferService;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -45,6 +46,9 @@ public class TransferResource {
     @Context
     UriInfo uriInfo;
 
+    @ConfigProperty(name = "client.url", defaultValue = "Check the URL in config file")
+    String clientURL;
+
     @Inject
     LinkHeaderPagination headerPagination;
 
@@ -70,27 +74,26 @@ public class TransferResource {
                     schema = @Schema(implementation = Transfer.class))) @Valid Transfer transfer,
             @Context UriInfo uriInfo
     ) {
-        if (transfer.prevCustodian.id == null || transfer.asset.id == null || transfer.currentCustodian.id == null)
+        if (transfer.employee.id == null || transfer.asset.id == null || transfer.newEmployee.id == null)
             return Response.status(Response.Status.BAD_REQUEST).build();
 
-        URI transferURI = null;
         try {
             Transfer transferred = transferService.transfer(transfer);
-            transferURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(transfer.id)).build();
-            LOG.info("TRANSFERRED URI : " + transferURI.toString());
-            transferService.transferQRString(transferred, transferURI);
+
+            URI qrRedirectURL = URI.create(clientURL + uriInfo.getPath() + "/" + transfer.id);
+            transferService.transferQRString(transferred, qrRedirectURL);
         } catch (NoResultException ex) {
             transfer = null;
         } catch (NotFoundException nf) {
             return Response.status(Response.Status.NOT_FOUND).entity("Custodian don't exist").build();
         } catch (BadRequestException br) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Ensure Asset is transferred from the current custodian").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Transfer to/from the same custodian").build();
         } catch (ClientErrorException ce) {
             return Response.status(Response.Status.CONFLICT).entity("Asset cannot be transferred!").build();
         }
 
         if (transfer == null) return Response.status(Response.Status.NOT_FOUND).entity("Asset was not found").build();
-        return Response.created(transferURI).build();
+        return Response.created(uriInfo.getAbsolutePathBuilder().path(Long.toString(transfer.id)).build()).build();
     }
 
 
@@ -136,9 +139,10 @@ public class TransferResource {
     @Operation(summary = "Returns the scanned QR Code details for transferred assets")
     @APIResponses({
             @APIResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON,
-                    schema = @Schema(implementation = Transfer.class, type = SchemaType.ARRAY)), description = "Encoded QR Code details"),
+                    schema = @Schema(implementation = Transfer.class   )), description = "Encoded QR Code details"),
             @APIResponse(responseCode = "204", description = "No record found")
     })
+    @Transactional(Transactional.TxType.SUPPORTS)
     public Response transferDetailsScanned(
             @Parameter(description = "Transfer identifier", required = true) @PathParam("transferId") @NotNull Long transferId
     ) {

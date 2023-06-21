@@ -12,9 +12,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Entity
 // @DynamicInsert
@@ -25,12 +22,12 @@ import java.util.Set;
                 query = " FROM Allocation a LEFT JOIN FETCH a.employee e LEFT JOIN FETCH e.department "
                         + "LEFT JOIN FETCH e.address LEFT JOIN FETCH a.asset ast LEFT JOIN FETCH ast.category "
                         + "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
-                        + "LEFT JOIN FETCH s.address WHERE e.id = :employeeId AND ast.serialNumber = :serialNumber "
-                        + "AND (:status IS NULL OR :status MEMBER OF a.status)"),
+                        + "LEFT JOIN FETCH s.address WHERE e.workId = :workId AND ast.serialNumber = :serialNumber "
+                        + "AND (:status IS NULL OR a.status = :status)"),
         @NamedQuery(
                 name = "Allocation.details",
-                query = " FROM Allocation a LEFT JOIN FETCH a.employee e LEFT JOIN FETCH e.department "
-                        + "LEFT JOIN FETCH e.address LEFT JOIN FETCH a.asset ast LEFT JOIN FETCH ast.category "
+                query = "FROM Allocation a LEFT JOIN FETCH a.employee e LEFT JOIN FETCH e.department "
+                        + "LEFT JOIN FETCH e.status LEFT JOIN FETCH e.address LEFT JOIN FETCH a.asset ast LEFT JOIN FETCH ast.category "
                         + "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
                         + "LEFT JOIN FETCH s.address WHERE a.id = :allocationId")
 })
@@ -47,15 +44,17 @@ public class Allocation extends PanacheEntity {
     @Column(name = "allocation_remarks", length = 4000)
     public String allocationRemark;
 
-    @ElementCollection
+
     @Enumerated(EnumType.STRING)
-    @JoinColumn(
-            name = "allocation_status",
-            nullable = false,
-            foreignKey = @ForeignKey(
-                    name = "allocation_status_fk_constraint",
-                    foreignKeyDefinition = ""))
-    public Set<AllocationStatus> status = new HashSet<>(List.of(AllocationStatus.ALLOCATED));
+//    @ElementCollection(targetClass = AllocationStatus.class)
+//    @CollectionTable(name = "allocation_status",
+//            joinColumns = @JoinColumn(name = "allocation_id", nullable = false,
+//                    foreignKey = @ForeignKey(name = "allocation_status_fk_constraint")))
+//    @Column(name = "status")
+//    @Convert(converter = AllocationStatusSetConverter.class)
+//    public Set<AllocationStatus> status = new HashSet<>(List.of(AllocationStatus.ALLOCATED));
+
+    public AllocationStatus status = AllocationStatus.ALLOCATED;
 
     @NotNull
     @JoinColumn(
@@ -76,14 +75,14 @@ public class Allocation extends PanacheEntity {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     public Asset asset;
 
-    public static PanacheQuery<Allocation> listAll(AllocationStatus filteredStatus, Long employeeId) {
-        return find("FROM Allocation a WHERE a.employee.id = :employeeId AND (:status IS NULL OR :status MEMBER OF a.status)",
-                Parameters.with("employeeId", employeeId).and("status", filteredStatus));
+    public static PanacheQuery<Allocation> listAll(AllocationStatus filteredStatus, String workId) {
+        return find("SELECT a.asset, a.employee, a.status FROM Allocation a WHERE a.employee.workId = :workId AND (:status IS NULL OR a.status = :status)",
+                Parameters.with("workId", workId).and("status", filteredStatus));
     }
 
-    public static Allocation preview(Long employeeId, String serialNumber) {
+    public static Allocation preview(String workId, String serialNumber) {
         return find("#Allocation.preview",
-                Parameters.with("employeeId", employeeId).and("serialNumber", serialNumber)
+                Parameters.with("workId", workId).and("serialNumber", serialNumber)
                         .and("status", AllocationStatus.ALLOCATED)
         ).firstResult();
     }
