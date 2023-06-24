@@ -6,7 +6,10 @@ import com.assets.management.assets.model.valueobject.SelectOptions;
 import com.assets.management.assets.service.EmployeeService;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.oidc.IdToken;
 import io.quarkus.panache.common.Page;
+import io.quarkus.security.Authenticated;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -16,7 +19,9 @@ import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.jboss.logging.Logger;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
@@ -33,6 +38,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Path("/employees")
+@Authenticated
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Tag(name = "Employee Endpoint", description = "This API allows to keep track of all the employees assigned the assets")
@@ -47,7 +53,16 @@ public class EmployeeResource {
     @Inject
     LinkHeaderPagination headerPagination;
 
+    @Inject
+    Logger LOG;
+
+    @Inject
+    @IdToken
+    JsonWebToken idToken;
+
     @GET
+//    @Authenticated
+//    @RolesAllowed("procure")
     @Operation(summary = "Retrieves all available employees from the database")
     @APIResponses({
             @APIResponse(responseCode = "200",
@@ -64,6 +79,7 @@ public class EmployeeResource {
             @Parameter(description = "Order property", required = false) @QueryParam("prop") @DefaultValue("firstName") String column,
             @Parameter(description = "Order direction", required = false) @QueryParam("order") @DefaultValue("asc") String direction
     ) {
+        LOG.info("ID TOKEN : " + idToken.getName());
         PanacheQuery<Employee> query = employeeService.listEmployees(search, date, column, direction);
         Page currentPage = Page.of(pageIndex, pageSize);
         query.page(currentPage);
