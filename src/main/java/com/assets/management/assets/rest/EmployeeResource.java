@@ -18,6 +18,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 
@@ -38,9 +39,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Path("/employees")
-@Authenticated
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@SecurityRequirement(name = "Keycloak")
 @Tag(name = "Employee Endpoint", description = "This API allows to keep track of all the employees assigned the assets")
 public class EmployeeResource {
 
@@ -61,8 +62,6 @@ public class EmployeeResource {
     JsonWebToken idToken;
 
     @GET
-//    @Authenticated
-//    @RolesAllowed("procure")
     @Operation(summary = "Retrieves all available employees from the database")
     @APIResponses({
             @APIResponse(responseCode = "200",

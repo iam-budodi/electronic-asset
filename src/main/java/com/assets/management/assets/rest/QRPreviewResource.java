@@ -8,6 +8,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import javax.transaction.Transactional;
@@ -21,6 +22,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Consumes(APPLICATION_JSON)
 @Produces(APPLICATION_JSON)
 @Transactional(Transactional.TxType.SUPPORTS)
+@SecurityRequirement(name = "Keycloak")
 @Tag(name = "QR Code Preview Endpoint", description = "Displays QR Code image for preview")
 public class QRPreviewResource {
 

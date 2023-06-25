@@ -15,6 +15,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 
@@ -39,6 +40,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Path("transfers")
 @Consumes(APPLICATION_JSON)
 @Produces(APPLICATION_JSON)
+@SecurityRequirement(name = "Keycloak")
 @Transactional(Transactional.TxType.REQUIRED)
 @Tag(name = "Transfer Endpoint", description = "Allows to keep track of all change of ownership")
 public class TransferResource {

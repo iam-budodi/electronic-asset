@@ -59,6 +59,10 @@ Generate Angular Client code
 openapi-generator-cli generate -i /mnt/c/Users/japhe/OneDrive/Desktop/workspace/dev/quarkus/asset-management/electronic-asset/target/generated/openapi.yaml -g typescript-angular -o src/app/service
 ```
 
+``` export keycloak realm
+kc.sh export --file udsm-assets-management.json --realm udsm-assets-management
+```
+
 ## Related Guides
 
 - Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code

@@ -18,6 +18,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 
@@ -40,6 +41,7 @@ import java.util.Set;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional(Transactional.TxType.REQUIRED)
+@SecurityRequirement(name = "Keycloak")
 @Tag(name = "Computer Endpoint", description = "This API allows to keep inventory of all purchased computers")
 public class ComputerResource {
 
