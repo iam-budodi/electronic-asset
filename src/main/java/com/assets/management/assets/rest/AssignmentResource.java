@@ -47,7 +47,7 @@ public class AssignmentResource {
     @Context
     UriInfo uriInfo;
 
-    @ConfigProperty(name = "client.url", defaultValue = "Check the URL in config file")
+    @ConfigProperty(name = "client.url", defaultValue = "http://0.0.0.0:8801")
     String clientURL;
 
     @Inject
@@ -142,7 +142,7 @@ public class AssignmentResource {
     //    TODO: Split this twice for transfer and assignment
     @GET
 //    @Path("/{employeeId}") OG
-    @Path("/assets")
+    @Path("{work-id}/asset")
     @Operation(summary = "Retrieves details of all allocations per employee")
     @APIResponses({
             @APIResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON,
@@ -153,7 +153,8 @@ public class AssignmentResource {
     @Transactional(Transactional.TxType.SUPPORTS)
     public Response employeeAllAssets(
 //            @Parameter(description = "Employee Identifier", required = true) @PathParam("employeeId") @NotNull Long employeeId, OG
-            @Parameter(description = "Search by work ID", required = true) @QueryParam("work-id") @NotNull String workId,
+//            @Parameter(description = "Search by work ID", required = true) @QueryParam("work-id") @NotNull String workId,
+            @Parameter(description = "Search by work ID", required = true) @PathParam("work-id") @NotNull String workId,
             @Parameter(description = "Status search", required = false) @QueryParam("status") AllocationStatus filteredStatus
     ) {
         List<EmployeeAsset> assets = assignmentService.getEmployeeAssets(filteredStatus, workId);

@@ -41,7 +41,7 @@ class SupplierServiceTest {
     private static final String DEFAULT_CITY = "Dar es Salaam";
     private static final String DEFAULT_POSTAL_CODE = "14110";
     private static final String DEFAULT_COUNTRY = "Tanzania";
-
+    private static final String DEFAULT_DIRECTION = "asc";
     private static final Integer DEFAULT_PAGE_INDEX = 0;
     private static final Integer DEFAULT_PAGE_SIZE = 15;
     private static Long supplierId;
