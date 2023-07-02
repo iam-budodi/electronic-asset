@@ -3,13 +3,11 @@ package com.assets.management.assets.rest;
 import com.assets.management.assets.model.entity.Asset;
 import com.assets.management.assets.model.entity.Computer;
 import com.assets.management.assets.model.entity.Purchase;
-import com.assets.management.assets.model.valueobject.AllocationStatus;
 import com.assets.management.assets.model.valueobject.SelectOptions;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
 import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
-import io.quarkus.panache.common.Parameters;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -35,7 +33,6 @@ import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Path("/computers")
 @Consumes(MediaType.APPLICATION_JSON)

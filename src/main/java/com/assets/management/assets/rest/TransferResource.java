@@ -141,7 +141,7 @@ public class TransferResource {
     @Operation(summary = "Returns the scanned QR Code details for transferred assets")
     @APIResponses({
             @APIResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON,
-                    schema = @Schema(implementation = Transfer.class   )), description = "Encoded QR Code details"),
+                    schema = @Schema(implementation = Transfer.class)), description = "Encoded QR Code details"),
             @APIResponse(responseCode = "204", description = "No record found")
     })
     @Transactional(Transactional.TxType.SUPPORTS)

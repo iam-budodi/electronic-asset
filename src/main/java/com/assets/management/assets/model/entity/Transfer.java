@@ -41,7 +41,7 @@ public class Transfer extends PanacheEntity {
     @Column(name = "transfer_remarks", length = 4000)
     public String transferRemark;
 
-//    @ElementCollection
+    //    @ElementCollection
     @Enumerated(EnumType.STRING)
 //    @ColumnDefault(value = "'TRANSFERED'")
 //    @JoinColumn(

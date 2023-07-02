@@ -8,7 +8,6 @@ import com.assets.management.assets.util.metadata.LinkHeaderPagination;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.oidc.IdToken;
 import io.quarkus.panache.common.Page;
-import io.quarkus.security.Authenticated;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
@@ -22,7 +21,6 @@ import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 
-import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
@@ -95,6 +93,27 @@ public class EmployeeResource {
                 .header("Link", linkHeader)
                 .header("X-Total-Count", totalCount)
                 .build();
+    }
+
+    @GET
+    @Path("report")
+    @Operation(summary = "Retrieves a specified range of employees record for generating report")
+    @APIResponses({
+            @APIResponse(responseCode = "200",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = Employee.class, type = SchemaType.ARRAY)),
+                    description = "Generate employees report"),
+            @APIResponse(responseCode = "204", description = "No date for report"),
+    })
+    public Response unPaginatedList(
+            @Parameter(description = "Search date", required = false) @QueryParam("start") LocalDate startDate,
+            @Parameter(description = "Search endDate", required = false) @QueryParam("end") LocalDate endDate
+    ) {
+
+        List<Employee> employees = employeeService.unPaginatedList(startDate, endDate);
+        if (employees.size() == 0) return Response.status(Status.NO_CONTENT).build();
+        return Response.ok(employees).build();
+
     }
 
     @GET

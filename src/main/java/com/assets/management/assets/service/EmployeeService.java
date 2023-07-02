@@ -16,6 +16,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -64,6 +65,15 @@ public class EmployeeService {
                 Sort.by(sortVariable, sortDirection),
                 Parameters.with("searchValue", searchValue).and("date", date)
         );
+    }
+
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public List<Employee> unPaginatedList(LocalDate startDate, LocalDate endDate) {
+        String queryString = "SELECT e FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.status LEFT JOIN FETCH e.address LEFT JOIN FETCH d.location " +
+                "WHERE e.registeredAt BETWEEN :startDate AND :endDate";
+
+        return Employee.find(queryString, Sort.by("e.firstName", Sort.Direction.Descending),
+                Parameters.with("startDate", startDate).and("endDate", endDate)).list();
     }
 
     @Transactional(Transactional.TxType.SUPPORTS)

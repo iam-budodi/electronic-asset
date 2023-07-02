@@ -4,8 +4,6 @@ import com.assets.management.assets.model.entity.Asset;
 import com.assets.management.assets.model.entity.Employee;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.Set;
-
 public class EmployeeAsset {
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -13,7 +11,7 @@ public class EmployeeAsset {
 
     public final Employee employee;
 
-//    public final Set<AllocationStatus> status;
+    //    public final Set<AllocationStatus> status;
     public final AllocationStatus status;
 //    @ProjectedFieldName("status") AllocationStatus
 
