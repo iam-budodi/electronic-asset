@@ -26,8 +26,7 @@ public class CollegeService {
 
         String queryString = "SELECT c FROM College c LEFT JOIN c.location l " +
                 "WHERE (:searchValue IS NULL OR LOWER(c.collegeName) LIKE :searchValue " +
-                "OR :searchValue IS NULL OR LOWER(l.city) LIKE :searchValue " +
-                "OR :searchValue IS NULL OR LOWER(l.district) LIKE :searchValue) ";
+                "OR :searchValue IS NULL OR LOWER(c.collegeCode) LIKE :searchValue) ";
 
         return College.find(
                 queryString,

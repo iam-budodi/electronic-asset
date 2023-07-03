@@ -78,7 +78,9 @@ public class AssignmentService {
                 "LEFT JOIN ast.label LEFT JOIN ast.purchase p  LEFT JOIN p.supplier s " +
                 "LEFT JOIN s.address " +
                 "WHERE (:searchValue IS NULL OR " +
-                "LOWER(e.firstName) LIKE :searchValue OR " +
+                "LOWER(ast.brand) LIKE :searchValue OR " +
+                "LOWER(ast.model) LIKE :searchValue OR " +
+                "LOWER(ast.serialNumber) LIKE :searchValue OR " +
                 "LOWER(e.lastName) LIKE :searchValue OR " +
                 "LOWER(e.workId) LIKE :searchValue OR " +
                 "LOWER(e.firstName || ' ' || e.lastName) LIKE :searchValue) " +

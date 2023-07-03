@@ -35,8 +35,7 @@ public class DepartmentService {
 
         String queryString = "SELECT d FROM Department d LEFT JOIN  d.college c LEFT JOIN c.location l " +
                 "WHERE (:searchValue IS NULL OR LOWER(d.departmentName) LIKE :searchValue " +
-                "OR :searchValue IS NULL OR LOWER(l.city) LIKE :searchValue " +
-                "OR :searchValue IS NULL OR LOWER(l.district) LIKE :searchValue) ";
+                "OR :searchValue IS NULL OR LOWER(d.departmentCode) LIKE :searchValue) ";
 
 //        LOG.info("SORT VARIABLE : " + sortVariable + " AND DIRECTION " + sortDirection);
         return Employee.find(
