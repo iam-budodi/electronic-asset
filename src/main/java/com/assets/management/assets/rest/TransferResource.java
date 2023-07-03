@@ -1,11 +1,15 @@
 package com.assets.management.assets.rest;
 
 import com.assets.management.assets.model.entity.Allocation;
+import com.assets.management.assets.model.entity.Employee;
 import com.assets.management.assets.model.entity.Transfer;
 import com.assets.management.assets.service.TransferService;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
+import io.quarkus.panache.common.Parameters;
+import io.quarkus.panache.common.Sort;
+import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
@@ -48,6 +52,9 @@ public class TransferResource {
     @Context
     UriInfo uriInfo;
 
+    @Inject
+    SecurityIdentity keycloakSecurityContext;
+
     @ConfigProperty(name = "client.url", defaultValue = "Check the URL in config file")
     String clientURL;
 
@@ -79,6 +86,7 @@ public class TransferResource {
         if (transfer.employee.id == null || transfer.asset.id == null || transfer.newEmployee.id == null)
             return Response.status(Response.Status.BAD_REQUEST).build();
 
+        transfer.transferedBy = keycloakSecurityContext.getPrincipal().getName();
         try {
             Transfer transferred = transferService.transfer(transfer);
 
@@ -137,6 +145,36 @@ public class TransferResource {
     }
 
     @GET
+    @Path("report")
+    @Transactional(Transactional.TxType.SUPPORTS)
+    @Operation(summary = "Retrieves a specified range of transfers record for generating report")
+    @APIResponses({
+            @APIResponse(responseCode = "200",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = Transfer.class, type = SchemaType.ARRAY)),
+                    description = "Generate transfers report"),
+            @APIResponse(responseCode = "204", description = "No data for report"),
+    })
+    public Response unPaginatedList(
+            @Parameter(description = "Search date", required = false) @QueryParam("start") LocalDate startDate,
+            @Parameter(description = "Search endDate", required = false) @QueryParam("end") LocalDate endDate
+    ) {
+
+        String queryString = "SELECT t FROM Transfer t LEFT JOIN FETCH t.employee fro LEFT JOIN FETCH fro.department "
+                + "LEFT JOIN FETCH fro.address LEFT JOIN FETCH t.newEmployee to LEFT JOIN FETCH to.department "
+                + "LEFT JOIN FETCH to.address LEFT JOIN FETCH t.asset  ast LEFT JOIN FETCH ast.category "
+                + "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
+                + "LEFT JOIN FETCH s.address WHERE t.transferDate BETWEEN :startDate AND :endDate";
+
+        List<Transfer> transfers = Transfer.find(queryString, Sort.by("t.transferDate", Sort.Direction.Descending),
+                Parameters.with("startDate", startDate).and("endDate", endDate)).list();
+
+        if (transfers.size() == 0) return Response.status(Response.Status.NO_CONTENT).build();
+        return Response.ok(transfers).build();
+
+    }
+
+    @GET
     @Path("/{transferId}")
     @Operation(summary = "Returns the scanned QR Code details for transferred assets")
     @APIResponses({
@@ -177,7 +215,8 @@ public class TransferResource {
             return Response.status(Response.Status.CONFLICT).entity(transfer).build();
 //        else if (allocation.department == null) return Response.status(Response.Status.BAD_REQUEST).build();
 
-//        employee.address = null;
+
+        transfer.updatedBy = keycloakSecurityContext.getPrincipal().getName();
         try {
             transferService.updateTransfer(transfer, transferId);
         } catch (NotFoundException nf) {

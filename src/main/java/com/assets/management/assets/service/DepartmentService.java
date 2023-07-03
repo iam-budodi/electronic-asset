@@ -24,16 +24,17 @@ public class DepartmentService {
     public PanacheQuery<Employee> listDepartments(String searchValue, String column, String direction) {
         if (searchValue != null) searchValue = "%" + searchValue.toLowerCase(Locale.ROOT) + "%";
 
-        String sortVariable = Objects.equals(column.toLowerCase(Locale.ROOT), "name")
-                ? String.format("d.%s", column)
-                : String.format("l.%s", column);
+//        String sortVariable = Objects.equals(column.toLowerCase(Locale.ROOT), "departmentName")
+//                ? String.format("d.%s", column)
+//                : String.format("l.%s", column);
+        String sortVariable = String.format("d.%s", column);
 
         Sort.Direction sortDirection = Objects.equals(direction.toLowerCase(Locale.ROOT), "desc")
                 ? Sort.Direction.Descending
                 : Sort.Direction.Ascending;
 
-        String queryString = "SELECT d FROM Department d LEFT JOIN d.location l " +
-                "WHERE (:searchValue IS NULL OR LOWER(d.name) LIKE :searchValue " +
+        String queryString = "SELECT d FROM Department d LEFT JOIN  d.college c LEFT JOIN c.location l " +
+                "WHERE (:searchValue IS NULL OR LOWER(d.departmentName) LIKE :searchValue " +
                 "OR :searchValue IS NULL OR LOWER(l.city) LIKE :searchValue " +
                 "OR :searchValue IS NULL OR LOWER(l.district) LIKE :searchValue) ";
 

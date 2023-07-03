@@ -27,7 +27,7 @@ class DepartmentTest {
     @Order(1)
     void shouldPersistDept() {
         Department dept = new Department();
-        dept.name = DEFAULT_NAME;
+        dept.departmentName = DEFAULT_NAME;
         dept.description = DEFAULT_DESCRIPTION;
         Department.persist(dept);
 
@@ -42,7 +42,7 @@ class DepartmentTest {
     void shouldFindAll() {
         List<Department> depts = Department.findAllOrderByName();
         assertEquals(1, depts.size());
-        assertEquals(DEFAULT_NAME, depts.get(0).name);
+        assertEquals(DEFAULT_NAME, depts.get(0).departmentName);
     }
 
     @Test
@@ -57,7 +57,7 @@ class DepartmentTest {
         assertEquals(1, depts.size());
         assertEquals(1, nbDepts);
         assertEquals(deptId, firstDept.id);
-        assertEquals(DEFAULT_NAME, dept.get().name);
+        assertEquals(DEFAULT_NAME, dept.get().departmentName);
 
     }
 
@@ -75,10 +75,10 @@ class DepartmentTest {
     @Order(5)
     void shouldUpdate() {
         Department dept = Department.findById(deptId);
-        dept.name = UPDATED_NAME;
+        dept.departmentName = UPDATED_NAME;
         Panache.getEntityManager().merge(dept);
-        assertNotEquals(DEFAULT_NAME, dept.name);
-        assertTrue(UPDATED_NAME.equals(dept.name));
+        assertNotEquals(DEFAULT_NAME, dept.departmentName);
+        assertTrue(UPDATED_NAME.equals(dept.departmentName));
         assertEquals(DEFAULT_DESCRIPTION, dept.description);
     }
 

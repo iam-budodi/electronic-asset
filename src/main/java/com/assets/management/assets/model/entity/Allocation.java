@@ -7,9 +7,11 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Parameters;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.Instant;
 import java.time.LocalDate;
 
@@ -74,6 +76,14 @@ public class Allocation extends PanacheEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     public Asset asset;
+
+    @Column(name = "allocated_by", length = 64)
+    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
+    public String allocatedBy;
+
+    @Column(name = "updated_by")
+    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
+    public String updatedBy;
 
     public static PanacheQuery<Allocation> listAll(AllocationStatus filteredStatus, String workId) {
         return find("SELECT a.asset, a.employee, a.status FROM Allocation a WHERE a.employee.workId = :workId AND (:status IS NULL OR a.status = :status)",

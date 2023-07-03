@@ -2,11 +2,17 @@
 insert into addresses (id, city, country, district_name, postal_code, street_name, ward_name)
 VALUES (490, 'Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi', 'kijitonyama');
 
+-- COLLEGES
+insert into colleges (id, college_name, college_code, location_id)
+VALUES (50, 'College of Information and Communication Technology', 'CoICT', 490);
+insert into colleges (id, college_name, college_code, location_id)
+VALUES (51, 'College of Agricultural Sciences and Fisheries', 'CoAF', 490);
+
 -- DEPARTMENT TABLE - add 4 more dept
-insert into departments (id, department_code, description, department_name, location_id)
-VALUES (100, 'CSE', 'Computer science and Engineering', 'CSE', 490);
-insert into departments (id, department_code, description, department_name, location_id)
-VALUES (101, 'TE', 'Telecommunication engineering', 'Telecom', 490);
+insert into departments (id, department_code, description, department_name, college_fk)
+VALUES (100, 'CSE', 'Computer science and Engineering', 'Computer Science and Engineering', 50);
+insert into departments (id, department_code, description, department_name, college_fk)
+VALUES (101, 'TE', 'Telecommunication engineering', 'Telecommunication Engineering', 50);
 
 -- EMPLOYEE TABLE - add at least 19 more employee
 insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name,

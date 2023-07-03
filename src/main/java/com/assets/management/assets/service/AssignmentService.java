@@ -46,7 +46,8 @@ public class AssignmentService {
         Optional<Allocation> allocated = Allocation.find(
                         queryString,
                         Parameters.with("assetId", allocation.asset.id)
-                                .and("allocationStatus", AllocationStatus.RETIRED)
+//                                .and("allocationStatus", AllocationStatus.RETIRED) // TODO: THIS CAUSES ERROR
+                                .and("allocationStatus", AllocationStatus.ALLOCATED)
                                 .and("transferStatus", AllocationStatus.TRANSFERRED)
                                 .and("retiredStatus", AllocationStatus.RETIRED))
                 .firstResultOptional();

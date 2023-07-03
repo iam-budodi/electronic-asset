@@ -6,6 +6,8 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -88,6 +90,22 @@ public class Asset extends PanacheEntity {
                     foreignKeyDefinition = ""))
     @ManyToOne(fetch = FetchType.LAZY)
     public Purchase purchase;
+
+    @CreationTimestamp
+    @Column(name = "created_at")
+    public LocalDate createdAt;
+
+    @Column(name = "created_by", length = 64)
+    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
+    public String createdBy;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    public LocalDate updatedAt;
+
+    @Column(name = "updated_by")
+    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
+    public String updatedBy;
 
     //	o	asset_warranty_expiration (foreign key to asset warranty table) //think about it //invoice_number
 //	@Override

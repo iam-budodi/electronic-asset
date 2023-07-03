@@ -24,7 +24,7 @@ import java.util.Optional;
 @NamedQueries({
         @NamedQuery(
                 name = "Department.getName",
-                query = "FROM Department WHERE LOWER(name) = :name")
+                query = "FROM Department WHERE LOWER(departmentName) = :name")
 })
 @Schema(description = "Department representation")
 public class Department extends PanacheEntity {
@@ -34,22 +34,27 @@ public class Department extends PanacheEntity {
     @Size(min = 2, max = 64)
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "should include only letters ' and - special characters")
     @Column(name = "department_name", length = 64, nullable = false)
-    public String name;
+    public String departmentName;
 
     @Size(min = 2, max = 10)
     @Pattern(regexp = "^[\\p{L}\\p{Nd} _]+$", message = "should include only letters, digit, space and underscore")
     @Column(name = "department_code")
-    public String code;
+    public String departmentCode;
 
     @Size(min = 1, max = 400)
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "should include only letters ' and - special characters")
     @Column(length = 400)
     public String description;
 
-
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "location_id", foreignKey = @ForeignKey(name = "department_address_fk_constraint", foreignKeyDefinition = ""))
-    public Address location;
+    @NotNull
+    @Schema(required = true)
+    @JoinColumn(
+            name = "college_fk",
+            nullable = false,
+            foreignKey = @ForeignKey(
+                    name = "college_department_fk_constraint"))
+    @ManyToOne(fetch = FetchType.LAZY)
+    public College college;
 
     public static List<Department> findAllOrderByName() {
         return listAll(Sort.by("name"));

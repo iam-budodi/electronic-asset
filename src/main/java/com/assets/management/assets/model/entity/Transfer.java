@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 @Entity
@@ -81,6 +82,14 @@ public class Transfer extends PanacheEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     public Asset asset;
+
+    @Column(name = "allocated_by", length = 64)
+    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
+    public String transferedBy;
+
+    @Column(name = "updated_by")
+    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
+    public String updatedBy;
 
     public static PanacheQuery<Transfer> listAll(AllocationStatus filteredStatus, String workId) {
         return find("SELECT t.asset, t.employee, t.status FROM Transfer t WHERE t.newEmployee.workId = :workId AND (:status IS NULL OR t.status = :status)",

@@ -48,7 +48,7 @@ public class EmployeeService {
                 ? Sort.Direction.Descending
                 : Sort.Direction.Ascending;
 
-        String queryString = "SELECT e FROM Employee e LEFT JOIN e.department d LEFT JOIN e.address a " +
+        String queryString = "SELECT e FROM Employee e LEFT JOIN e.department d LEFT JOIN e.address a LEFT JOIN d.college " +
                 "WHERE (:searchValue IS NULL OR LOWER(e.firstName) LIKE :searchValue " +
                 "OR :searchValue IS NULL OR LOWER(e.lastName) LIKE :searchValue " +
                 "OR :searchValue IS NULL OR LOWER(e.workId) LIKE :searchValue " +
@@ -69,7 +69,7 @@ public class EmployeeService {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public List<Employee> unPaginatedList(LocalDate startDate, LocalDate endDate) {
-        String queryString = "SELECT e FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.status LEFT JOIN FETCH e.address LEFT JOIN FETCH d.location " +
+        String queryString = "SELECT e FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.status LEFT JOIN FETCH e.address LEFT JOIN FETCH d.college " +
                 "WHERE e.registeredAt BETWEEN :startDate AND :endDate";
 
         return Employee.find(queryString, Sort.by("e.firstName", Sort.Direction.Descending),
@@ -79,7 +79,7 @@ public class EmployeeService {
     @Transactional(Transactional.TxType.SUPPORTS)
     public Optional<Employee> findById(@NotNull Long employeeId) {
         return Employee.find(
-                        "FROM Employee e LEFT JOIN FETCH e.department LEFT JOIN FETCH e.address "
+                        "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH d.college LEFT JOIN FETCH e.address LEFT JOIN FETCH e.status "
                                 + "WHERE e.id = :employeeId ", Parameters.with("employeeId", employeeId))
                 .firstResultOptional();
     }

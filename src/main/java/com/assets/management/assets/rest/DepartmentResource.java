@@ -53,7 +53,7 @@ public class DepartmentResource {
 
     @GET
     @Transactional(Transactional.TxType.SUPPORTS)
-    @Operation(summary = "Retrieves all available deparments from the database")
+    @Operation(summary = "Retrieves all available departments from the database")
     @APIResponses({
             @APIResponse(
                     responseCode = "200",
@@ -68,7 +68,7 @@ public class DepartmentResource {
             @Parameter(description = "Page index", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
             @Parameter(description = "Page size", required = false) @QueryParam("size") @DefaultValue("5") Integer size,
             @Parameter(description = "Search string", required = false) @QueryParam("search") String search,
-            @Parameter(description = "Order property", required = false) @QueryParam("prop") @DefaultValue("name") String column,
+            @Parameter(description = "Order property", required = false) @QueryParam("prop") @DefaultValue("departmentName") String column,
             @Parameter(description = "Order direction", required = false) @QueryParam("order") @DefaultValue("asc") String direction) {
 
         PanacheQuery<Employee> query = departmentService.listDepartments(search, column, direction);
@@ -124,7 +124,7 @@ public class DepartmentResource {
             @APIResponse(responseCode = "204", description = "No department available in the database")
     })
     public Response departmentSelectOptions() {
-        List<SelectOptions> dept = Department.find("SELECT d.id, d.name FROM Department d")
+        List<SelectOptions> dept = Department.find("SELECT d.id, d.departmentName FROM Department d")
                 .project(SelectOptions.class).list();
         if (dept.size() == 0) return Response.status(Status.NO_CONTENT).build();
         return Response.ok(dept).build();
@@ -148,7 +148,7 @@ public class DepartmentResource {
     public Response createDepartment(
             @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Department.class)))
             @Valid Department department, @Context UriInfo uriInfo) {
-        boolean isDept = Department.findByName(department.name).isPresent();
+        boolean isDept = Department.findByName(department.departmentName).isPresent();
         if (isDept) return Response.status(Status.CONFLICT).entity("Department already exists").build();
         departmentService.insertDepartment(department);
         URI deptUri = uriInfo.getAbsolutePathBuilder().path(Long.toString(department.id)).build();

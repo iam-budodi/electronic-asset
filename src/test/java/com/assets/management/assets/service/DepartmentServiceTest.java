@@ -52,7 +52,7 @@ class DepartmentServiceTest {
     @Order(3)
     void shouldThrowExceptionOnInsertingNullDepartmentName() {
         Department department = new Department();
-        department.name = null;
+        department.departmentName = null;
         department.description = DEFAULT_DESCRIPTION;
         ConstraintViolationException thrown = assertThrows(
                 ConstraintViolationException.class,
@@ -65,7 +65,7 @@ class DepartmentServiceTest {
     @Order(4)
     void shouldInsertDepartment() {
         Department department = new Department();
-        department.name = DEFAULT_NAME;
+        department.departmentName = DEFAULT_NAME;
         department.description = DEFAULT_DESCRIPTION;
 
         assertFalse(department.isPersistent());
@@ -74,7 +74,7 @@ class DepartmentServiceTest {
 
         assertNotNull(deptId);
         // assertTrue(department.isPersistent());
-        assertEquals(DEFAULT_NAME, department.name);
+        assertEquals(DEFAULT_NAME, department.departmentName);
         assertEquals(DEFAULT_DESCRIPTION, department.description);
     }
 
@@ -90,7 +90,7 @@ class DepartmentServiceTest {
     void shouldGetDepartment() {
         Optional<Department> department = service.findDepartment(deptId);
         assertTrue(department.isPresent());
-        assertEquals(DEFAULT_NAME, department.get().name);
+        assertEquals(DEFAULT_NAME, department.get().departmentName);
         assertEquals(DEFAULT_DESCRIPTION, department.get().description);
     }
 
@@ -99,7 +99,7 @@ class DepartmentServiceTest {
     void shouldThrowNotFoundExceptionUponUpdate() {
         Department department = new Department();
         department.id = deptId;
-        department.name = UPDATED_NAME;
+        department.departmentName = UPDATED_NAME;
         department.description = UPDATED_DESCRIPTION;
 
         Long randomId = new Random().nextLong();
@@ -113,7 +113,7 @@ class DepartmentServiceTest {
     void shouldThrowConstraintsViolationException() {
         Department department = new Department();
         department.id = deptId;
-        department.name = null;
+        department.departmentName = null;
         department.description = UPDATED_DESCRIPTION;
 
         assertThrows(ConstraintViolationException.class,
@@ -125,7 +125,7 @@ class DepartmentServiceTest {
     void shouldUpdateDepartment() {
         Department department = new Department();
         department.id = deptId;
-        department.name = UPDATED_NAME;
+        department.departmentName = UPDATED_NAME;
         department.description = UPDATED_DESCRIPTION;
 
         service.updateDepartment(department, deptId);
@@ -133,7 +133,7 @@ class DepartmentServiceTest {
         department = service.findDepartment(deptId).get();
         assertTrue(department.isPersistent());
         assertEquals(deptId, department.id);
-        assertEquals(UPDATED_NAME, department.name);
+        assertEquals(UPDATED_NAME, department.departmentName);
         assertEquals(UPDATED_DESCRIPTION, department.description);
     }
 

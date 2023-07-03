@@ -54,7 +54,7 @@ class DepartmentResourceTest {
     @Order(2)
     void shouldNotCreateInvalidDepartment() {
         Department department = new Department();
-        department.name = null;
+        department.departmentName = null;
         department.description = DEFAULT_DESCRIPTION;
 
         given()
@@ -72,7 +72,7 @@ class DepartmentResourceTest {
     @Order(3)
     void shouldCreateDepartment() {
         Department department = new Department();
-        department.name = DEFAULT_NAME;
+        department.departmentName = DEFAULT_NAME;
         department.description = DEFAULT_DESCRIPTION;
 
         String location = given()
@@ -197,7 +197,7 @@ class DepartmentResourceTest {
         Long randomId = new Random().nextLong();
         Department department = new Department();
         department.id = Long.valueOf(departmentId);
-        department.name = UPDATED_NAME;
+        department.departmentName = UPDATED_NAME;
         department.description = UPDATED_DESCRIPTION;
 
         given()
@@ -216,7 +216,7 @@ class DepartmentResourceTest {
     void shouldUpdateDepartment() {
         Department department = new Department();
         department.id = Long.valueOf(departmentId);
-        department.name = UPDATED_NAME;
+        department.departmentName = UPDATED_NAME;
         department.description = UPDATED_DESCRIPTION;
 
         given()

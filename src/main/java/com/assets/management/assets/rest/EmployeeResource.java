@@ -8,6 +8,7 @@ import com.assets.management.assets.util.metadata.LinkHeaderPagination;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.oidc.IdToken;
 import io.quarkus.panache.common.Page;
+import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
@@ -59,6 +60,9 @@ public class EmployeeResource {
     @IdToken
     JsonWebToken idToken;
 
+    @Inject
+    SecurityIdentity keycloakSecurityContext;
+
     @GET
     @Operation(summary = "Retrieves all available employees from the database")
     @APIResponses({
@@ -103,7 +107,7 @@ public class EmployeeResource {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON,
                             schema = @Schema(implementation = Employee.class, type = SchemaType.ARRAY)),
                     description = "Generate employees report"),
-            @APIResponse(responseCode = "204", description = "No date for report"),
+            @APIResponse(responseCode = "204", description = "No data for report"),
     })
     public Response unPaginatedList(
             @Parameter(description = "Search date", required = false) @QueryParam("start") LocalDate startDate,
@@ -161,7 +165,10 @@ public class EmployeeResource {
                     responseCode = "404",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = String.class)),
                     description = "Specified department does not exist in the database")})
-    public Response createEmployee(@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Employee.class))) @Valid Employee employee, @Context UriInfo uriInfo) {
+    public Response createEmployee(
+            @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(implementation = Employee.class))) @Valid Employee employee,
+            @Context UriInfo uriInfo) {
         if (employee.address == null || employee.department == null) return Response.status(Status.BAD_REQUEST).build();
         else if (Employee.checkByEmailAndPhone(employee.email, employee.mobile))
             if (Employee.checkByEmailAndPhone(employee.email, employee.mobile))
@@ -169,6 +176,7 @@ public class EmployeeResource {
             else if (!Department.findByIdOptional(employee.department.id).isPresent())
                 return Response.status(Status.NOT_FOUND).entity("Department dont exists").build();
 
+        employee.registeredBy = keycloakSecurityContext.getPrincipal().getName();
         employee = employeeService.addEmployee(employee);
         URI employeeUri = uriInfo.getAbsolutePathBuilder().path(Long.toString(employee.id)).build();
         return Response.created(employeeUri).build();
@@ -183,6 +191,7 @@ public class EmployeeResource {
         else if (employee.department == null) return Response.status(Status.BAD_REQUEST).build();
 
         employee.address = null;
+        employee.updatedBy = keycloakSecurityContext.getPrincipal().getName();
         try {
             employeeService.updateEmployee(employee, empId);
         } catch (NotFoundException nf) {

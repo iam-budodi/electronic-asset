@@ -1,12 +1,17 @@
 package com.assets.management.assets.rest;
 
 import com.assets.management.assets.model.entity.Allocation;
+import com.assets.management.assets.model.entity.Asset;
+import com.assets.management.assets.model.entity.Computer;
 import com.assets.management.assets.model.valueobject.AllocationStatus;
 import com.assets.management.assets.model.valueobject.EmployeeAsset;
 import com.assets.management.assets.service.AssignmentService;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
+import io.quarkus.panache.common.Parameters;
+import io.quarkus.panache.common.Sort;
+import io.quarkus.security.identity.SecurityIdentity;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
@@ -47,6 +52,9 @@ public class AssignmentResource {
     @Context
     UriInfo uriInfo;
 
+    @Inject
+    SecurityIdentity keycloakSecurityContext;
+
     @ConfigProperty(name = "client.url", defaultValue = "http://0.0.0.0:8801")
     String clientURL;
 
@@ -84,6 +92,7 @@ public class AssignmentResource {
             return Response.status(Response.Status.BAD_REQUEST).build();
 
         URI allocationURI;
+        allocation.allocatedBy = keycloakSecurityContext.getPrincipal().getName();
         try {
             allocation = assignmentService.allocate(allocation);
             allocationURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(allocation.id)).build();
@@ -165,6 +174,35 @@ public class AssignmentResource {
 
 
     @GET
+    @Path("report")
+    @Operation(summary = "Retrieves a specified range of allocations record for generating report")
+    @APIResponses({
+            @APIResponse(responseCode = "200",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = Allocation.class, type = SchemaType.ARRAY)),
+                    description = "Generate allocation report"),
+            @APIResponse(responseCode = "204", description = "No data for report"),
+    })
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public Response unPaginatedList(
+            @Parameter(description = "Search date", required = false) @QueryParam("start") LocalDate startDate,
+            @Parameter(description = "Search endDate", required = false) @QueryParam("end") LocalDate endDate
+    ) {
+        String queryString = "SELECT a FROM Allocation a LEFT JOIN FETCH a.employee e LEFT JOIN FETCH e.department "
+                + "LEFT JOIN FETCH e.address LEFT JOIN FETCH a.asset ast LEFT JOIN FETCH ast.category "
+                + "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
+                + "LEFT JOIN FETCH s.address WHERE a.allocationDate BETWEEN :startDate AND :endDate";
+
+
+        List<Allocation> allocations = Allocation.find(queryString, Sort.by("a.allocationDate", Sort.Direction.Descending),
+                Parameters.with("startDate", startDate).and("endDate", endDate)).list();
+        if (allocations.size() == 0) return Response.status(Response.Status.NO_CONTENT).build();
+        return Response.ok(allocations).build();
+
+    }
+
+
+    @GET
     @Path("{allocationId}")
     @Operation(summary = "Returns the scanned QR Code details for allocated assets")
     @APIResponses({
@@ -205,7 +243,7 @@ public class AssignmentResource {
             return Response.status(Response.Status.CONFLICT).entity(allocation).build();
 //        else if (allocation.department == null) return Response.status(Response.Status.BAD_REQUEST).build();
 
-//        employee.address = null;
+        allocation.updatedBy = keycloakSecurityContext.getPrincipal().getName();
         try {
             assignmentService.updateAllocation(allocation, allocationId);
         } catch (NotFoundException nf) {

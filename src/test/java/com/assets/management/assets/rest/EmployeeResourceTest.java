@@ -135,7 +135,7 @@ class EmployeeResourceTest {
     @Order(4)
     void ShouldCreateDepartment() {
         final Department dept = new Department();
-        dept.name = DEPARTMENT_NAME;
+        dept.departmentName = DEPARTMENT_NAME;
         dept.description = DEPARTMENT_DESCRIPTION;
 
         // creates department
