@@ -2,10 +2,10 @@ package com.assets.management.assets.model.valueobject;
 
 import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 // registered for reflection in a separate file under resource folder
 public class PurchasePerSupplier {

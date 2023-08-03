@@ -3,8 +3,8 @@ package com.assets.management.assets.model.entity;
 import com.assets.management.assets.model.valueobject.Peripheral;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity

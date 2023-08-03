@@ -13,15 +13,15 @@ import io.quarkus.panache.common.Sort;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.persistence.Tuple;
-import javax.transaction.Transactional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.NotFoundException;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.persistence.Tuple;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.NotFoundException;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -105,8 +105,11 @@ public class TransferService {
                 "LOWER(to.firstName) LIKE :searchValue OR " +
                 "LOWER(to.lastName) LIKE :searchValue OR " +
                 "LOWER(to.workId) LIKE :searchValue OR " +
-                "LOWER(to.firstName || ' ' || to.lastName) LIKE :searchValue) " +
-                "AND (:date IS NULL OR t.transferDate = :date)";
+                "LOWER(to.firstName || ' ' || to.lastName) LIKE :searchValue) "; //+
+//                "AND (:date IS NULL OR t.transferDate = :date)";
+
+        if (transferDate != null) queryString += "AND t.transferDate = :date";
+        else queryString += "AND (:date IS NULL OR t.transferDate = :date)";
 
         return Transfer.find(
                 queryString,
@@ -123,7 +126,7 @@ public class TransferService {
     }
 
     public void updateTransfer(@Valid Transfer transfer, @NotNull Long transferId) {
-        Allocation.findByIdOptional(transferId)
+        Transfer.findByIdOptional(transferId)
                 .map(found -> Panache.getEntityManager().merge(transfer))
                 .orElseThrow(() -> new NotFoundException("Transfer record dont exist"));
     }

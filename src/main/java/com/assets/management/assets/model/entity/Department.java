@@ -5,10 +5,10 @@ import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,6 +55,10 @@ public class Department extends PanacheEntity {
                     name = "college_department_fk_constraint"))
     @ManyToOne(fetch = FetchType.LAZY)
     public College college;
+
+//
+//    @OneToOne(mappedBy = "department")
+//    public HeadOfDepartment headOfDepartment;
 
     public static List<Department> findAllOrderByName() {
         return listAll(Sort.by("name"));

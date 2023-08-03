@@ -6,10 +6,10 @@ import com.assets.management.assets.model.valueobject.SelectOptions;
 import com.assets.management.assets.service.EmployeeService;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
-import io.quarkus.oidc.IdToken;
+//import io.quarkus.oidc.IdToken;
 import io.quarkus.panache.common.Page;
 import io.quarkus.security.identity.SecurityIdentity;
-import org.eclipse.microprofile.jwt.JsonWebToken;
+//import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -22,17 +22,17 @@ import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 
-import javax.inject.Inject;
-import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -56,9 +56,9 @@ public class EmployeeResource {
     @Inject
     Logger LOG;
 
-    @Inject
-    @IdToken
-    JsonWebToken idToken;
+//    @Inject
+//    @IdToken
+//    JsonWebToken idToken;
 
     @Inject
     SecurityIdentity keycloakSecurityContext;
@@ -80,7 +80,7 @@ public class EmployeeResource {
             @Parameter(description = "Order property", required = false) @QueryParam("prop") @DefaultValue("firstName") String column,
             @Parameter(description = "Order direction", required = false) @QueryParam("order") @DefaultValue("asc") String direction
     ) {
-        LOG.info("ID TOKEN : " + idToken.getName());
+//        LOG.info("ID TOKEN : " + idToken.getName());
         PanacheQuery<Employee> query = employeeService.listEmployees(search, date, column, direction);
         Page currentPage = Page.of(pageIndex, pageSize);
         query.page(currentPage);

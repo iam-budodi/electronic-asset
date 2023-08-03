@@ -3,6 +3,7 @@ package com.assets.management.assets.rest;
 import com.assets.management.assets.model.entity.Asset;
 import com.assets.management.assets.model.entity.Purchase;
 import com.assets.management.assets.model.entity.Supplier;
+import com.assets.management.assets.model.valueobject.PurchaseChart;
 import com.assets.management.assets.model.valueobject.PurchasePerSupplier;
 import com.assets.management.assets.model.valueobject.SelectOptions;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
@@ -20,16 +21,16 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -140,6 +141,25 @@ public class PurchaseResource {
                 .project(SelectOptions.class).list();
         if (selectOptions.size() == 0) return Response.status(Status.NO_CONTENT).build();
         return Response.ok(selectOptions).build();
+    }
+
+    @GET
+    @Path("/dashboard")
+    @Transactional(Transactional.TxType.SUPPORTS)
+    @Operation(summary = "Fetch only purchase date and quantity for dashboard charts")
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = PurchaseChart.class, type = SchemaType.ARRAY)),
+                    description = "Purchase date and quantity for dashboard charts"),
+            @APIResponse(responseCode = "204", description = "No purchase available in the database")
+    })
+    public Response purchaseChart() {
+        List<PurchaseChart> purchaseChart = Purchase.find("SELECT p.purchaseQty, p.purchaseDate FROM Purchase p")
+                .project(PurchaseChart.class).list();
+        if (purchaseChart.size() == 0) return Response.status(Status.NO_CONTENT).build();
+        return Response.ok(purchaseChart).build();
     }
 
     @GET

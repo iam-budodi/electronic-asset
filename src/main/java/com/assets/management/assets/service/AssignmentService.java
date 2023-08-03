@@ -12,13 +12,13 @@ import io.quarkus.panache.common.Sort;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.NotFoundException;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.NotFoundException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -73,6 +73,8 @@ public class AssignmentService {
         String sortVariable = String.format("a.%s", column);
         Sort.Direction sortDirection = PanacheUtils.panacheSort(direction);
 
+        LOG.info("ALLOCATION DATE : " + allocationDate);
+
         String queryString = "SELECT a FROM Allocation a LEFT JOIN a.employee e LEFT JOIN e.department " +
                 "LEFT JOIN e.address LEFT JOIN a.asset ast LEFT JOIN ast.category " +
                 "LEFT JOIN ast.label LEFT JOIN ast.purchase p  LEFT JOIN p.supplier s " +
@@ -83,8 +85,11 @@ public class AssignmentService {
                 "LOWER(ast.serialNumber) LIKE :searchValue OR " +
                 "LOWER(e.lastName) LIKE :searchValue OR " +
                 "LOWER(e.workId) LIKE :searchValue OR " +
-                "LOWER(e.firstName || ' ' || e.lastName) LIKE :searchValue) " +
-                "AND (:date IS NULL OR a.allocationDate = :date)";
+                "LOWER(e.firstName || ' ' || e.lastName) LIKE :searchValue) "; //+
+//                "AND (:date IS NULL OR a.allocationDate = :date)";
+
+        if (allocationDate != null) queryString += "AND a.allocationDate = :date";
+        else queryString += "AND (:date IS NULL OR a.allocationDate = :date)";
 
         return Allocation.find(
                 queryString,

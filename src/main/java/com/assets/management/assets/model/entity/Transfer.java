@@ -8,9 +8,9 @@ import io.quarkus.panache.common.Parameters;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 @Entity
@@ -18,12 +18,12 @@ import java.time.LocalDate;
 @NamedQueries({
         @NamedQuery(
                 name = "Transfer.preview",
-                query = "FROM Transfer t LEFT JOIN FETCH t.employee fro LEFT JOIN FETCH fro.department "
-                        + "LEFT JOIN FETCH fro.address LEFT JOIN FETCH t.newEmployee to LEFT JOIN FETCH to.department "
-                        + "LEFT JOIN FETCH to.address LEFT JOIN FETCH t.asset  ast LEFT JOIN FETCH ast.category "
-                        + "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
-                        + "LEFT JOIN FETCH s.address WHERE to.workId = :workId  AND ast.serialNumber = :serialNumber "
-                        + "AND (:status IS NULL OR t.status = :status)"),
+                query = "FROM Transfer t LEFT JOIN FETCH t.employee fro LEFT JOIN FETCH fro.department " +
+                        "LEFT JOIN FETCH fro.address LEFT JOIN FETCH fro.status LEFT JOIN FETCH t.newEmployee to " +
+                        "LEFT JOIN FETCH to.department LEFT JOIN FETCH to.address LEFT JOIN FETCH to.status " +
+                        "LEFT JOIN FETCH t.asset  ast LEFT JOIN FETCH ast.category LEFT JOIN FETCH ast.label " +
+                        "LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s LEFT JOIN FETCH s.address " +
+                        "WHERE to.workId = :workId  AND ast.serialNumber = :serialNumber AND t.status = :status"),
         @NamedQuery(
                 name = "Transfer.details",
                 query = "FROM Transfer t LEFT JOIN FETCH t.employee fro LEFT JOIN FETCH fro.department "

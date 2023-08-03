@@ -11,12 +11,12 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
-import javax.transaction.Transactional;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
+import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("preview")
 @Consumes(APPLICATION_JSON)
@@ -50,6 +50,10 @@ public class QRPreviewResource {
         return allocated == null
                 ? Response.ok(transferred.asset.label.qrByteString).build()
                 : Response.ok(allocated.asset.label.qrByteString).build();
+
+//        if (allocated == null) return Response.ok(transferred.asset.label.qrByteString).build();
+//        else if (transferred == null) return Response.ok(allocated.asset.label.qrByteString).build();
+
     }
 
 }

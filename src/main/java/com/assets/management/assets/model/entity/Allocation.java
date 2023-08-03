@@ -9,9 +9,9 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import java.time.Instant;
 import java.time.LocalDate;
 
@@ -21,11 +21,13 @@ import java.time.LocalDate;
 @NamedQueries({
         @NamedQuery(
                 name = "Allocation.preview",
-                query = " FROM Allocation a LEFT JOIN FETCH a.employee e LEFT JOIN FETCH e.department "
-                        + "LEFT JOIN FETCH e.address LEFT JOIN FETCH a.asset ast LEFT JOIN FETCH ast.category "
-                        + "LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  LEFT JOIN FETCH p.supplier s "
-                        + "LEFT JOIN FETCH s.address WHERE e.workId = :workId AND ast.serialNumber = :serialNumber "
-                        + "AND (:status IS NULL OR a.status = :status)"),
+                query = " FROM Allocation a LEFT JOIN FETCH a.employee e LEFT JOIN FETCH e.department " +
+                        "LEFT JOIN FETCH e.address LEFT JOIN FETCH e.status LEFT JOIN FETCH a.asset ast " +
+                        "LEFT JOIN FETCH ast.category LEFT JOIN FETCH ast.label LEFT JOIN FETCH ast.purchase p  " +
+                        "LEFT JOIN FETCH p.supplier s LEFT JOIN FETCH s.address " +
+                        "WHERE e.workId = :workId AND ast.serialNumber = :serialNumber AND a.status = :status"),
+//                        + "AND (:status IS NULL OR a.status = :status)"),
+
         @NamedQuery(
                 name = "Allocation.details",
                 query = "FROM Allocation a LEFT JOIN FETCH a.employee e LEFT JOIN FETCH e.department "

@@ -4,8 +4,8 @@ import com.assets.management.assets.model.valueobject.EmploymentStatus;
 import io.quarkus.panache.common.Parameters;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Set;

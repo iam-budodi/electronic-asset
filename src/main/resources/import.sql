@@ -72,7 +72,15 @@ insert into employees (id, registered_at, registered_by, email_address, first_na
                        phone_number, birthdate, hire_date, work_id, department_fk)
 VALUES (216, '2023-05-06', 'Lulu', 'revocatuswaa@gmail.com', 'Revocatus', 'M', 'Waangu', 'Elly', '25573456789',
         '1993-07-07', '2022-10-01', '2022-04-02001', 101);
+insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name,
+                       phone_number, birthdate, hire_date, work_id, department_fk)
+VALUES (217, '2023-07-05', 'lulu.shaban', 'hod@gmail.com', 'Head', 'M', 'IT', 'Of', '25573456789',
+        '1982-10-01', '2020-10-01', '2020CoICT-1', 100);
 
+
+-- HOD TABLE
+INSERT INTO head_of_departments (id, employee_fk)
+VALUES (230, 217);
 
 -- SUPPLIER TABLE - at least 4 more supplier
 insert into suppliers (id, registered_at, registered_by, description, company_email, company_name, company_phone,
@@ -182,10 +190,10 @@ VALUES ('COMPUTER', 602, 'LENOVO', 'Lenovo', 'Thinkbook 14 G2 ITL', 'MPNXB-19270
         '11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz   2.42 GHz', '1000000', 500, '550');
 insert into assets (asset_discriminator, id, brand_name, manufacturer, model_name, model_number, serial_number,
                     display_size, graphics_card, computer_memory, operating_system, computer_processor,
-                    computer_storage, category_fk, purchase_fk)
+                    computer_storage, created_at, category_fk, purchase_fk)
 VALUES ('COMPUTER', 603, 'HP', 'hp', 'Pro-book 650 G2', 'MP/B192709Z', 'MP2ANWJ', '14', '4115', '8192',
         'Windows 11 Enterprise 64-bit (10.0, Build 22621) (22621.ni_release.220506-1250)',
-        '11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz   2.42 GHz', '1000000', 500, '550');
+        '11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz   2.42 GHz', '1000000', '2023-07-04', 500, '550');
 insert into assets (asset_discriminator, id, brand_name, manufacturer, model_name, model_number, serial_number,
                     display_size, graphics_card, computer_memory, operating_system, computer_processor,
                     computer_storage, category_fk, purchase_fk)

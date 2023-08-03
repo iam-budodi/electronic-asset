@@ -2,9 +2,9 @@ package com.assets.management.assets.util.metadata;
 
 import io.quarkus.panache.common.Page;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.core.Link;
-import javax.ws.rs.core.UriInfo;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.core.Link;
+import jakarta.ws.rs.core.UriInfo;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
