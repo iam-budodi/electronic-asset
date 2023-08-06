@@ -1,7 +1,6 @@
 package com.assets.management.assets.model.valueobject;
 
 import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

@@ -1,8 +1,8 @@
 package com.assets.management.assets.util;
 
 import com.assets.management.assets.qualifier.WorkId;
-
 import jakarta.enterprise.context.ApplicationScoped;
+
 import java.time.LocalDate;
 
 @WorkId

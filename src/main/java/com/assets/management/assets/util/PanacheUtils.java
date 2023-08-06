@@ -1,8 +1,8 @@
 package com.assets.management.assets.util;
 
 import io.quarkus.panache.common.Sort;
-
 import jakarta.enterprise.context.ApplicationScoped;
+
 import java.util.Locale;
 import java.util.Objects;
 

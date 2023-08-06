@@ -2,10 +2,10 @@ package com.assets.management.assets.model.entity;
 
 import com.assets.management.assets.model.valueobject.EmploymentStatus;
 import io.quarkus.panache.common.Parameters;
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Set;

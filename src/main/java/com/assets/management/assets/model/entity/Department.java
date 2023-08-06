@@ -3,12 +3,12 @@ package com.assets.management.assets.model.entity;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +24,7 @@ import java.util.Optional;
 @NamedQueries({
         @NamedQuery(
                 name = "Department.getName",
-                query = "FROM Department WHERE LOWER(departmentName) = :name")
+                query = "FROM DepartmentEntity WHERE LOWER(departmentName) = :name")
 })
 @Schema(description = "Department representation")
 public class Department extends PanacheEntity {

@@ -2,14 +2,14 @@ package com.assets.management.assets.errorhandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.http.HttpServerRequest;
-import org.jboss.logging.Logger;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
+import org.jboss.logging.Logger;
+
 import java.util.List;
 
 public class ErrorResponseMapper implements ExceptionMapper<Exception> {

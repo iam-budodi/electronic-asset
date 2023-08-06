@@ -5,12 +5,12 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;

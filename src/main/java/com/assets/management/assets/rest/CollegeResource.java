@@ -6,19 +6,6 @@ import com.assets.management.assets.service.CollegeService;
 import com.assets.management.assets.util.metadata.LinkHeaderPagination;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
-import io.quarkus.panache.common.Parameters;
-import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
-import org.eclipse.microprofile.openapi.annotations.media.Content;
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
-import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
-import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
-import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
-import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
-import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
-import org.eclipse.microprofile.openapi.annotations.tags.Tag;
-import org.jboss.logging.Logger;
-
 import jakarta.inject.Inject;
 import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
@@ -29,12 +16,25 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 @Path("/college")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Transactional(Transactional.TxType.REQUIRED)
 @SecurityRequirement(name = "Keycloak")
 @Tag(name = "College Endpoint", description = "This API allows to create college and associated departments")
 public class CollegeResource {
@@ -69,7 +69,7 @@ public class CollegeResource {
         Long totalCount = query.count();
         List<College> departmentsForPage = query.list();
         int lastPage = query.pageCount();
-        if (departmentsForPage.size() == 0)
+        if (departmentsForPage.isEmpty())
             return Response.status(Response.Status.NO_CONTENT).build();
 
         String linkHeader = headerPagination.linkStream(uriInfo, currentPage, size, lastPage);
@@ -93,7 +93,7 @@ public class CollegeResource {
             @APIResponse(responseCode = "404", description = "College is not found for a given identifier")
     })
     public Response getCollege(
-            @Parameter(description = "Department identifier", required = true) @PathParam("college-id") @NotNull Long collegeId) {
+            @Parameter(description = "Department identifier", required = true) @PathParam("college-id") @NotNull UUID collegeId) {
         return collegeService.findCollege(collegeId)
                 .map(college -> Response.ok(college).build())
                 .orElseGet(() -> Response.status(Response.Status.NOT_FOUND).build());
@@ -112,9 +112,11 @@ public class CollegeResource {
             @APIResponse(responseCode = "204", description = "No college available in the database")
     })
     public Response collegeSelectOptions() {
-        List<SelectOptions> colleges = College.find("SELECT c.id, c.collegeName FROM College c")
-                .project(SelectOptions.class).list();
-        if (colleges.size() == 0) return Response.status(Response.Status.NO_CONTENT).build();
+//        List<SelectOptions> colleges = College.find("SELECT c.id, c.collegeName FROM College c")
+//                .project(SelectOptions.class).list();
+
+        List<SelectOptions> colleges = collegeService.selected();
+        if (colleges.isEmpty()) return Response.status(Response.Status.NO_CONTENT).build();
         return Response.ok(colleges).build();
     }
 
@@ -137,11 +139,10 @@ public class CollegeResource {
             @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = College.class)))
             @Valid College college, @Context UriInfo uriInfo) {
-        boolean isCollege = College.find("#College.name", Parameters.with("name", college.collegeName.toLowerCase()))
-                .firstResultOptional().isPresent();
+        boolean isCollege = collegeService.collegeExists(college.getCollegeName());
         if (isCollege) return Response.status(Response.Status.CONFLICT).entity("College already exists").build();
         collegeService.addCollege(college);
-        URI collegeURI = uriInfo.getAbsolutePathBuilder().path(Long.toString(college.id)).build();
+        URI collegeURI = uriInfo.getAbsolutePathBuilder().path(college.getCollegeId().toString()).build();
         return Response.created(collegeURI).build();
     }
 
@@ -159,10 +160,10 @@ public class CollegeResource {
                     description = "College payload is not the same as an entity object that needed to be updated")
     })
     public Response updateCollege(
-            @Parameter(description = "College identifier", required = true) @PathParam("id") @NotNull Long collegeId,
+            @Parameter(description = "College identifier", required = true) @PathParam("id") @NotNull UUID collegeId,
             @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = College.class))) @Valid College college) {
-        if (!collegeId.equals(college.id))
+        if (!collegeId.equals(college.getCollegeId()))
             return Response.status(Response.Status.CONFLICT).entity(college).build();
 
         try {
@@ -185,8 +186,8 @@ public class CollegeResource {
             @APIResponse(responseCode = "500", description = "College not found")
     })
     public Response deleteCollege(
-            @Parameter(description = "College identifier", required = true) @PathParam("id") @NotNull Long collegeId) {
-        return College.deleteById(collegeId)
+            @Parameter(description = "College identifier", required = true) @PathParam("id") @NotNull UUID collegeId) {
+        return collegeService.deleteCollege(collegeId)
                 ? Response.status(Response.Status.NO_CONTENT).build()
                 : Response.status(Response.Status.NOT_FOUND).build();
     }

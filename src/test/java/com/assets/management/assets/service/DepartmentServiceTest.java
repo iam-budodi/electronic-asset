@@ -2,15 +2,15 @@ package com.assets.management.assets.service;
 
 import com.assets.management.assets.model.entity.Department;
 import io.quarkus.test.junit.QuarkusTest;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.ws.rs.NotFoundException;
 import java.util.Optional;
 import java.util.Random;
 

@@ -9,12 +9,12 @@ import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
+import jakarta.ws.rs.core.Response.Status;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import jakarta.ws.rs.core.Response.Status;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;

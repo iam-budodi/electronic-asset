@@ -2,13 +2,13 @@ package com.assets.management.assets.model.entity;
 
 import com.assets.management.assets.model.valueobject.SupplierType;
 import io.quarkus.panache.common.Parameters;
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 import java.util.Optional;
 
 @Entity
@@ -25,7 +25,7 @@ import java.util.Optional;
 @NamedQueries({
         @NamedQuery(
                 name = "Supplier.getEmailOrPhone",
-                query = "FROM Supplier WHERE email = :email OR phone = :phone")
+                query = "FROM SupplierEntity WHERE email = :email OR phone = :phone")
 })
 @Schema(description = "Supplier representation")
 public class Supplier extends BaseEntity {

@@ -1,14 +1,14 @@
 package com.assets.management.assets.model.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;

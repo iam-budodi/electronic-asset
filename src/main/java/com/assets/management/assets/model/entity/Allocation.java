@@ -5,13 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Parameters;
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.Instant;
 import java.time.LocalDate;
 

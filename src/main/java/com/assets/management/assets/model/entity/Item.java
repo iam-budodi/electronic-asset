@@ -2,12 +2,12 @@ package com.assets.management.assets.model.entity;
 
 import com.assets.management.assets.model.valueobject.Status;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+
 import java.time.LocalDate;
 
 //@Entity

@@ -1,9 +1,9 @@
 package com.assets.management.assets.model.valueobject;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 
 @RegisterForReflection

@@ -6,10 +6,10 @@ import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.panache.common.Sort;
 import io.quarkus.panache.common.Sort.Direction;
 import io.quarkus.test.junit.QuarkusTest;
+import jakarta.transaction.Transactional;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.*;
 
-import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.EnumSet;
