@@ -2,14 +2,13 @@ package com.japhet_sebastian.organization.control;
 
 import com.japhet_sebastian.organization.entity.College;
 import com.japhet_sebastian.organization.entity.CollegeEntity;
-import jakarta.enterprise.context.ApplicationScoped;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
-@Mapper(componentModel = "cdi")
+@Mapper(componentModel = "CDI")
 public interface CollegeMapper {
 
 

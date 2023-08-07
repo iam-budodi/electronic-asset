@@ -1,6 +1,5 @@
 package com.japhet_sebastian.employee;
 
-import com.assets.management.assets.model.entity.BaseEntity;
 import com.assets.management.assets.model.valueobject.Gender;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;

@@ -71,11 +71,11 @@ public class CollegeEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof com.assets.management.assets.model.entity.College college)) return false;
-        return Objects.equals(getCollegeId(), college.getCollegeId())
-                && Objects.equals(getCollegeName(), college.getCollegeName())
-                && Objects.equals(getCollegeCode(), college.getCollegeCode())
-                && Objects.equals(getLocation(), college.getLocation());
+        if (!(o instanceof CollegeEntity entity)) return false;
+        return Objects.equals(getCollegeId(), entity.getCollegeId())
+                && Objects.equals(getCollegeName(), entity.getCollegeName())
+                && Objects.equals(getCollegeCode(), entity.getCollegeCode())
+                && Objects.equals(getLocation(), entity.getLocation());
     }
 
     @Override
@@ -85,7 +85,7 @@ public class CollegeEntity {
 
     @Override
     public String toString() {
-        return "College{" +
+        return "CollegeEntity{" +
                 "collegeId=" + collegeId +
                 ", collegeName='" + collegeName + '\'' +
                 ", collegeCode='" + collegeCode + '\'' +
@@ -93,3 +93,4 @@ public class CollegeEntity {
                 '}';
     }
 }
+

@@ -1,8 +1,8 @@
 package com.japhet_sebastian.supplier;
 
-import com.assets.management.assets.model.entity.Address;
-import com.assets.management.assets.model.entity.BaseEntity;
 import com.assets.management.assets.model.valueobject.SupplierType;
+import com.japhet_sebastian.employee.BaseEntity;
+import com.japhet_sebastian.organization.entity.AddressEntity;
 import io.quarkus.panache.common.Parameters;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -13,22 +13,22 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import java.util.Optional;
 
-//@Entity
-//@Table(
-//        name = "suppliers",
-//        uniqueConstraints = {
-//                @UniqueConstraint(
-//                        name = "uniqueEmailandPhone",
-//                        columnNames = {"company_email", "company_phone"
-//                        }
-//                )
-//        }
-//)
-//@NamedQueries({
-//        @NamedQuery(
-//                name = "Supplier.getEmailOrPhone",
-//                query = "FROM SupplierEntity WHERE email = :email OR phone = :phone")
-//})
+@Entity
+@Table(
+        name = "suppliers",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uniqueEmailandPhone",
+                        columnNames = {"company_email", "company_phone"
+                        }
+                )
+        }
+)
+@NamedQueries({
+        @NamedQuery(
+                name = "SupplierEntity.getEmailOrPhone",
+                query = "FROM SupplierEntity WHERE email = :email OR phone = :phone")
+})
 @Schema(description = "Supplier representation")
 public class SupplierEntity extends BaseEntity {
 
@@ -81,7 +81,7 @@ public class SupplierEntity extends BaseEntity {
             orphanRemoval = true,
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
-    public Address address;
+    public AddressEntity address;
 
     public static Optional<SupplierEntity> findByEmailAndPhone(String email, String phone) {
         return find("#Supplier.getEmailOrPhone", Parameters.with("email", email).and("phone", phone).map())

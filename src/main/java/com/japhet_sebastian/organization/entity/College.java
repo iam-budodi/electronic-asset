@@ -29,12 +29,24 @@ public class College {
         return collegeId;
     }
 
+    public void setCollegeId(UUID collegeId) {
+        this.collegeId = collegeId;
+    }
+
     public String getCollegeName() {
         return collegeName;
     }
 
+    public void setCollegeName(String collegeName) {
+        this.collegeName = collegeName;
+    }
+
     public String getCollegeCode() {
         return collegeCode;
+    }
+
+    public void setCollegeCode(String collegeCode) {
+        this.collegeCode = collegeCode;
     }
 
     public Address getLocation() {

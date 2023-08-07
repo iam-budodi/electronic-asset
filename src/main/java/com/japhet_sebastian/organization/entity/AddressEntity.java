@@ -1,8 +1,8 @@
 package com.japhet_sebastian.organization.entity;
 
-import com.assets.management.assets.model.entity.Employee;
-import com.assets.management.assets.model.entity.Supplier;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.japhet_sebastian.employee.EmployeeEntity;
+import com.japhet_sebastian.supplier.SupplierEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
@@ -47,11 +47,11 @@ public class AddressEntity {
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_fk", foreignKey = @ForeignKey(name = "employee_address_fk_constraint"))
-    public Employee employee;
+    public EmployeeEntity employee;
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_fk", foreignKey = @ForeignKey(name = "supplier_address_fk_constraint"))
-    public Supplier supplier;
+    public SupplierEntity supplier;
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "address_uuid")
@@ -116,19 +116,19 @@ public class AddressEntity {
         this.country = country;
     }
 
-    public Employee getEmployee() {
+    public EmployeeEntity getEmployee() {
         return employee;
     }
 
-    public void setEmployee(Employee employee) {
+    public void setEmployee(EmployeeEntity employee) {
         this.employee = employee;
     }
 
-    public Supplier getSupplier() {
+    public SupplierEntity getSupplier() {
         return supplier;
     }
 
-    public void setSupplier(Supplier supplier) {
+    public void setSupplier(SupplierEntity supplier) {
         this.supplier = supplier;
     }
 

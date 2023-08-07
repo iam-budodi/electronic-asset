@@ -3,6 +3,7 @@ package com.japhet_sebastian.organization.control;
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.entity.College;
 import com.japhet_sebastian.organization.entity.CollegeEntity;
+import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -10,7 +11,6 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-
 
 import java.util.*;
 
@@ -24,14 +24,20 @@ public class CollegeService {
     @Inject
     CollegeMapper mapper;
 
-    public List<College> listColleges(String searchValue) {
-        if (searchValue != null) searchValue = "%" + searchValue.toLowerCase(Locale.ROOT) + "%";
-        return mapper.toDomainList(collegeRepository.search(searchValue));
+    public List<College> listColleges(PageRequest pageRequest) {
+        if (pageRequest.getSearch() != null)
+            pageRequest.setSearch("%" + pageRequest.getSearch().toLowerCase(Locale.ROOT) + "%");
+        Log.info("Lower Case Search String : " + pageRequest.getSearch());
+        return mapper.toDomainList(collegeRepository.search(pageRequest));
     }
 
     public Optional<College> findCollege(@NotNull UUID collegeId) {
         return collegeRepository.findByIdOptional(collegeId)
                 .map(mapper::toDomain);
+    }
+
+    public Long totalColleges() {
+        return collegeRepository.count();
     }
 
     public boolean collegeExists(@NotNull String collegeName) {
@@ -61,14 +67,15 @@ public class CollegeService {
         mapper.updateDomainFromEntity(entity, college);
     }
 
-    public void deleteCollege(@NotNull UUID collegeId) {
+    public Boolean deleteCollege(@NotNull UUID collegeId) {
         CollegeEntity entity = findById(collegeId);
         College domain = mapper.toDomain(entity);
-        collegeRepository.deleteById(entity.getCollegeId());
+        boolean deleted = collegeRepository.deleteById(entity.getCollegeId());
         mapper.updateDomainFromEntity(entity, domain);
+        return deleted;
     }
 
-    private CollegeEntity findById(@NotNull UUID collegeId) {
+    private CollegeEntity findById(UUID collegeId) {
         return collegeRepository.findByIdOptional(collegeId)
                 .orElseThrow(() -> new ServiceException("No college found for collegeId[%s]", collegeId));
     }

@@ -1,10 +1,8 @@
 package com.japhet_sebastian.employee;
 
-
-import com.assets.management.assets.model.entity.Address;
-import com.assets.management.assets.model.entity.Department;
-import com.assets.management.assets.model.entity.Person;
 import com.assets.management.assets.model.valueobject.EmploymentStatus;
+import com.japhet_sebastian.organization.entity.AddressEntity;
+import com.japhet_sebastian.organization.entity.DepartmentEntity;
 import io.quarkus.panache.common.Parameters;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -23,8 +21,8 @@ import java.util.Set;
                         columnNames = {"email_address", "phone_number"}),
                 @UniqueConstraint(name = "unique_work_id", columnNames = {"work_id"})})
 @NamedQueries({
-        @NamedQuery(name = "Employee.getEmailOrPhone",
-                query = "FROM Employee WHERE email = :email OR mobile = :mobile")
+        @NamedQuery(name = "EmployeeEntity.getEmailOrPhone",
+                query = "FROM EmployeeEntity WHERE email = :email OR mobile = :mobile")
 })
 @Schema(description = "Employee representation")
 public class EmployeeEntity extends Person {
@@ -53,10 +51,10 @@ public class EmployeeEntity extends Person {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "department_fk", foreignKey = @ForeignKey(name = "employee_department_fk_constraint", foreignKeyDefinition = ""))
-    public Department department;
+    public DepartmentEntity department;
 
     @OneToOne(mappedBy = "employee", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    public Address address;
+    public AddressEntity address;
 
     @Transient
     public Integer age;
