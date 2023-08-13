@@ -19,6 +19,7 @@
         <skipITs>false</skipITs>
         <surefire-plugin.version>3.0.0</surefire-plugin.version>
         <wiremock.version>2.35.0</wiremock.version>
+        <testcontainers.keyckloak.version>3.0.0</testcontainers.keyckloak.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
     </properties>
     <dependencyManagement>
@@ -130,6 +131,12 @@
             <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock-jre8</artifactId>
             <version>${wiremock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.dasniko</groupId>
+            <artifactId>testcontainers-keycloak</artifactId>
+            <version>${testcontainers.keyckloak.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

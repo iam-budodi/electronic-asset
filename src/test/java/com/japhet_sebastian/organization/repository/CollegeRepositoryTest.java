@@ -11,9 +11,9 @@ class CollegeRepositoryTest {
     @Inject
     CollegeRepository repository;
 
-    @Test
-    public void testSearchCollege() {
-
-    }
+//    @Test
+//    public void testSearchCollege() {
+//
+//    }
 
 }

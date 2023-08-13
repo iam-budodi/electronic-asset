@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class College {
 
-    private UUID collegeId;
+    private String collegeId;
 
     @NotEmpty(message = "{College.name.required}")
     @Size(min = 2, max = 64, message = "{Sixty-four.string.length}")
@@ -20,16 +20,14 @@ public class College {
     @Pattern(regexp = "^[\\p{L}\\p{Nd} _]+$", message = "{Alphanumeric.character}")
     private String collegeCode;
 
-    private Address location;
-
     public College() {
     }
 
-    public UUID getCollegeId() {
+    public String getCollegeId() {
         return collegeId;
     }
 
-    public void setCollegeId(UUID collegeId) {
+    public void setCollegeId(String collegeId) {
         this.collegeId = collegeId;
     }
 
@@ -49,27 +47,16 @@ public class College {
         this.collegeCode = collegeCode;
     }
 
-    public Address getLocation() {
-        return location;
-    }
-
-    public void setLocation(Address location) {
-        this.location = location;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof College college)) return false;
-        return Objects.equals(getCollegeId(), college.getCollegeId())
-                && Objects.equals(getCollegeName(), college.getCollegeName())
-                && Objects.equals(getCollegeCode(), college.getCollegeCode())
-                && Objects.equals(getLocation(), college.getLocation());
+        return Objects.equals(getCollegeId(), college.getCollegeId()) && Objects.equals(getCollegeName(), college.getCollegeName()) && Objects.equals(getCollegeCode(), college.getCollegeCode());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCollegeId(), getCollegeName(), getCollegeCode(), getLocation());
+        return Objects.hash(getCollegeId(), getCollegeName(), getCollegeCode());
     }
 
     @Override
@@ -78,7 +65,6 @@ public class College {
                 "collegeId='" + collegeId + '\'' +
                 ", collegeName='" + collegeName + '\'' +
                 ", collegeCode='" + collegeCode + '\'' +
-                ", location=" + location +
                 '}';
     }
 }

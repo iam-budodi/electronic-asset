@@ -33,15 +33,24 @@ public class CollegeEntity {
     @Column(name = "college_code")
     private String collegeCode;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "location_id", foreignKey = @ForeignKey(name = "college_address_fk_constraint"))
-    private AddressEntity location;
+//    @OneToOne(mappedBy = "college", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+//    private AddressEntity location;
 
     public CollegeEntity() {
     }
 
+    public CollegeEntity(UUID collegeId, String collegeName, String collegeCode) {
+        this.collegeId = collegeId;
+        this.collegeName = collegeName;
+        this.collegeCode = collegeCode;
+    }
+
     public UUID getCollegeId() {
         return collegeId;
+    }
+
+    public void setCollegeId(UUID collegeId) {
+        this.collegeId = collegeId;
     }
 
     public String getCollegeName() {
@@ -60,13 +69,13 @@ public class CollegeEntity {
         this.collegeCode = collegeCode;
     }
 
-    public AddressEntity getLocation() {
-        return location;
-    }
-
-    public void setLocation(AddressEntity location) {
-        this.location = location;
-    }
+//    public AddressEntity getLocation() {
+//        return location;
+//    }
+//
+//    public void setLocation(AddressEntity location) {
+//        this.location = location;
+//    }
 
     @Override
     public boolean equals(Object o) {
@@ -74,13 +83,12 @@ public class CollegeEntity {
         if (!(o instanceof CollegeEntity entity)) return false;
         return Objects.equals(getCollegeId(), entity.getCollegeId())
                 && Objects.equals(getCollegeName(), entity.getCollegeName())
-                && Objects.equals(getCollegeCode(), entity.getCollegeCode())
-                && Objects.equals(getLocation(), entity.getLocation());
+                && Objects.equals(getCollegeCode(), entity.getCollegeCode());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCollegeId(), getCollegeName(), getCollegeCode(), getLocation());
+        return Objects.hash(getCollegeId(), getCollegeName(), getCollegeCode() /*, getLocation()*/);
     }
 
     @Override
@@ -89,7 +97,7 @@ public class CollegeEntity {
                 "collegeId=" + collegeId +
                 ", collegeName='" + collegeName + '\'' +
                 ", collegeCode='" + collegeCode + '\'' +
-                ", location=" + location +
+//                ", location=" + location +
                 '}';
     }
 }

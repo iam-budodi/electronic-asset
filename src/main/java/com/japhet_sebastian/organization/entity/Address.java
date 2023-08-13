@@ -8,49 +8,38 @@ import java.util.Objects;
 
 public class Address {
 
-    @NotEmpty(message = "{Address.field.required}")
-    @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
-    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
-    public String street;
-    @NotEmpty(message = "{Address.field.required}")
-    @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
-    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
-    public String ward;
-    @NotEmpty(message = "{Address.field.required}")
-    @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
-    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
-    public String district;
-    @NotEmpty(message = "{Address.field.required}")
-    @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
-    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
-    public String city;
-    @Size(min = 5, max = 5, message = "{Postal.code.length}")
-    @Pattern(regexp = "^\\d{5}$", message = "{Postal.code.length}")
-    public String postalCode;
-    @NotEmpty(message = "{Address.field.required}")
-    @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
-    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
-    public String country;
     private String addressId;
 
-//    @JsonIgnore
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(
-//            name = "employee_fk",
-//            foreignKey = @ForeignKey(
-//                    name = "employee_address_fk_constraint",
-//                    foreignKeyDefinition = ""))
-//    public Employee employee;
-//
-//    @JsonIgnore
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(
-//            name = "supplier_fk",
-//            foreignKey = @ForeignKey(
-//                    name = "supplier_address_fk_constraint",
-//                    foreignKeyDefinition = ""))
-//    public Supplier supplier;
+    @NotEmpty(message = "{Address.field.required}")
+    @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
+    private String street;
 
+    @NotEmpty(message = "{Address.field.required}")
+    @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
+    private String ward;
+
+    @NotEmpty(message = "{Address.field.required}")
+    @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
+    private String district;
+
+    @NotEmpty(message = "{Address.field.required}")
+    @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
+    private String city;
+
+    @Size(min = 5, max = 5, message = "{Postal.code.length}")
+    @Pattern(regexp = "^\\d{5}$", message = "{Postal.code.length}")
+    private String postalCode;
+
+    @NotEmpty(message = "{Address.field.required}")
+    @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
+    private String country;
+
+//    private College college;
 
     public Address() {
     }
@@ -111,6 +100,14 @@ public class Address {
         this.country = country;
     }
 
+//    public College getCollege() {
+//        return college;
+//    }
+//
+//    public void setCollege(College college) {
+//        this.college = college;
+//    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -132,7 +129,7 @@ public class Address {
                 ", district='" + district + '\'' +
                 ", city='" + city + '\'' +
                 ", postalCode='" + postalCode + '\'' +
-                ", country='" + country + '\'' +
+                ", country='" + country +
                 '}';
     }
 }

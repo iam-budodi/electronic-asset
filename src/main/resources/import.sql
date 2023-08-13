@@ -1,12 +1,18 @@
--- ADDRESSES
-insert into addresses (address_uuid, city, country, district_name, postal_code, street_name, ward_name)
-VALUES ('a08bf048-354d-11ee-be56-0242ac120002', 'Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi', 'kijitonyama');
-
 -- COLLEGES
-insert into colleges (college_uuid, college_name, college_code, location_id)
-VALUES ('64365d7c-354d-11ee-be56-0242ac120002', 'College of Information and Communication Technology', 'CoICT', 'a08bf048-354d-11ee-be56-0242ac120002');
-insert into colleges (college_uuid, college_name, college_code, location_id)
-VALUES ('849ea0ce-354d-11ee-be56-0242ac120002', 'College of Agricultural Sciences and Fisheries', 'CoAF', 'a08bf048-354d-11ee-be56-0242ac120002');
+insert into colleges (college_uuid, college_name, college_code)
+VALUES ('64365d7c-354d-11ee-be56-0242ac120002', 'College of Information and Communication Technology', 'CoICT');
+insert into colleges (college_uuid, college_name, college_code)
+VALUES ('849ea0ce-354d-11ee-be56-0242ac120002', 'College of Agricultural Sciences and Fisheries', 'CoAF');
+
+-- ADDRESSES
+insert into addresses (city, country, district_name, postal_code, street_name, ward_name, college_uuid)
+VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi',
+        'kijitonyama', '64365d7c-354d-11ee-be56-0242ac120002');
+
+insert into addresses (city, country, district_name, postal_code, street_name, ward_name, college_uuid)
+VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi',
+        'kijitonyama', '849ea0ce-354d-11ee-be56-0242ac120002');
+
 
 -- DEPARTMENT TABLE - add 4 more dept
 -- insert into departments (id, department_code, description, department_name, college_fk)

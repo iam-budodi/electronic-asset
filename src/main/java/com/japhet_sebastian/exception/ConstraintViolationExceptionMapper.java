@@ -12,7 +12,7 @@ public class ConstraintViolationExceptionMapper implements ExceptionMapper<Const
     @Override
     public Response toResponse(ConstraintViolationException cve) {
         List<ErrorResponse.ErrorMessage> errorMessages = cve.getConstraintViolations().stream().map(
-                violation -> new ErrorResponse.ErrorMessage(violation.getPropertyPath().toString(), violation.getMessage()))
+                        violation -> new ErrorResponse.ErrorMessage(violation.getPropertyPath().toString(), violation.getMessage()))
                 .toList();
         return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse(errorMessages)).build();
     }

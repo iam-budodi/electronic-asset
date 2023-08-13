@@ -28,6 +28,26 @@ public class ErrorResponse {
     public ErrorResponse() {
     }
 
+    public String getErrorId() {
+        return errorId;
+    }
+
+    public List<ErrorMessage> getErrors() {
+        return errors;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ErrorResponse that)) return false;
+        return Objects.equals(getErrorId(), that.getErrorId()) && Objects.equals(getErrors(), that.getErrors());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getErrorId(), getErrors());
+    }
+
     public static class ErrorMessage {
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -66,25 +86,13 @@ public class ErrorResponse {
         public int hashCode() {
             return Objects.hash(getPath(), getMessage());
         }
-    }
 
-    public String getErrorId() {
-        return errorId;
-    }
-
-    public List<ErrorMessage> getErrors() {
-        return errors;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ErrorResponse that)) return false;
-        return Objects.equals(getErrorId(), that.getErrorId()) && Objects.equals(getErrors(), that.getErrors());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getErrorId(), getErrors());
+        @Override
+        public String toString() {
+            return "ErrorMessage{" +
+                    "path='" + path + '\'' +
+                    ", message='" + message + '\'' +
+                    '}';
+        }
     }
 }

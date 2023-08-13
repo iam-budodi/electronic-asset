@@ -15,47 +15,59 @@ import java.util.UUID;
 @Table(name = "addresses")
 public class AddressEntity {
 
+    @Id
+    private UUID addressId;
+
     @NotEmpty(message = "{Address.field.required}")
     @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     @Column(name = "street_name", length = 32, nullable = false)
     public String street;
+
     @NotEmpty(message = "{Address.field.required}")
     @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     @Column(name = "ward_name", length = 32, nullable = false)
     public String ward;
+
     @NotEmpty(message = "{Address.field.required}")
     @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     @Column(name = "district_name", length = 32, nullable = false)
     public String district;
+
     @NotEmpty(message = "{Address.field.required}")
     @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     @Column(length = 32, nullable = false)
     public String city;
+
     @Size(min = 5, max = 5, message = "{Postal.code.length}")
     @Pattern(regexp = "^\\d{5}$", message = "{Postal.code.length}")
     @Column(name = "postal_code", length = 5, nullable = false)
     public String postalCode;
+
     @NotEmpty(message = "{Address.field.required}")
     @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     @Column(length = 32, nullable = false)
     public String country;
+
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_fk", foreignKey = @ForeignKey(name = "employee_address_fk_constraint"))
     public EmployeeEntity employee;
+
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_fk", foreignKey = @ForeignKey(name = "supplier_address_fk_constraint"))
     public SupplierEntity supplier;
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "address_uuid")
-    private UUID addressId;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "college_uuid", foreignKey = @ForeignKey(name = "college_address_fk_constraint"))
+    public CollegeEntity college;
+
 
     public AddressEntity() {
     }
@@ -132,16 +144,34 @@ public class AddressEntity {
         this.supplier = supplier;
     }
 
+    public CollegeEntity getCollege() {
+        return college;
+    }
+
+    public void setCollege(CollegeEntity college) {
+        this.college = college;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof AddressEntity that)) return false;
-        return Objects.equals(getAddressId(), that.getAddressId()) && Objects.equals(getStreet(), that.getStreet()) && Objects.equals(getWard(), that.getWard()) && Objects.equals(getDistrict(), that.getDistrict()) && Objects.equals(getCity(), that.getCity()) && Objects.equals(getPostalCode(), that.getPostalCode()) && Objects.equals(getCountry(), that.getCountry()) && Objects.equals(getEmployee(), that.getEmployee()) && Objects.equals(getSupplier(), that.getSupplier());
+        if (!(o instanceof AddressEntity address)) return false;
+        return Objects.equals(getAddressId(), address.getAddressId())
+                && Objects.equals(getStreet(), address.getStreet())
+                && Objects.equals(getWard(), address.getWard())
+                && Objects.equals(getDistrict(), address.getDistrict())
+                && Objects.equals(getCity(), address.getCity())
+                && Objects.equals(getPostalCode(), address.getPostalCode())
+                && Objects.equals(getCountry(), address.getCountry())
+                && Objects.equals(getEmployee(), address.getEmployee())
+                && Objects.equals(getSupplier(), address.getSupplier())
+                && Objects.equals(getCollege(), address.getCollege());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getAddressId(), getStreet(), getWard(), getDistrict(), getCity(), getPostalCode(), getCountry(), getEmployee(), getSupplier());
+        return Objects.hash(getAddressId(), getStreet(), getWard(), getDistrict(), getCity(),
+                getPostalCode(), getCountry(), getEmployee(), getSupplier(), getCollege());
     }
 
     @Override
@@ -156,6 +186,7 @@ public class AddressEntity {
                 ", country='" + country + '\'' +
                 ", employee=" + employee +
                 ", supplier=" + supplier +
+                ", college=" + college +
                 '}';
     }
 }

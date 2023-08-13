@@ -3,9 +3,11 @@ package com.japhet_sebastian.organization.boundary;
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.control.CollegeService;
 import com.japhet_sebastian.organization.entity.College;
+import com.japhet_sebastian.organization.entity.CollegeAddress;
 import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
@@ -27,14 +29,16 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
-@Path("/college")
+@Path(CollegeResource.RESOURCE_PATH)
+@Transactional
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @SecurityRequirement(name = "Keycloak")
 @Tag(name = "College Endpoint", description = "College related operations")
-public class CollegeResource {
+public class CollegeResource extends AbstractGenericType {
+
+    public static final String RESOURCE_PATH = "/colleges";
 
     @Inject
     CollegeService collegeService;
@@ -46,11 +50,11 @@ public class CollegeResource {
             description = "Lists all the colleges",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = College.class, type = SchemaType.ARRAY)))
+                    schema = @Schema(implementation = CollegeAddress.class, type = SchemaType.ARRAY)))
     public Response allColleges(@BeanParam PageRequest pageRequest) {
-        List<College> colleges = collegeService.listColleges(pageRequest);
-        Long totalCount = collegeService.totalColleges();
-        return Response.ok(colleges).header("X-Total-Count", totalCount).build();
+        List<CollegeAddress> collegeAddresses = this.collegeService.listColleges(pageRequest);
+        Long totalCount = this.collegeService.totalColleges();
+        return Response.ok(collegeAddresses).header("X-Total-Count", totalCount).build();
     }
 
     @GET
@@ -62,22 +66,23 @@ public class CollegeResource {
                     description = "Get college by college identifier",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON,
-                            schema = @Schema(implementation = College.class, type = SchemaType.OBJECT))),
+                            schema = @Schema(implementation = CollegeAddress.class, type = SchemaType.OBJECT))),
             @APIResponse(
                     responseCode = "404",
                     description = "College does not exist for a given identifier",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON))
     })
     public Response getCollege(
-            @Parameter(description = "College identifier", required = true) @PathParam("collegeId") @NotNull UUID collegeId) {
-        return collegeService.findCollege(collegeId)
+            @Parameter(description = "College identifier", required = true)
+            @PathParam("collegeId") @NotNull String collegeId) {
+        return this.collegeService.getCollege(collegeId)
                 .map(college -> Response.ok(college).build())
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
     }
 
     @GET
     @Path("/select")
-    @Operation(summary = "Get all selection options projection of the colleg")
+    @Operation(summary = "Get all selection options projection of the college")
     @APIResponse(
             responseCode = "200",
             description = "Return an object with identifier and name as key value pair",
@@ -86,7 +91,7 @@ public class CollegeResource {
                     schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY))
     )
     public Response selectOptions() {
-        return Response.ok(collegeService.selected()).build();
+        return Response.ok(this.collegeService.selected()).build();
     }
 
     @POST
@@ -108,9 +113,10 @@ public class CollegeResource {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON))
     })
     public Response createCollege(@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
-            schema = @Schema(implementation = College.class))) @Valid College college, @Context UriInfo uriInfo) {
-        collegeService.addCollege(college);
-        URI collegeURI = uriInfo.getAbsolutePathBuilder().path(college.getCollegeId().toString()).build();
+            schema = @Schema(implementation = CollegeAddress.class, type = SchemaType.OBJECT)))
+                                      @Valid CollegeAddress collegeAddress, @Context UriInfo uriInfo) {
+        this.collegeService.addCollege(collegeAddress);
+        URI collegeURI = genericUriBuilder(collegeAddress.getCollegeId(), uriInfo).build();
         return Response.created(collegeURI).build();
     }
 
@@ -142,7 +148,7 @@ public class CollegeResource {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON)),
     })
     public Response updateCollege(
-            @Parameter(description = "College identifier", required = true) @PathParam("collegeId") @NotNull UUID collegeId,
+            @Parameter(description = "College identifier", required = true) @PathParam("collegeId") @NotNull String collegeId,
             @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = College.class, type = SchemaType.OBJECT)))
             @Valid College college) {
@@ -168,7 +174,8 @@ public class CollegeResource {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON))
     })
     public Response deleteCollege(
-            @Parameter(description = "College identifier", required = true) @PathParam("collegeId") @NotNull UUID collegeId) {
+            @Parameter(description = "College identifier", required = true)
+            @PathParam("collegeId") @NotNull String collegeId) {
         return collegeService.deleteCollege(collegeId)
                 ? Response.status(Response.Status.NO_CONTENT).build()
                 : Response.status(Response.Status.NOT_FOUND).build();
