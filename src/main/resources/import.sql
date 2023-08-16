@@ -6,20 +6,20 @@ VALUES ('849ea0ce-354d-11ee-be56-0242ac120002', 'College of Agricultural Science
 
 -- ADDRESSES
 insert into addresses (city, country, district_name, postal_code, street_name, ward_name, college_uuid)
-VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi',
-        'kijitonyama', '64365d7c-354d-11ee-be56-0242ac120002');
-
+VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi', 'kijitonyama',
+        '64365d7c-354d-11ee-be56-0242ac120002');
 insert into addresses (city, country, district_name, postal_code, street_name, ward_name, college_uuid)
-VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi',
-        'kijitonyama', '849ea0ce-354d-11ee-be56-0242ac120002');
-
+VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi', 'kijitonyama',
+        '849ea0ce-354d-11ee-be56-0242ac120002');
 
 -- DEPARTMENT TABLE - add 4 more dept
--- insert into departments (id, department_code, description, department_name, college_fk)
--- VALUES (100, 'CSE', 'Computer science and Engineering', 'Computer Science and Engineering', 50);
--- insert into departments (id, department_code, description, department_name, college_fk)
--- VALUES (101, 'TE', 'Telecommunication engineering', 'Telecommunication Engineering', 50);
---
+insert into departments (department_uuid, department_code, description, department_name, college_uuid)
+VALUES ('849ea0ce-354d-11ee-be56-0242ac120022', 'CSE', 'Computer science and Engineering',
+        'Computer Science and Engineering', '64365d7c-354d-11ee-be56-0242ac120002');
+insert into departments (department_uuid, department_code, description, department_name, college_uuid)
+VALUES ('849ea0ce-354d-11ee-be56-0242ac120024', 'TE', 'Telecommunication engineering', 'Telecommunication Engineering',
+        '64365d7c-354d-11ee-be56-0242ac120002');
+
 -- -- EMPLOYEE TABLE - add at least 19 more employee
 -- insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name,
 --                        phone_number, birthdate, hire_date, work_id, department_fk)

@@ -2,7 +2,7 @@ package com.japhet_sebastian.organization.entity;
 
 import java.util.Objects;
 
-public class CollegeAddress extends College {
+public class CollegeAddress {
     Address address;
 
     public Address getAddress() {

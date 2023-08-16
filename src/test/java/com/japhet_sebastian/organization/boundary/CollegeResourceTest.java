@@ -4,7 +4,6 @@ import com.japhet_sebastian.AccessTokenProvider;
 import com.japhet_sebastian.KeycloakResource;
 import com.japhet_sebastian.exception.ErrorResponse;
 import com.japhet_sebastian.organization.control.CollegeAddressMapper;
-import com.japhet_sebastian.organization.control.CollegeMapper;
 import com.japhet_sebastian.organization.entity.Address;
 import com.japhet_sebastian.organization.entity.College;
 import com.japhet_sebastian.organization.entity.CollegeAddress;
@@ -35,9 +34,6 @@ class CollegeResourceTest extends AccessTokenProvider {
 
     @Inject
     CollegeAddressMapper collegeAddressMapper;
-
-    @Inject
-    CollegeMapper collegeMapper;
 
     @TestHTTPResource("collegeId")
     @TestHTTPEndpoint(CollegeResource.class)
@@ -115,7 +111,7 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .statusCode(OK.getStatusCode())
                 .extract().as(CollegeAddress.class);
 
-        assertThat(uuid, equalTo(found.getCollegeId()));
+        assertThat(uuid, equalTo(found.getAddress().getAddressId()));
     }
 
     @Test
@@ -135,7 +131,7 @@ class CollegeResourceTest extends AccessTokenProvider {
     void saveCollege() {
         final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
         CollegeAddress collegeAddress = createCollegeAddress();
-        collegeAddress.setCollegeCode("CoNAS");
+        collegeAddress.getAddress().getCollege().setCollegeCode("CoNAS");
         String url = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
@@ -154,7 +150,7 @@ class CollegeResourceTest extends AccessTokenProvider {
     @Order(7)
     void saveFailsNoCollegeName() {
         CollegeAddress collegeAddress = createCollegeAddress();
-        collegeAddress.setCollegeName(null);
+        collegeAddress.getAddress().getCollege().setCollegeName(null);
         ErrorResponse errorResponse = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
@@ -196,8 +192,8 @@ class CollegeResourceTest extends AccessTokenProvider {
     @Order(9)
     void saveConstraintViolations() {
         CollegeAddress collegeAddress = createCollegeAddress();
-        collegeAddress.setCollegeName(null);
-        collegeAddress.setCollegeCode(RandomStringUtils.randomAlphanumeric(12));
+        collegeAddress.getAddress().getCollege().setCollegeName(null);
+        collegeAddress.getAddress().getCollege().setCollegeCode(RandomStringUtils.randomAlphanumeric(12));
         ErrorResponse errorResponse = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
@@ -221,7 +217,7 @@ class CollegeResourceTest extends AccessTokenProvider {
     void updateCollege() {
         final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
         CollegeAddress collegeAddress = createCollegeAddress();
-        collegeAddress.setCollegeName("Original college name before update");
+        collegeAddress.getAddress().getCollege().setCollegeName("Original college name before update");
         String url = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
@@ -232,7 +228,7 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .extract().response().getHeader("Location");
 
         assertThat(url, notNullValue());
-        assertThat(collegeAddress.getCollegeName(), is(equalTo("Original college name before update")));
+        assertThat(collegeAddress.getAddress().getCollege().getCollegeName(), is(equalTo("Original college name before update")));
         String uuid = url.substring(url.lastIndexOf("/") + 1);
         assertThat(uuid, matchesRegex(UUID_REGEX));
 
@@ -243,9 +239,9 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .statusCode(OK.getStatusCode())
                 .extract().as(CollegeAddress.class);
 
-        assertThat(uuid, equalTo(found.getCollegeId()));
+        assertThat(uuid, equalTo(found.getAddress().getAddressId()));
 
-        College updateCollege = this.collegeAddressMapper.toCollege(this.collegeMapper.toCollegeEntity(found));
+        College updateCollege = this.collegeAddressMapper.toCollege(found);
         updateCollege.setCollegeName("Updated college name");
 
         given()
@@ -263,7 +259,7 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .statusCode(OK.getStatusCode())
                 .extract().as(CollegeAddress.class);
 
-        assertThat(updated.getCollegeName(), is(equalTo("Updated college name")));
+        assertThat(updated.getAddress().getCollege().getCollegeName(), is(equalTo("Updated college name")));
     }
 
     @Test
@@ -271,7 +267,7 @@ class CollegeResourceTest extends AccessTokenProvider {
     void updateFailsNoCollegeName() {
         final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
         CollegeAddress collegeAddress = createCollegeAddress();
-        collegeAddress.setCollegeName("This update should fail");
+        collegeAddress.getAddress().getCollege().setCollegeName("This update should fail");
         String url = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
@@ -282,7 +278,7 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .extract().response().getHeader("Location");
 
         assertThat(url, notNullValue());
-        assertThat(collegeAddress.getCollegeName(), is(equalTo("This update should fail")));
+        assertThat(collegeAddress.getAddress().getCollege().getCollegeName(), is(equalTo("This update should fail")));
         String uuid = url.substring(url.lastIndexOf("/") + 1);
         assertThat(uuid, matchesRegex(UUID_REGEX));
 
@@ -293,9 +289,9 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .statusCode(OK.getStatusCode())
                 .extract().as(CollegeAddress.class);
 
-        assertThat(uuid, equalTo(found.getCollegeId()));
+        assertThat(uuid, equalTo(found.getAddress().getAddressId()));
 
-        College updateCollege = this.collegeAddressMapper.toCollege(this.collegeMapper.toCollegeEntity(found));
+        College updateCollege = this.collegeAddressMapper.toCollege(found);
         updateCollege.setCollegeName(null);
 
         ErrorResponse errorResponse = given()
@@ -325,8 +321,8 @@ class CollegeResourceTest extends AccessTokenProvider {
         address.setCountry("Tanzania");
 
         CollegeAddress collegeAddress = new CollegeAddress();
-        collegeAddress.setCollegeName("College of Engineering Technology");
-        collegeAddress.setCollegeCode("CoET");
+        collegeAddress.getAddress().getCollege().setCollegeName("College of Engineering Technology");
+        collegeAddress.getAddress().getCollege().setCollegeCode("CoET");
         collegeAddress.setAddress(address);
         return collegeAddress;
     }

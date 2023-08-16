@@ -12,38 +12,38 @@ import java.util.UUID;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface CollegeAddressMapper {
 
-    @Mappings({
-            @Mapping(target = "collegeId", expression = "java(collegeEntity.getCollegeId().toString())"),
-            @Mapping(target = "collegeName", source = "collegeEntity.collegeName"),
-            @Mapping(target = "collegeCode", source = "collegeEntity.collegeCode"),
-            @Mapping(target = "address.addressId", expression = "java(addressEntity.getAddressId().toString())"),
-            @Mapping(target = "address.street", source = "addressEntity.street"),
-            @Mapping(target = "address.ward", source = "addressEntity.ward"),
-            @Mapping(target = "address.district", source = "addressEntity.district"),
-            @Mapping(target = "address.city", source = "addressEntity.city"),
-            @Mapping(target = "address.postalCode", source = "addressEntity.postalCode"),
-            @Mapping(target = "address.country", source = "addressEntity.country")
-    })
-    CollegeAddress toCollegeAddress(CollegeEntity collegeEntity, AddressEntity addressEntity);
+//    @Mappings({
+//            @Mapping(target = "address.college.collegeId", expression = "java(collegeEntity.getCollegeId().toString())"),
+//            @Mapping(target = "address.college.collegeName", source = "collegeEntity.collegeName"),
+//            @Mapping(target = "address.college.collegeCode", source = "collegeEntity.collegeCode"),
+//            @Mapping(target = "address.addressId", expression = "java(addressEntity.getAddressId().toString())"),
+//            @Mapping(target = "address.street", source = "addressEntity.street"),
+//            @Mapping(target = "address.ward", source = "addressEntity.ward"),
+//            @Mapping(target = "address.district", source = "addressEntity.district"),
+//            @Mapping(target = "address.city", source = "addressEntity.city"),
+//            @Mapping(target = "address.postalCode", source = "addressEntity.postalCode"),
+//            @Mapping(target = "address.country", source = "addressEntity.country")
+//    })
+//    CollegeAddress toCollegeAddress(CollegeEntity collegeEntity, AddressEntity addressEntity);
 
     @Mappings({
-            @Mapping(target = "collegeId", expression = "java(addressEntity.college.getCollegeId().toString())"),
-            @Mapping(target = "collegeName", source = "addressEntity.college.collegeName"),
-            @Mapping(target = "collegeCode", source = "addressEntity.college.collegeCode"),
-            @Mapping(target = "address.addressId", expression = "java(addressEntity.getAddressId().toString())"),
-            @Mapping(target = "address.street", source = "addressEntity.street"),
-            @Mapping(target = "address.ward", source = "addressEntity.ward"),
-            @Mapping(target = "address.district", source = "addressEntity.district"),
-            @Mapping(target = "address.city", source = "addressEntity.city"),
-            @Mapping(target = "address.postalCode", source = "addressEntity.postalCode"),
-            @Mapping(target = "address.country", source = "addressEntity.country")
+            @Mapping(target = "address.college.collegeId", source = "address.addressId"),
+            @Mapping(target = "address.college.collegeName", source = "address.college.collegeName"),
+            @Mapping(target = "address.college.collegeCode", source = "address.college.collegeCode"),
+            @Mapping(target = "address.addressId", source = "address.addressId"),
+            @Mapping(target = "address.street", source = "address.street"),
+            @Mapping(target = "address.ward", source = "address.ward"),
+            @Mapping(target = "address.district", source = "address.district"),
+            @Mapping(target = "address.city", source = "address.city"),
+            @Mapping(target = "address.postalCode", source = "address.postalCode"),
+            @Mapping(target = "address.country", source = "address.country")
     })
-    CollegeAddress toCollegeAddress(AddressEntity addressEntity);
+    CollegeAddress toCollegeAddress(Address address);
 
     @Mappings({
-            @Mapping(target = "collegeId", expression = "java(addressEntities.college.getCollegeId().toString())"),
-            @Mapping(target = "collegeName", source = "addressEntities.college.collegeName"),
-            @Mapping(target = "collegeCode", source = "addressEntities.college.collegeCode"),
+            @Mapping(target = "address.collegeId", expression = "java(addressEntities.college.getCollegeId().toString())"),
+            @Mapping(target = "address.collegeName", source = "addressEntities.college.collegeName"),
+            @Mapping(target = "address.collegeCode", source = "addressEntities.college.collegeCode"),
             @Mapping(target = "address.addressId", expression = "java(addressEntities.getAddressId().toString())"),
             @Mapping(target = "address.street", source = "addressEntities.street"),
             @Mapping(target = "address.ward", source = "addressEntities.ward"),
@@ -56,8 +56,8 @@ public interface CollegeAddressMapper {
 
     @Mappings({
             @Mapping(target = "collegeId", ignore = true),
-            @Mapping(target = "collegeName", source = "collegeAddress.collegeName"),
-            @Mapping(target = "collegeCode", source = "collegeAddress.collegeCode")
+            @Mapping(target = "collegeName", source = "collegeAddress.address.college.collegeName"),
+            @Mapping(target = "collegeCode", source = "collegeAddress.address.college.collegeCode")
     })
     CollegeEntity toCollegeEntity(CollegeAddress collegeAddress);
 
@@ -74,8 +74,11 @@ public interface CollegeAddressMapper {
     })
     AddressEntity toAddressEntity(CollegeAddress collegeAddress);
 
-    @Mapping(target = "collegeId", expression = "java(collegeEntity.getCollegeId().toString())")
-    College toCollege(CollegeEntity collegeEntity);
+//    @Mapping(target = "collegeId", expression = "java(collegeEntity.getCollegeId().toString())")
+//    College toCollege(CollegeEntity collegeEntity);
+
+    @Mapping(target = "collegeId", source = "collegeAddress.address.addressId")
+    College toCollege(CollegeAddress collegeAddress);
 
 
     @Mapping(target = "addressId", expression = "java(addressEntity.getAddressId().toString())")
@@ -85,8 +88,8 @@ public interface CollegeAddressMapper {
 
     @AfterMapping
     default void setCollegeEntityId(CollegeAddress collegeAddress, @MappingTarget CollegeEntity collegeEntity) {
-        if (Objects.nonNull(collegeAddress.getCollegeId()))
-            collegeEntity.setCollegeId(UUID.fromString(collegeAddress.getCollegeId()));
+        if (Objects.nonNull(collegeAddress.getAddress().getAddressId()))
+            collegeEntity.setCollegeId(UUID.fromString(collegeAddress.getAddress().getAddressId()));
     }
 
     @AfterMapping

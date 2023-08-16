@@ -1,4 +1,4 @@
-package com.japhet_sebastian.vo;
+package com.japhet_sebastian.organization.boundary;
 
 import jakarta.ws.rs.DefaultValue;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
@@ -10,16 +10,16 @@ public class PageRequest {
 
     @RestQuery("page")
     @DefaultValue("0")
-    @Parameter(description = "Page index", required = false)
+    @Parameter(description = "Page index")
     private Integer pageNum;
 
     @RestQuery("size")
     @DefaultValue("10")
-    @Parameter(description = "Page size", required = false)
+    @Parameter(description = "Page size")
     private Integer pageSize;
 
     @RestQuery("search")
-    @Parameter(description = "Search query parameter", required = false)
+    @Parameter(description = "Search query parameter")
     private String search;
 
     public Integer getPageNum() {
@@ -50,13 +50,12 @@ public class PageRequest {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof PageRequest that)) return false;
-        return Objects.equals(getPageNum(), that.getPageNum())
-                && Objects.equals(getPageSize(), that.getPageSize())
-                && Objects.equals(getSearch(), that.getSearch());
+        return Objects.equals(getPageNum(), that.getPageNum()) && Objects.equals(getPageSize(), that.getPageSize()) && Objects.equals(getSearch(), that.getSearch());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getPageNum(), getPageSize(), getSearch());
     }
+
 }

@@ -15,58 +15,49 @@ import java.util.UUID;
 @Table(name = "addresses")
 public class AddressEntity {
 
-    @Id
-    private UUID addressId;
-
     @NotEmpty(message = "{Address.field.required}")
     @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     @Column(name = "street_name", length = 32, nullable = false)
     public String street;
-
     @NotEmpty(message = "{Address.field.required}")
     @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     @Column(name = "ward_name", length = 32, nullable = false)
     public String ward;
-
     @NotEmpty(message = "{Address.field.required}")
     @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     @Column(name = "district_name", length = 32, nullable = false)
     public String district;
-
     @NotEmpty(message = "{Address.field.required}")
     @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     @Column(length = 32, nullable = false)
     public String city;
-
     @Size(min = 5, max = 5, message = "{Postal.code.length}")
     @Pattern(regexp = "^\\d{5}$", message = "{Postal.code.length}")
     @Column(name = "postal_code", length = 5, nullable = false)
     public String postalCode;
-
     @NotEmpty(message = "{Address.field.required}")
     @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     @Column(length = 32, nullable = false)
     public String country;
-
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_fk", foreignKey = @ForeignKey(name = "employee_address_fk_constraint"))
     public EmployeeEntity employee;
-
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_fk", foreignKey = @ForeignKey(name = "supplier_address_fk_constraint"))
     public SupplierEntity supplier;
-
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "college_uuid", foreignKey = @ForeignKey(name = "college_address_fk_constraint"))
     public CollegeEntity college;
+    @Id
+    private UUID addressId;
 
 
     public AddressEntity() {

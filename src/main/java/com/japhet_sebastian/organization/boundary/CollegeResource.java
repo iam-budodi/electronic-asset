@@ -4,7 +4,6 @@ import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.control.CollegeService;
 import com.japhet_sebastian.organization.entity.College;
 import com.japhet_sebastian.organization.entity.CollegeAddress;
-import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -30,13 +29,15 @@ import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 
-@Path(CollegeResource.RESOURCE_PATH)
+import static com.japhet_sebastian.organization.boundary.CollegeResource.RESOURCE_PATH;
+
+@Path(RESOURCE_PATH)
 @Transactional
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @SecurityRequirement(name = "Keycloak")
 @Tag(name = "College Endpoint", description = "College related operations")
-public class CollegeResource extends AbstractGenericType {
+public class CollegeResource extends AbstractCollegeType {
 
     public static final String RESOURCE_PATH = "/colleges";
 
@@ -50,11 +51,11 @@ public class CollegeResource extends AbstractGenericType {
             description = "Lists all the colleges",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = CollegeAddress.class, type = SchemaType.ARRAY)))
+                    schema = @Schema(implementation = College.class, type = SchemaType.ARRAY)))
     public Response allColleges(@BeanParam PageRequest pageRequest) {
-        List<CollegeAddress> collegeAddresses = this.collegeService.listColleges(pageRequest);
+        List<College> colleges = this.collegeService.listColleges(pageRequest);
         Long totalCount = this.collegeService.totalColleges();
-        return Response.ok(collegeAddresses).header("X-Total-Count", totalCount).build();
+        return Response.ok(colleges).header("X-Total-Count", totalCount).build();
     }
 
     @GET
@@ -114,9 +115,9 @@ public class CollegeResource extends AbstractGenericType {
     })
     public Response createCollege(@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
             schema = @Schema(implementation = CollegeAddress.class, type = SchemaType.OBJECT)))
-                                      @Valid CollegeAddress collegeAddress, @Context UriInfo uriInfo) {
+                                  @Valid CollegeAddress collegeAddress, @Context UriInfo uriInfo) {
         this.collegeService.addCollege(collegeAddress);
-        URI collegeURI = genericUriBuilder(collegeAddress.getCollegeId(), uriInfo).build();
+        URI collegeURI = collegeUriBuilder(collegeAddress.getAddress().getCollege().getCollegeId(), uriInfo).build();
         return Response.created(collegeURI).build();
     }
 

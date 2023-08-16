@@ -1,20 +1,22 @@
 package com.japhet_sebastian.organization.control;
 
 import com.japhet_sebastian.exception.ServiceException;
-import com.japhet_sebastian.organization.entity.*;
-import com.japhet_sebastian.vo.PageRequest;
+import com.japhet_sebastian.organization.boundary.PageRequest;
+import com.japhet_sebastian.organization.entity.AddressEntity;
+import com.japhet_sebastian.organization.entity.College;
+import com.japhet_sebastian.organization.entity.CollegeAddress;
+import com.japhet_sebastian.organization.entity.CollegeEntity;
 import com.japhet_sebastian.vo.SelectOptions;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.*;
 
 @ApplicationScoped
-public class CollegeService {
+public class CollegeService implements CollegeInterface {
 
     @Inject
     CollegeRepository collegeRepository;
@@ -28,12 +30,8 @@ public class CollegeService {
     @Inject
     CollegeAddressMapper collegeAddressMapper;
 
-    public List<CollegeAddress> listColleges(PageRequest pageRequest) {
-        if (pageRequest.getSearch() != null)
-            pageRequest.setSearch("%" + pageRequest.getSearch().toLowerCase(Locale.ROOT) + "%");
-
-        List<AddressEntity> addressEntities = this.addressRepository.pageOrListAll(pageRequest);
-        return this.collegeAddressMapper.toCollegeAddressList(addressEntities);
+    public List<College> listColleges(PageRequest pageRequest) {
+        return this.collegeRepository.allColleges(pageRequest);
     }
 
     public Optional<CollegeAddress> getCollege(@NotNull String collegeId) {
@@ -59,7 +57,6 @@ public class CollegeService {
         this.collegeAddressMapper.updateCollegeAddressFromCollegeEntity(collegeEntity, collegeAddress);
     }
 
-    @Transactional
     public void updateCollege(@Valid College college) {
         Log.debug("Updating College: {}" + college);
         if (Objects.isNull(college.getCollegeId())) {

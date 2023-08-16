@@ -38,10 +38,8 @@ public class DepartmentEntity {
     @Column(length = 64)
     private String description;
 
-    @Schema(required = true)
-    @NotEmpty(message = "{Department.field.required}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "college_fk", nullable = false, foreignKey = @ForeignKey(name = "college_department_fk_constraint"))
+    @JoinColumn(name = "college_uuid", nullable = false, foreignKey = @ForeignKey(name = "college_department_fk_constraint"))
     private CollegeEntity college;
 
 //

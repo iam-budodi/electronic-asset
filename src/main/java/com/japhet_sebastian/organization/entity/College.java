@@ -5,7 +5,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class College {
 

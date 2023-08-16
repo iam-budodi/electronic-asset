@@ -13,25 +13,26 @@ import java.util.UUID;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface AddressMapper {
 
-    List<Address> toDomainList(List<AddressEntity> entities);
+    @Mapping(target = "addressId",
+            expression = "java(addressEntity.getAddressId().toString())")
+    Address toAddress(AddressEntity addressEntity);
 
-    @Mapping(target = "addressId", expression = "java(entity.getAddressId().toString())")
-    Address toDomain(AddressEntity entity);
+    List<Address> toAddressList(List<AddressEntity> addressEntities);
 
     @Mapping(target = "addressId", ignore = true)
-    @InheritInverseConfiguration(name = "toDomain")
-    AddressEntity toEntity(Address domain);
+    @InheritInverseConfiguration(name = "toAddress")
+    AddressEntity toAddressEntity(Address address);
 
-    @InheritInverseConfiguration(name = "toDomainList")
-    List<AddressEntity> toEntityList(List<Address> domainList);
+    @InheritInverseConfiguration(name = "toAddressList")
+    List<AddressEntity> toAddressEntities(List<Address> addresses);
 
-    void updateEntityFromDomain(Address domain, @MappingTarget AddressEntity entity);
+    void updateAddressEntityFromAddress(Address address, @MappingTarget AddressEntity addressEntity);
 
-    void updateAddressFromAddressEntity(AddressEntity entity, @MappingTarget Address domain);
+    void updateAddressFromAddressEntity(AddressEntity addressEntity, @MappingTarget Address address);
 
     @AfterMapping
-    default void setEntityId(Address domain, @MappingTarget AddressEntity entity) {
-        if (Objects.nonNull(domain.getAddressId()))
-            entity.setAddressId(UUID.fromString(domain.getAddressId()));
+    default void setAddressEntityId(Address address, @MappingTarget AddressEntity addressEntity) {
+        if (Objects.nonNull(address.getAddressId()))
+            addressEntity.setAddressId(UUID.fromString(address.getAddressId()));
     }
 }

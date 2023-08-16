@@ -39,7 +39,7 @@ public class Address {
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     private String country;
 
-//    private College college;
+    private College college;
 
     public Address() {
     }
@@ -100,24 +100,24 @@ public class Address {
         this.country = country;
     }
 
-//    public College getCollege() {
-//        return college;
-//    }
-//
-//    public void setCollege(College college) {
-//        this.college = college;
-//    }
+    public College getCollege() {
+        return college;
+    }
+
+    public void setCollege(College college) {
+        this.college = college;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Address address)) return false;
-        return Objects.equals(getAddressId(), address.getAddressId()) && Objects.equals(getStreet(), address.getStreet()) && Objects.equals(getWard(), address.getWard()) && Objects.equals(getDistrict(), address.getDistrict()) && Objects.equals(getCity(), address.getCity()) && Objects.equals(getPostalCode(), address.getPostalCode()) && Objects.equals(getCountry(), address.getCountry());
+        return Objects.equals(getAddressId(), address.getAddressId()) && Objects.equals(getStreet(), address.getStreet()) && Objects.equals(getWard(), address.getWard()) && Objects.equals(getDistrict(), address.getDistrict()) && Objects.equals(getCity(), address.getCity()) && Objects.equals(getPostalCode(), address.getPostalCode()) && Objects.equals(getCountry(), address.getCountry()) && Objects.equals(getCollege(), address.getCollege());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getAddressId(), getStreet(), getWard(), getDistrict(), getCity(), getPostalCode(), getCountry());
+        return Objects.hash(getAddressId(), getStreet(), getWard(), getDistrict(), getCity(), getPostalCode(), getCountry(), getCollege());
     }
 
     @Override
@@ -129,7 +129,8 @@ public class Address {
                 ", district='" + district + '\'' +
                 ", city='" + city + '\'' +
                 ", postalCode='" + postalCode + '\'' +
-                ", country='" + country +
+                ", country='" + country + '\'' +
+                ", college=" + college +
                 '}';
     }
 }
