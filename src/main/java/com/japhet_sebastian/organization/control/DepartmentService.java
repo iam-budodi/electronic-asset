@@ -6,9 +6,11 @@ import com.japhet_sebastian.organization.entity.Address;
 import com.japhet_sebastian.organization.entity.DepartmentDetail;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
 import org.jboss.logging.Logger;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -27,12 +29,12 @@ public class DepartmentService {
     Logger LOGGER;
 
     public List<DepartmentDetail> listDepartments(PageRequest pageRequest) {
-        return departmentRepository.departments(pageRequest)
+        return this.departmentRepository.departments(pageRequest)
                 .stream()
                 .map(department -> {
                     String addressId = department.getCollege().getCollegeId();
                     Address address = this.addressRepository.findAddress(addressId)
-                            .orElseThrow(() -> new ServiceException("No college found for collegeId[%s]", addressId));
+                            .orElseThrow(() -> new ServiceException("No address found for collegeId[%s]", addressId));
                     return this.departmentDetailMapper.toDepartmentDetails(department, address);
                 }).collect(Collectors.toList());
     }
@@ -41,31 +43,17 @@ public class DepartmentService {
         return departmentRepository.count();
     }
 
+    public Optional<DepartmentDetail> getDepartment(@NotNull String departmentId) {
+        return this.departmentRepository.findDepartment(departmentId)
+                .stream()
+                .map(department -> {
+                    String addressId = department.getCollege().getCollegeId();
+                    Address address = this.addressRepository.findAddress(addressId)
+                            .orElseThrow(() -> new ServiceException("No address found for collegeId[%s]", addressId));
+                    return this.departmentDetailMapper.toDepartmentDetails(department, address);
+                }).findFirst();
+    }
 
-//    public PanacheQuery<Employee> listDepartments(String searchValue, String column, String direction) {
-//        if (searchValue != null) searchValue = "%" + searchValue.toLowerCase(Locale.ROOT) + "%";
-//
-////        String sortVariable = Objects.equals(column.toLowerCase(Locale.ROOT), "departmentName")
-////                ? String.format("d.%s", column)
-////                : String.format("l.%s", column);
-//        String sortVariable = String.format("d.%s", column);
-//
-//        Sort.Direction sortDirection = Objects.equals(direction.toLowerCase(Locale.ROOT), "desc")
-//                ? Sort.Direction.Descending
-//                : Sort.Direction.Ascending;
-//
-//        String queryString = "SELECT d FROM Department d LEFT JOIN  d.college c LEFT JOIN c.location l " +
-//                "WHERE (:searchValue IS NULL OR LOWER(d.departmentName) LIKE :searchValue " +
-//                "OR :searchValue IS NULL OR LOWER(d.departmentCode) LIKE :searchValue) ";
-//
-////        LOG.info("SORT VARIABLE : " + sortVariable + " AND DIRECTION " + sortDirection);
-//        return Employee.find(
-//                queryString,
-//                Sort.by(sortVariable, sortDirection),
-//                Parameters.with("searchValue", searchValue)
-//        );
-//    }
-//
 //    public Department insertDepartment(@Valid Department department) {
 //        Department.persist(department);
 //        return department;
@@ -79,8 +67,5 @@ public class DepartmentService {
 //    public void deleteDepartment(@NotNull Long deptId) {
 //        Panache.getEntityManager().getReference(Department.class, deptId).delete();
 //    }
-//
-//    public Optional<Department> findDepartment(@NotNull Long deptId) {
-//        return Department.findByIdOptional(deptId);
-//    }
+
 }

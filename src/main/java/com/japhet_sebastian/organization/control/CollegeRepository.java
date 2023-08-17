@@ -3,6 +3,7 @@ package com.japhet_sebastian.organization.control;
 import com.japhet_sebastian.organization.boundary.PageRequest;
 import com.japhet_sebastian.organization.entity.College;
 import com.japhet_sebastian.organization.entity.CollegeEntity;
+import com.japhet_sebastian.organization.entity.Department;
 import com.japhet_sebastian.vo.SelectOptions;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;
@@ -13,6 +14,7 @@ import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -34,6 +36,7 @@ public class CollegeRepository implements PanacheRepositoryBase<CollegeEntity, U
 
         return this.collegeMapper.toCollegeList(collegeEntities);
     }
+
 
     public List<SelectOptions> selectProjection() {
         return find("SELECT ce.collegeId, ce.collegeName FROM College ce")

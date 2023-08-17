@@ -4,6 +4,7 @@ import com.japhet_sebastian.organization.control.DepartmentService;
 import com.japhet_sebastian.organization.entity.DepartmentDetail;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -11,7 +12,9 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
@@ -47,9 +50,7 @@ public class DepartmentResource {
     public Response allDepartments(@BeanParam PageRequest pageRequest) {
         List<DepartmentDetail> departmentDetails = this.departmentService.listDepartments(pageRequest);
         Long totalCount = this.departmentService.totalDepartments();
-        return Response.ok(departmentDetails)
-                .header("X-Total-Count", totalCount)
-                .build();
+        return Response.ok(departmentDetails).header("X-Total-Count", totalCount).build();
 
 //        return null;
 
@@ -57,25 +58,30 @@ public class DepartmentResource {
 //                .map(department -> Response.ok(department).build())
 //                .orElseGet(() -> Response.status(Status.NOT_FOUND).build());
     }
-//
-//    @GET
-//    @Path("/{id}")
-//    @Operation(summary = "Returns the department for a given identifier")
-//    @APIResponses({
-//            @APIResponse(
-//                    responseCode = "200",
-//                    content = @Content(
-//                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Department.class)),
-//                    description = "Returns a found department"),
-//            @APIResponse(responseCode = "400", description = "Invalid input"),
-//            @APIResponse(responseCode = "404", description = "Department is not found for a given identifier")
-//    })
-//    public Response findDepartment(@Parameter(description = "Department identifier", required = true) @PathParam("id") @NotNull Long deptId) {
-//        return departmentService.findDepartment(deptId)
-//                .map(department -> Response.ok(department).build())
-//                .orElseGet(() -> Response.status(Status.NOT_FOUND).build());
-//    }
-//
+
+    @GET
+    @Path("/{departmentId}")
+    @Operation(summary = "Get department details for a given identifier")
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Get department by department identifier",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = DepartmentDetail.class, type = SchemaType.OBJECT))),
+            @APIResponse(
+                    responseCode = "404",
+                    description = "Department does not exist for a given identifier",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON))
+    })
+    public Response getDepartment(
+            @Parameter(description = "Department identifier", required = true)
+            @PathParam("departmentId") @NotNull String departmentId) {
+        return this.departmentService.getDepartment(departmentId)
+                .map(department -> Response.ok(department).build())
+                .orElseGet(() -> Response.status(Response.Status.NOT_FOUND).build());
+    }
+
 //    @GET
 //    @Path("/select")
 //    @Transactional(Transactional.TxType.SUPPORTS)

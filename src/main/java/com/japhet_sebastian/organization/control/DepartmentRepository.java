@@ -12,6 +12,7 @@ import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -33,6 +34,13 @@ public class DepartmentRepository implements PanacheRepositoryBase<DepartmentEnt
                 .list();
 
         return this.departmentMapper.toDepartmentList(departmentEntities);
+    }
+
+    public Optional<Department> findDepartment(String departmentId) {
+        return find("FROM Department d LEFT JOIN FETCH d.college c " +
+                "WHERE d.departmentId = ?1", UUID.fromString(departmentId))
+                .firstResultOptional()
+                .map(this.departmentMapper::toDepartment);
     }
 
 }

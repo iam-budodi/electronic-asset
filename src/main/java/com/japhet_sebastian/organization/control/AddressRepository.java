@@ -30,7 +30,7 @@ public class AddressRepository implements PanacheRepositoryBase<AddressEntity, U
     }
 
     public Optional<Address> findAddress(String collegeId) {
-        return find("FROM Address a JOIN FETCH a.college c " +
+        return find("FROM Address a LEFT JOIN FETCH a.college c " +
                 "WHERE c.collegeId = ?1", UUID.fromString(collegeId))
                 .firstResultOptional()
                 .map(this.addressMapper::toAddress);

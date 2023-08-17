@@ -13,7 +13,10 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 @ApplicationScoped
 public class CollegeService implements CollegeInterface {
@@ -34,9 +37,9 @@ public class CollegeService implements CollegeInterface {
         return this.collegeRepository.allColleges(pageRequest);
     }
 
-    public Optional<CollegeAddress> getCollege(@NotNull String collegeId) {
-        return this.addressRepository.findAddress(collegeId)
-                .map(this.collegeAddressMapper::toCollegeAddress);
+    public Optional<College> getCollege(@NotNull String collegeId) {
+        return this.collegeRepository.findByIdOptional(UUID.fromString(collegeId))
+                .map(this.collegeMapper::toCollege);
     }
 
     public Long totalColleges() {

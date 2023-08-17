@@ -13,7 +13,7 @@ public interface CollegeInterface {
 
     List<College> listColleges(PageRequest pageRequest);
 
-    Optional<CollegeAddress> getCollege(@NotNull String collegeId);
+    Optional<College> getCollege(@NotNull String collegeId);
 
     Long totalColleges();
 

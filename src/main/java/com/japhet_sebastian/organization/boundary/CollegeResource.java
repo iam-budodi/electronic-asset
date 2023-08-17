@@ -67,7 +67,7 @@ public class CollegeResource extends AbstractCollegeType {
                     description = "Get college by college identifier",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON,
-                            schema = @Schema(implementation = CollegeAddress.class, type = SchemaType.OBJECT))),
+                            schema = @Schema(implementation = College.class, type = SchemaType.OBJECT))),
             @APIResponse(
                     responseCode = "404",
                     description = "College does not exist for a given identifier",
