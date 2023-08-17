@@ -30,18 +30,18 @@ import static org.hamcrest.Matchers.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestHTTPEndpoint(CollegeResource.class)
 @QuarkusTestResource(KeycloakResource.class)
-class CollegeResourceTest extends AccessTokenProvider {
+class StringResourceTest extends AccessTokenProvider {
 
     @Inject
     CollegeAddressMapper collegeAddressMapper;
 
     @TestHTTPResource("collegeId")
     @TestHTTPEndpoint(CollegeResource.class)
-    String collegeId;
+    java.lang.String stringId;
 
     @TestHTTPResource("select")
     @TestHTTPEndpoint(CollegeResource.class)
-    String selectPath;
+    java.lang.String selectPath;
 
     @Test
     @Order(1)
@@ -54,7 +54,7 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .statusCode(OK.getStatusCode())
                 .body("$.size()", is(2),
                         "collegeCode", containsInAnyOrder("CoAF", "CoICT"))
-                .header("X-Total-Count", String.valueOf(2));
+                .header("X-Total-Count", java.lang.String.valueOf(2));
     }
 
     @Test
@@ -68,7 +68,7 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .statusCode(OK.getStatusCode())
                 .body("$.size()", is(1),
                         "collegeCode", anyOf(contains("CoAF"), contains("CoICT")))
-                .header("X-Total-Count", String.valueOf(2));
+                .header("X-Total-Count", java.lang.String.valueOf(2));
     }
 
     @Test
@@ -89,9 +89,9 @@ class CollegeResourceTest extends AccessTokenProvider {
     @Test
     @Order(4)
     void getById() {
-        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+        final java.lang.String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
         CollegeAddress collegeAddress = createCollegeAddress();
-        String url = given()
+        java.lang.String url = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
                 .body(collegeAddress)
@@ -101,7 +101,7 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .extract().response().getHeader("Location");
 
         assertThat(url, notNullValue());
-        String uuid = url.substring(url.lastIndexOf("/") + 1);
+        java.lang.String uuid = url.substring(url.lastIndexOf("/") + 1);
         assertThat(uuid, matchesRegex(UUID_REGEX));
 
         CollegeAddress found = given()
@@ -117,7 +117,7 @@ class CollegeResourceTest extends AccessTokenProvider {
     @Test
     @Order(5)
     void getNotFound() {
-        final String uuid = "450921b5-5def-4fab-b3f6-2bea30ee7099";
+        final java.lang.String uuid = "450921b5-5def-4fab-b3f6-2bea30ee7099";
         given()
                 .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
                 .contentType(ContentType.JSON)
@@ -129,10 +129,10 @@ class CollegeResourceTest extends AccessTokenProvider {
     @Test
     @Order(6)
     void saveCollege() {
-        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+        final java.lang.String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
         CollegeAddress collegeAddress = createCollegeAddress();
         collegeAddress.getAddress().getCollege().setCollegeCode("CoNAS");
-        String url = given()
+        java.lang.String url = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
                 .body(collegeAddress)
@@ -142,7 +142,7 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .extract().response().getHeader("Location");
 
         assertThat(url, is(notNullValue()));
-        String uuid = url.substring(url.lastIndexOf("/") + 1);
+        java.lang.String uuid = url.substring(url.lastIndexOf("/") + 1);
         assertThat(uuid, matchesRegex(UUID_REGEX));
     }
 
@@ -215,10 +215,10 @@ class CollegeResourceTest extends AccessTokenProvider {
     @Test
     @Order(10)
     void updateCollege() {
-        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+        final java.lang.String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
         CollegeAddress collegeAddress = createCollegeAddress();
         collegeAddress.getAddress().getCollege().setCollegeName("Original college name before update");
-        String url = given()
+        java.lang.String url = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .body(collegeAddress)
@@ -229,7 +229,7 @@ class CollegeResourceTest extends AccessTokenProvider {
 
         assertThat(url, notNullValue());
         assertThat(collegeAddress.getAddress().getCollege().getCollegeName(), is(equalTo("Original college name before update")));
-        String uuid = url.substring(url.lastIndexOf("/") + 1);
+        java.lang.String uuid = url.substring(url.lastIndexOf("/") + 1);
         assertThat(uuid, matchesRegex(UUID_REGEX));
 
         CollegeAddress found = given()
@@ -241,14 +241,14 @@ class CollegeResourceTest extends AccessTokenProvider {
 
         assertThat(uuid, equalTo(found.getAddress().getAddressId()));
 
-        College updateCollege = this.collegeAddressMapper.toCollege(found);
-        updateCollege.setCollegeName("Updated college name");
+        College updateString = this.collegeAddressMapper.toCollege(found);
+        updateString.setCollegeName("Updated college name");
 
         given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .contentType(ContentType.JSON)
-                .body(updateCollege)
-                .when().put(updateCollege.getCollegeId())
+                .body(updateString)
+                .when().put(updateString.getCollegeId())
                 .then()
                 .statusCode(NO_CONTENT.getStatusCode());
 
@@ -265,10 +265,10 @@ class CollegeResourceTest extends AccessTokenProvider {
     @Test
     @Order(11)
     void updateFailsNoCollegeName() {
-        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+        final java.lang.String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
         CollegeAddress collegeAddress = createCollegeAddress();
         collegeAddress.getAddress().getCollege().setCollegeName("This update should fail");
-        String url = given()
+        java.lang.String url = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .body(collegeAddress)
@@ -279,7 +279,7 @@ class CollegeResourceTest extends AccessTokenProvider {
 
         assertThat(url, notNullValue());
         assertThat(collegeAddress.getAddress().getCollege().getCollegeName(), is(equalTo("This update should fail")));
-        String uuid = url.substring(url.lastIndexOf("/") + 1);
+        java.lang.String uuid = url.substring(url.lastIndexOf("/") + 1);
         assertThat(uuid, matchesRegex(UUID_REGEX));
 
         CollegeAddress found = given()
@@ -291,14 +291,14 @@ class CollegeResourceTest extends AccessTokenProvider {
 
         assertThat(uuid, equalTo(found.getAddress().getAddressId()));
 
-        College updateCollege = this.collegeAddressMapper.toCollege(found);
-        updateCollege.setCollegeName(null);
+        College updateString = this.collegeAddressMapper.toCollege(found);
+        updateString.setCollegeName(null);
 
         ErrorResponse errorResponse = given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .contentType(ContentType.JSON)
-                .body(updateCollege)
-                .when().put(updateCollege.getCollegeId())
+                .body(updateString)
+                .when().put(updateString.getCollegeId())
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .extract().as(ErrorResponse.class);

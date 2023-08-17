@@ -2,10 +2,11 @@ package com.japhet_sebastian.organization.control;
 
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.boundary.PageRequest;
-import com.japhet_sebastian.organization.entity.Address;
-import com.japhet_sebastian.organization.entity.DepartmentDetail;
+import com.japhet_sebastian.organization.entity.*;
+import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.jboss.logging.Logger;
 
@@ -24,6 +25,12 @@ public class DepartmentService {
 
     @Inject
     DepartmentDetailMapper departmentDetailMapper;
+
+    @Inject
+    DepartmentMapper departmentMapper;
+
+    @Inject
+    DepartmentInputMapper departmentInputMapper;
 
     @Inject
     Logger LOGGER;
@@ -54,11 +61,17 @@ public class DepartmentService {
                 }).findFirst();
     }
 
-//    public Department insertDepartment(@Valid Department department) {
-//        Department.persist(department);
-//        return department;
-//    }
-//
+    public List<SelectOptions> selected() {
+        return this.departmentRepository.selectProjections();
+    }
+
+    public void addDepartment(@Valid DepartmentInput departmentInput) {
+        DepartmentEntity departmentEntity = this.departmentDetailMapper
+                .toDepartmentEntity(this.departmentInputMapper.toDepartment(departmentInput));
+        this.departmentRepository.persist(departmentEntity);
+        this.departmentInputMapper.updateDepartmentInputFromDepartmentEntity(departmentEntity, departmentInput);
+        LOGGER.info("DEPT : " + departmentInput);
+    }
 //    public void updateDepartment(@Valid Department dept, @NotNull Long deptId) {
 //        findDepartment(deptId).map(foundDept -> Panache.getEntityManager().merge(dept))
 //                .orElseThrow(() -> new NotFoundException("Department don't exist"));

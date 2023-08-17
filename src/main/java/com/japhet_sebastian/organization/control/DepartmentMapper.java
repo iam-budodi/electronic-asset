@@ -1,5 +1,7 @@
 package com.japhet_sebastian.organization.control;
 
+import com.japhet_sebastian.organization.entity.College;
+import com.japhet_sebastian.organization.entity.CollegeEntity;
 import com.japhet_sebastian.organization.entity.Department;
 import com.japhet_sebastian.organization.entity.DepartmentEntity;
 import org.mapstruct.*;
@@ -24,6 +26,10 @@ public interface DepartmentMapper {
 
     @InheritInverseConfiguration(name = "toDepartmentList")
     List<DepartmentEntity> toDepartmentEntities(List<Department> departments);
+
+
+    void updateDepartmentEntityFromDepartment(Department department, @MappingTarget DepartmentEntity departmentEntity);
+
 
     @AfterMapping
     default void setDepartmentId(Department department, @MappingTarget DepartmentEntity departmentEntity) {

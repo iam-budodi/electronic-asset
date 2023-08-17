@@ -1,24 +1,32 @@
 package com.japhet_sebastian.organization.boundary;
 
 import com.japhet_sebastian.organization.control.DepartmentService;
+import com.japhet_sebastian.organization.entity.Department;
 import com.japhet_sebastian.organization.entity.DepartmentDetail;
+import com.japhet_sebastian.organization.entity.DepartmentInput;
+import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 
+import java.net.URI;
 import java.util.List;
 
 import static com.japhet_sebastian.organization.boundary.DepartmentResource.RESOURCE_PATH;
@@ -29,7 +37,7 @@ import static com.japhet_sebastian.organization.boundary.DepartmentResource.RESO
 @Produces(MediaType.APPLICATION_JSON)
 @SecurityRequirement(name = "Keycloak")
 @Tag(name = "Department Endpoint", description = "Department operations")
-public class DepartmentResource {
+public class DepartmentResource extends AbstractDepartmentType {
 
     public static final String RESOURCE_PATH = "/departments";
 
@@ -82,50 +90,48 @@ public class DepartmentResource {
                 .orElseGet(() -> Response.status(Response.Status.NOT_FOUND).build());
     }
 
-//    @GET
-//    @Path("/select")
-//    @Transactional(Transactional.TxType.SUPPORTS)
-//    @Operation(summary = "Fetch only department ID and name for all departments available to be used for client side selection options")
-//    @APIResponses({
-//            @APIResponse(
-//                    responseCode = "200",
-//                    content = @Content(
-//                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY)),
-//                    description = "Department ID and name as key value pair objects for the departments available"),
-//            @APIResponse(responseCode = "204", description = "No department available in the database")
-//    })
-//    public Response departmentSelectOptions() {
-//        List<SelectOptions> dept = Department.find("SELECT d.id, d.departmentName FROM Department d")
-//                .project(SelectOptions.class).list();
-//        if (dept.size() == 0) return Response.status(Status.NO_CONTENT).build();
-//        return Response.ok(dept).build();
-//    }
-//
-//    @POST
-//    @Operation(summary = "Creates a valid department and stores it into the database")
-//    @APIResponses({
-//            @APIResponse(
-//                    responseCode = "201",
-//                    content = @Content(
-//                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = URI.class)),
-//                    description = "URI of the created department"),
-//            @APIResponse(responseCode = "400", description = "Invalid input"),
-//            @APIResponse(
-//                    responseCode = "409",
-//                    content = @Content(
-//                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Department.class)),
-//                    description = "Department duplications is not allowed")
-//    })
-//    public Response createDepartment(
-//            @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Department.class)))
-//            @Valid Department department, @Context UriInfo uriInfo) {
+    @GET
+    @Path("/select")
+    @Transactional(Transactional.TxType.SUPPORTS)
+    @Operation(summary = "Get all selection options projection of the departments")
+    @APIResponse(
+            responseCode = "200",
+            description = "Return an object with identifier and name as key value pair",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY))
+    )
+    public Response selectOptions() {
+        return Response.ok(this.departmentService.selected()).build();
+    }
+
+    @POST
+    @Operation(summary = "Creates valid department")
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "201",
+                    description = "URI of the created department",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = URI.class))),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Invalid input",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON)),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "College already exists for college identifier",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON))
+    })
+    public Response saveDepartment(
+            @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Department.class)))
+            @Valid DepartmentInput departmentInput, @Context UriInfo uriInfo) {
 //        boolean isDept = Department.findByName(department.departmentName).isPresent();
 //        if (isDept) return Response.status(Status.CONFLICT).entity("Department already exists").build();
-//        departmentService.insertDepartment(department);
-//        URI deptUri = uriInfo.getAbsolutePathBuilder().path(Long.toString(department.id)).build();
-//        return Response.created(deptUri).build();
-//    }
-//
+        this.departmentService.addDepartment(departmentInput);
+        URI departmentUri = departmentUriBuilder(departmentInput.getDepartmentId(), uriInfo).build();
+        return Response.created(departmentUri).build();
+    }
+
 //    @PUT
 //    @Path("/{id}")
 //    @Operation(summary = "Updates an existing department")
