@@ -10,6 +10,7 @@ public class ServiceExceptionMapper implements ExceptionMapper<ServiceException>
     public Response toResponse(ServiceException e) {
         ErrorResponse.ErrorMessage errorMessage = new ErrorResponse.ErrorMessage(e.getMessage());
         ErrorResponse errorResponse = new ErrorResponse(errorMessage);
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse).build();
+//        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorResponse).build(); // ORIGINAL
+        return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
     }
 }

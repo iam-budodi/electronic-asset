@@ -1,8 +1,8 @@
 package com.japhet_sebastian.organization.control;
 
 import com.japhet_sebastian.organization.boundary.PageRequest;
-import com.japhet_sebastian.organization.entity.College;
-import com.japhet_sebastian.organization.entity.CollegeAddress;
+import com.japhet_sebastian.organization.entity.CollegeDetail;
+import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -11,16 +11,17 @@ import java.util.Optional;
 
 public interface CollegeInterface {
 
-    List<College> listColleges(PageRequest pageRequest);
+    List<CollegeDetail> listColleges(PageRequest pageRequest);
 
-    Optional<College> getCollege(@NotNull String collegeId);
+    Optional<CollegeDetail> getCollege(@NotNull String collegeId);
 
     Long totalColleges();
 
-    void addCollege(@Valid CollegeAddress collegeAddress);
+    List<SelectOptions> selected();
 
-    void updateCollege(@Valid College college);
+    void addCollege(@Valid CollegeDetail collegeDetail);
 
-    Boolean deleteCollege(@NotNull String collegeId);
+    void updateCollege(@Valid CollegeDetail collegeDetail);
 
+    void deleteCollege(@NotNull String collegeId);
 }

@@ -1,9 +1,10 @@
 package com.japhet_sebastian.organization.boundary;
 
+import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.control.DepartmentService;
-import com.japhet_sebastian.organization.entity.Department;
 import com.japhet_sebastian.organization.entity.DepartmentDetail;
 import com.japhet_sebastian.organization.entity.DepartmentInput;
+import com.japhet_sebastian.organization.entity.DepartmentUpdate;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -28,6 +29,7 @@ import org.jboss.logging.Logger;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 
 import static com.japhet_sebastian.organization.boundary.DepartmentResource.RESOURCE_PATH;
 
@@ -59,12 +61,6 @@ public class DepartmentResource extends AbstractDepartmentType {
         List<DepartmentDetail> departmentDetails = this.departmentService.listDepartments(pageRequest);
         Long totalCount = this.departmentService.totalDepartments();
         return Response.ok(departmentDetails).header("X-Total-Count", totalCount).build();
-
-//        return null;
-
-//        return Department.findByName(deptName)
-//                .map(department -> Response.ok(department).build())
-//                .orElseGet(() -> Response.status(Status.NOT_FOUND).build());
     }
 
     @GET
@@ -92,7 +88,6 @@ public class DepartmentResource extends AbstractDepartmentType {
 
     @GET
     @Path("/select")
-    @Transactional(Transactional.TxType.SUPPORTS)
     @Operation(summary = "Get all selection options projection of the departments")
     @APIResponse(
             responseCode = "200",
@@ -112,72 +107,84 @@ public class DepartmentResource extends AbstractDepartmentType {
                     responseCode = "201",
                     description = "URI of the created department",
                     content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = URI.class))),
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = URI.class, type = SchemaType.STRING))),
             @APIResponse(
                     responseCode = "400",
                     description = "Invalid input",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON)),
             @APIResponse(
                     responseCode = "400",
-                    description = "College already exists for college identifier",
+                    description = "Department already exists for department name",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON))
     })
-    public Response saveDepartment(
-            @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Department.class)))
-            @Valid DepartmentInput departmentInput, @Context UriInfo uriInfo) {
-//        boolean isDept = Department.findByName(department.departmentName).isPresent();
-//        if (isDept) return Response.status(Status.CONFLICT).entity("Department already exists").build();
+    public Response saveDepartment(@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
+            schema = @Schema(implementation = DepartmentInput.class))) @Valid DepartmentInput departmentInput, @Context UriInfo uriInfo) {
         this.departmentService.addDepartment(departmentInput);
         URI departmentUri = departmentUriBuilder(departmentInput.getDepartmentId(), uriInfo).build();
         return Response.created(departmentUri).build();
     }
 
-//    @PUT
-//    @Path("/{id}")
-//    @Operation(summary = "Updates an existing department")
-//    @APIResponses({
-//            @APIResponse(responseCode = "204", description = "Department has been successfully updated"),
-//            @APIResponse(responseCode = "404", description = "Department to be updated does not exist in the database"),
-//            @APIResponse(responseCode = "415", description = "Format is not JSON"),
-//            @APIResponse(
-//                    responseCode = "409",
-//                    content = @Content(
-//                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Department.class)),
-//                    description = "Department payload is not the same as an entity object that needed to be updated")
-//    })
-//    public Response updateDepartment(
-//            @Parameter(description = "Department identifier", required = true) @PathParam("id") @NotNull Long deptId,
-//            @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Department.class)))
-//            @Valid Department department) {
-//        if (!deptId.equals(department.id))
-//            return Response.status(Response.Status.CONFLICT).entity(department).build();
-//
-//        try {
-//            departmentService.updateDepartment(department, deptId);
-//        } catch (NotFoundException | NoResultException enf) {
-//            return Response.status(Response.Status.NOT_FOUND).build();
-//        }
-//
-//        return Response.status(Status.NO_CONTENT).build();
-//    }
-//
-//    @DELETE
-//    @Path("/{id}")
-//    @Transactional(Transactional.TxType.REQUIRED)
-//    @Operation(summary = "Deletes an existing department")
-//    @APIResponses({
-//            @APIResponse(responseCode = "204", description = "Department has been successfully deleted"),
-//            @APIResponse(responseCode = "400", description = "Invalid input"),
-//            @APIResponse(responseCode = "404", description = "Department to be deleted does not exist in the database"),
-//            @APIResponse(responseCode = "500", description = "Department not found")
-//    })
-//    public Response deleteDepartment(
-//            @Parameter(description = "Department identifier", required = true) @PathParam("id") @NotNull Long deptId) {
-//        return Department.deleteById(deptId)
-//                ? Response.status(Status.NO_CONTENT).build()
-//                : Response.status(Status.NOT_FOUND).build();
-//    }
-//
+    @PUT
+    @Path("/{departmentId}")
+    @Operation(summary = "Updates existing department")
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "204",
+                    description = "Department updated",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = DepartmentUpdate.class, type = SchemaType.OBJECT))),
+            @APIResponse(
+                    responseCode = "404",
+                    description = "No Department found for a given identifier",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON)),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Invalid Department input",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON)),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Department does not have identifier",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON)),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Path variable departmentId does not match Department.departmentId",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON))
+    })
+    public Response updateDepartment(
+            @Parameter(description = "departmentId", required = true) @PathParam("departmentId") @NotNull String departmentId,
+            @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(implementation = DepartmentUpdate.class))) @Valid DepartmentUpdate department) {
+        if (Objects.isNull(department.getDepartmentId()) || department.getDepartmentId().isEmpty())
+            throw new ServiceException("Department does not have departmentId");
+
+        if (!Objects.equals(departmentId, department.getDepartmentId()))
+            throw new ServiceException("path variable departmentId does not match Department.departmentId");
+
+        departmentService.updateDepartment(department);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @DELETE
+    @Path("/{departmentId}")
+    @Operation(summary = "Deletes existing department")
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "204",
+                    description = "College deleted",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON)),
+            @APIResponse(
+                    responseCode = "40",
+                    description = "No department found for departmentId",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON))
+    })
+    public Response deleteDepartment(
+            @Parameter(description = "departmentId", required = true) @PathParam("departmentId") @NotNull String departmentId) {
+        this.departmentService.deleteDepartment(departmentId);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
 //    @GET
 //    @Path("/{id}/employees")
 //    @Transactional(Transactional.TxType.SUPPORTS)

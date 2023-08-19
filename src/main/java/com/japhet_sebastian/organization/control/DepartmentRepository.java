@@ -44,6 +44,13 @@ public class DepartmentRepository implements PanacheRepositoryBase<DepartmentEnt
                 .map(this.departmentMapper::toDepartment);
     }
 
+    public Optional<Department> findDepartmentByName(String departmentName) {
+        return find(
+                "#Department.getName", Parameters.with("name", departmentName.toLowerCase(Locale.ROOT)))
+                .firstResultOptional()
+                .map(this.departmentMapper::toDepartment);
+    }
+
     public List<SelectOptions> selectProjections() {
         return find("SELECT d.departmentId, d.departmentName FROM Department d")
                 .project(SelectOptions.class)

@@ -8,14 +8,14 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.jboss.logging.Logger;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class DepartmentService {
+public class DepartmentService implements DepartmentInterface {
 
     @Inject
     DepartmentRepository departmentRepository;
@@ -28,12 +28,6 @@ public class DepartmentService {
 
     @Inject
     DepartmentMapper departmentMapper;
-
-    @Inject
-    DepartmentInputMapper departmentInputMapper;
-
-    @Inject
-    Logger LOGGER;
 
     public List<DepartmentDetail> listDepartments(PageRequest pageRequest) {
         return this.departmentRepository.departments(pageRequest)
@@ -66,19 +60,31 @@ public class DepartmentService {
     }
 
     public void addDepartment(@Valid DepartmentInput departmentInput) {
-        DepartmentEntity departmentEntity = this.departmentDetailMapper
-                .toDepartmentEntity(this.departmentInputMapper.toDepartment(departmentInput));
-        this.departmentRepository.persist(departmentEntity);
-        this.departmentInputMapper.updateDepartmentInputFromDepartmentEntity(departmentEntity, departmentInput);
-        LOGGER.info("DEPT : " + departmentInput);
-    }
-//    public void updateDepartment(@Valid Department dept, @NotNull Long deptId) {
-//        findDepartment(deptId).map(foundDept -> Panache.getEntityManager().merge(dept))
-//                .orElseThrow(() -> new NotFoundException("Department don't exist"));
-//    }
-//
-//    public void deleteDepartment(@NotNull Long deptId) {
-//        Panache.getEntityManager().getReference(Department.class, deptId).delete();
-//    }
+        boolean isDepartmentPresent = this.departmentRepository
+                .findDepartmentByName(departmentInput.getDepartmentName()).isPresent();
 
+        if (isDepartmentPresent)
+            throw new ServiceException("Invalid object, department with the same name already exists");
+
+        DepartmentEntity departmentEntity = this.departmentDetailMapper
+                .toDepartmentEntity(this.departmentMapper.toDepartment(departmentInput));
+        this.departmentRepository.persist(departmentEntity);
+        this.departmentMapper.updateDepartmentInputFromDepartmentEntity(departmentEntity, departmentInput);
+    }
+
+    public void updateDepartment(@Valid DepartmentUpdate departmentUpdate) {
+        String departmentId = departmentUpdate.getDepartmentId();
+        DepartmentEntity departmentEntity = this.departmentRepository.findByIdOptional(UUID.fromString(departmentId))
+                .orElseThrow(() -> new ServiceException("No department found for departmentId[%s]", departmentId));
+
+        this.departmentMapper.updateDepartmentEntityFromDepartmentUpdate(departmentUpdate, departmentEntity);
+        this.departmentRepository.persist(departmentEntity);
+        this.departmentMapper.updateDepartmentUpdateFromDepartmentEntity(departmentEntity, departmentUpdate);
+    }
+
+    public void deleteDepartment(@NotNull String departmentId) {
+        DepartmentEntity departmentEntity = this.departmentRepository.findByIdOptional(UUID.fromString(departmentId))
+                .orElseThrow(() -> new ServiceException("No department found for departmentId[%s]", departmentId));
+        this.departmentRepository.delete(departmentEntity);
+    }
 }

@@ -12,7 +12,8 @@ import java.util.UUID;
 @Entity(name = "Department")
 @Table(name = "departments", uniqueConstraints = {@UniqueConstraint(name = "unique_department_name",
         columnNames = {"department_name"})})
-@NamedQueries({@NamedQuery(name = "Department.getName", query = "FROM Department WHERE LOWER(departmentName) = :name")})
+@NamedQueries({@NamedQuery(name = "Department.getName",
+        query = "FROM Department d LEFT JOIN FETCH d.college WHERE LOWER(d.departmentName) = :name")})
 @Schema(description = "Department representation")
 public class DepartmentEntity {
 
@@ -48,12 +49,6 @@ public class DepartmentEntity {
 //
 //    public static List<DepartmentEntity> findAllOrderByName() {
 //        return listAll(Sort.by("name"));
-//    }
-//
-//    public static Optional<DepartmentEntity> findByName(String name) {
-//        return find(
-//                "#Department.getName", Parameters.with("name", name.toLowerCase()))
-//                .firstResultOptional();
 //    }
 
 

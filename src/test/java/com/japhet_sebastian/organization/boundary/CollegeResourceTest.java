@@ -3,10 +3,8 @@ package com.japhet_sebastian.organization.boundary;
 import com.japhet_sebastian.AccessTokenProvider;
 import com.japhet_sebastian.KeycloakResource;
 import com.japhet_sebastian.exception.ErrorResponse;
-import com.japhet_sebastian.organization.control.CollegeAddressMapper;
 import com.japhet_sebastian.organization.entity.Address;
 import com.japhet_sebastian.organization.entity.College;
-import com.japhet_sebastian.organization.entity.CollegeAddress;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
@@ -30,7 +28,7 @@ import static org.hamcrest.Matchers.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestHTTPEndpoint(CollegeResource.class)
 @QuarkusTestResource(KeycloakResource.class)
-class StringResourceTest extends AccessTokenProvider {
+class CollegeResourceTest extends AccessTokenProvider {
 
     @Inject
     CollegeAddressMapper collegeAddressMapper;

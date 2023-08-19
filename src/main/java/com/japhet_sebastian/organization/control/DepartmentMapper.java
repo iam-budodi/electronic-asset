@@ -1,9 +1,9 @@
 package com.japhet_sebastian.organization.control;
 
-import com.japhet_sebastian.organization.entity.College;
-import com.japhet_sebastian.organization.entity.CollegeEntity;
 import com.japhet_sebastian.organization.entity.Department;
 import com.japhet_sebastian.organization.entity.DepartmentEntity;
+import com.japhet_sebastian.organization.entity.DepartmentInput;
+import com.japhet_sebastian.organization.entity.DepartmentUpdate;
 import org.mapstruct.*;
 
 import java.util.List;
@@ -18,6 +18,9 @@ public interface DepartmentMapper {
             expression = "java(departmentEntity.getDepartmentId().toString())")
     Department toDepartment(DepartmentEntity departmentEntity);
 
+    @Mapping(target = "college.collegeId", source = "departmentInput.collegeId")
+    Department toDepartment(DepartmentInput departmentInput);
+
     List<Department> toDepartmentList(List<DepartmentEntity> departmentEntities);
 
     @Mapping(target = "departmentId", ignore = true)
@@ -28,7 +31,16 @@ public interface DepartmentMapper {
     List<DepartmentEntity> toDepartmentEntities(List<Department> departments);
 
 
-    void updateDepartmentEntityFromDepartment(Department department, @MappingTarget DepartmentEntity departmentEntity);
+    void updateDepartmentInputFromDepartmentEntity(DepartmentEntity departmentEntity, @MappingTarget DepartmentInput departmentInput);
+
+//    void updateDepartmentEntityFromDepartment(Department department, @MappingTarget DepartmentEntity departmentEntity);
+//
+//    void updateDepartmentFromDepartmentEntity(DepartmentEntity departmentEntity, @MappingTarget Department department);
+
+
+    void updateDepartmentEntityFromDepartmentUpdate(DepartmentUpdate departmentUpdate, @MappingTarget DepartmentEntity departmentEntity);
+
+    void updateDepartmentUpdateFromDepartmentEntity(DepartmentEntity departmentEntity, @MappingTarget DepartmentUpdate departmentUpdate);
 
 
     @AfterMapping

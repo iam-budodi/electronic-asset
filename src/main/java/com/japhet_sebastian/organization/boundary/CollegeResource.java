@@ -2,8 +2,7 @@ package com.japhet_sebastian.organization.boundary;
 
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.control.CollegeService;
-import com.japhet_sebastian.organization.entity.College;
-import com.japhet_sebastian.organization.entity.CollegeAddress;
+import com.japhet_sebastian.organization.entity.CollegeDetail;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -51,9 +50,9 @@ public class CollegeResource extends AbstractCollegeType {
             description = "Lists all the colleges",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = College.class, type = SchemaType.ARRAY)))
+                    schema = @Schema(implementation = CollegeDetail.class, type = SchemaType.ARRAY)))
     public Response allColleges(@BeanParam PageRequest pageRequest) {
-        List<College> colleges = this.collegeService.listColleges(pageRequest);
+        List<CollegeDetail> colleges = this.collegeService.listColleges(pageRequest);
         Long totalCount = this.collegeService.totalColleges();
         return Response.ok(colleges).header("X-Total-Count", totalCount).build();
     }
@@ -67,14 +66,14 @@ public class CollegeResource extends AbstractCollegeType {
                     description = "Get college by college identifier",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON,
-                            schema = @Schema(implementation = College.class, type = SchemaType.OBJECT))),
+                            schema = @Schema(implementation = CollegeDetail.class, type = SchemaType.OBJECT))),
             @APIResponse(
                     responseCode = "404",
                     description = "College does not exist for a given identifier",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON))
     })
     public Response getCollege(
-            @Parameter(description = "College identifier", required = true)
+            @Parameter(description = "collegeId", required = true)
             @PathParam("collegeId") @NotNull String collegeId) {
         return this.collegeService.getCollege(collegeId)
                 .map(college -> Response.ok(college).build())
@@ -96,14 +95,14 @@ public class CollegeResource extends AbstractCollegeType {
     }
 
     @POST
-    @Operation(summary = "Creates a valid college")
+    @Operation(summary = "Creates valid college")
     @APIResponses({
             @APIResponse(
                     responseCode = "201",
                     description = "College created",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON,
-                            schema = @Schema(implementation = URI.class, type = SchemaType.OBJECT))),
+                            schema = @Schema(implementation = URI.class, type = SchemaType.STRING))),
             @APIResponse(
                     responseCode = "400",
                     description = "Invalid input",
@@ -114,34 +113,34 @@ public class CollegeResource extends AbstractCollegeType {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON))
     })
     public Response createCollege(@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
-            schema = @Schema(implementation = CollegeAddress.class, type = SchemaType.OBJECT)))
-                                  @Valid CollegeAddress collegeAddress, @Context UriInfo uriInfo) {
-        this.collegeService.addCollege(collegeAddress);
-        URI collegeURI = collegeUriBuilder(collegeAddress.getAddress().getCollege().getCollegeId(), uriInfo).build();
+            schema = @Schema(implementation = CollegeDetail.class, type = SchemaType.OBJECT)))
+                                  @Valid CollegeDetail collegeDetail, @Context UriInfo uriInfo) {
+        this.collegeService.addCollege(collegeDetail);
+        URI collegeURI = collegeUriBuilder(collegeDetail.getCollegeId(), uriInfo).build();
         return Response.created(collegeURI).build();
     }
 
     @PUT
     @Path("/{collegeId}")
-    @Operation(summary = "Updates an existing college")
+    @Operation(summary = "Updates existing college")
     @APIResponses({
             @APIResponse(
                     responseCode = "204",
                     description = "College updated",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON,
-                            schema = @Schema(implementation = College.class, type = SchemaType.OBJECT))),
+                            schema = @Schema(implementation = CollegeDetail.class, type = SchemaType.OBJECT))),
             @APIResponse(
                     responseCode = "404",
                     description = "No College found for a given identifier",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON)),
             @APIResponse(
                     responseCode = "400",
-                    description = "Invalid College object",
+                    description = "Invalid object",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON)),
             @APIResponse(
                     responseCode = "400",
-                    description = "College object does not have identifier",
+                    description = "College object does not have collegeId",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON)),
             @APIResponse(
                     responseCode = "400",
@@ -151,19 +150,21 @@ public class CollegeResource extends AbstractCollegeType {
     public Response updateCollege(
             @Parameter(description = "College identifier", required = true) @PathParam("collegeId") @NotNull String collegeId,
             @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = College.class, type = SchemaType.OBJECT)))
-            @Valid College college) {
-        if (!Objects.equals(collegeId, college.getCollegeId())) {
-            throw new ServiceException("College identifier does not match");
-        }
+                    schema = @Schema(implementation = CollegeDetail.class, type = SchemaType.OBJECT)))
+            @Valid CollegeDetail collegeDetail) {
+        if (Objects.isNull(collegeDetail.getCollegeId()) || collegeDetail.getCollegeId().isEmpty())
+            throw new ServiceException("College does not have collegeId");
 
-        collegeService.updateCollege(college);
+        if (!Objects.equals(collegeId, collegeDetail.getCollegeId()))
+            throw new ServiceException("path variable collegeId does not match College.collegeId");
+
+        collegeService.updateCollege(collegeDetail);
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @DELETE
     @Path("/{collegeId}")
-    @Operation(summary = "Deletes college for a given identifier")
+    @Operation(summary = "Deletes existing college")
     @APIResponses({
             @APIResponse(
                     responseCode = "204",
@@ -175,10 +176,8 @@ public class CollegeResource extends AbstractCollegeType {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON))
     })
     public Response deleteCollege(
-            @Parameter(description = "College identifier", required = true)
-            @PathParam("collegeId") @NotNull String collegeId) {
-        return collegeService.deleteCollege(collegeId)
-                ? Response.status(Response.Status.NO_CONTENT).build()
-                : Response.status(Response.Status.NOT_FOUND).build();
+            @Parameter(description = "collegeId", required = true) @PathParam("collegeId") @NotNull String collegeId) {
+        this.collegeService.deleteCollege(collegeId);
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 }

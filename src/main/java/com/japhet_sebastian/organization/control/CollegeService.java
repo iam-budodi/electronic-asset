@@ -2,21 +2,17 @@ package com.japhet_sebastian.organization.control;
 
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.boundary.PageRequest;
-import com.japhet_sebastian.organization.entity.AddressEntity;
-import com.japhet_sebastian.organization.entity.College;
-import com.japhet_sebastian.organization.entity.CollegeAddress;
-import com.japhet_sebastian.organization.entity.CollegeEntity;
+import com.japhet_sebastian.organization.entity.*;
 import com.japhet_sebastian.vo.SelectOptions;
-import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class CollegeService implements CollegeInterface {
@@ -30,16 +26,29 @@ public class CollegeService implements CollegeInterface {
     @Inject
     CollegeMapper collegeMapper;
 
-    @Inject
-    CollegeAddressMapper collegeAddressMapper;
 
-    public List<College> listColleges(PageRequest pageRequest) {
-        return this.collegeRepository.allColleges(pageRequest);
+    public List<CollegeDetail> listColleges(PageRequest pageRequest) {
+        return this.collegeRepository.allColleges(pageRequest)
+                .stream()
+                .map(college -> {
+                    String collegeId = college.getCollegeId();
+                    Address address = this.addressRepository.findAddress(collegeId)
+                            .orElseThrow(() -> new ServiceException("No address found for collegeId[%s]", collegeId));
+                    return this.collegeMapper.toCollegeDetail(college, address);
+                }).collect(Collectors.toList());
     }
 
-    public Optional<College> getCollege(@NotNull String collegeId) {
+    public Optional<CollegeDetail> getCollege(@NotNull String collegeId) {
+//        return this.collegeRepository.findByIdOptional(UUID.fromString(collegeId))
+//                .map(this.collegeMapper::toCollege);
         return this.collegeRepository.findByIdOptional(UUID.fromString(collegeId))
-                .map(this.collegeMapper::toCollege);
+                .stream()
+                .map(collegeEntity -> {
+                    String collegeStrId = collegeEntity.getCollegeId().toString();
+                    Address address = this.addressRepository.findAddress(collegeStrId)
+                            .orElseThrow(() -> new ServiceException("No address found for collegeId[%s]", collegeStrId));
+                    return this.collegeMapper.toCollegeDetail(this.collegeMapper.toCollege(collegeEntity), address);
+                }).findFirst();
     }
 
     public Long totalColleges() {
@@ -50,38 +59,44 @@ public class CollegeService implements CollegeInterface {
         return collegeRepository.selectProjection();
     }
 
-    public void addCollege(@Valid CollegeAddress collegeAddress) {
-        CollegeEntity collegeEntity = this.collegeAddressMapper.toCollegeEntity(collegeAddress);
+    public void addCollege(@Valid CollegeDetail collegeDetail) {
+        CollegeEntity collegeEntity = this.collegeMapper.toCollegeEntity(collegeDetail);
         this.collegeRepository.persist(collegeEntity);
 
-        AddressEntity addressEntity = this.collegeAddressMapper.toAddressEntity(collegeAddress);
+        AddressEntity addressEntity = this.collegeMapper.toAddressEntity(collegeDetail);
         addressEntity.setCollege(collegeEntity);
         this.addressRepository.persist(addressEntity);
-        this.collegeAddressMapper.updateCollegeAddressFromCollegeEntity(collegeEntity, collegeAddress);
+
+        this.collegeMapper.updateCollegeDetailFromCollegeEntity(collegeEntity, collegeDetail);
     }
 
-    public void updateCollege(@Valid College college) {
-        Log.debug("Updating College: {}" + college);
-        if (Objects.isNull(college.getCollegeId())) {
-            throw new ServiceException("Invalid object, customerId is missing");
-        }
-
-        CollegeEntity collegeEntity = findById(college.getCollegeId());
-        this.collegeMapper.updateEntityFromDomain(college, collegeEntity);
-        this.collegeRepository.persist(collegeEntity);
-        collegeMapper.updateCollegeFromCollegeEntity(collegeEntity, college);
-    }
-
-    public Boolean deleteCollege(@NotNull String collegeId) {
-        College college = this.collegeMapper.toCollege(findById(collegeId));
-        if (Objects.nonNull(college) && Objects.nonNull(college.getCollegeId()))
-            this.addressRepository.deleteById(UUID.fromString(college.getCollegeId()));
-
-        return this.collegeRepository.deleteById(UUID.fromString(college.getCollegeId()));
-    }
-
-    private CollegeEntity findById(String collegeId) {
-        return this.collegeRepository.findByIdOptional(UUID.fromString(collegeId))
+    public void updateCollege(@Valid CollegeDetail collegeDetail) {
+        String collegeId = collegeDetail.getCollegeId();
+        CollegeEntity collegeEntity = this.collegeRepository.findByIdOptional(UUID.fromString(collegeId))
                 .orElseThrow(() -> new ServiceException("No college found for collegeId[%s]", collegeId));
+
+        this.collegeMapper.updateCollegeEntityFromCollegeDetail(collegeDetail, collegeEntity);
+        this.collegeRepository.persist(collegeEntity);
+
+        this.addressRepository.findByIdOptional(collegeEntity.getCollegeId())
+                .map(addressEntity -> {
+                    this.collegeMapper.updateAddressEntityFromCollegeDetail(collegeDetail, addressEntity);
+                    this.addressRepository.persist(addressEntity);
+                    return addressEntity;
+                });
+
+        collegeMapper.updateCollegeDetailFromCollegeEntity(collegeEntity, collegeDetail);
+    }
+
+    public void deleteCollege(@NotNull String collegeId) {
+        CollegeEntity collegeEntity = this.collegeRepository.findByIdOptional(UUID.fromString(collegeId))
+                .orElseThrow(() -> new ServiceException("No college found for collegeId[%s]", collegeId));
+
+        AddressEntity addressEntity = this.addressRepository.findByIdOptional(collegeEntity.getCollegeId())
+                .stream().findFirst()
+                .orElseThrow(() -> new ServiceException("Associated college address could not be determined"));
+
+        this.addressRepository.delete(addressEntity);
+        this.collegeRepository.delete(collegeEntity);
     }
 }
