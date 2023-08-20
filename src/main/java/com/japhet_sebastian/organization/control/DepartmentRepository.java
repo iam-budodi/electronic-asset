@@ -37,6 +37,13 @@ public class DepartmentRepository implements PanacheRepositoryBase<DepartmentEnt
         return this.departmentMapper.toDepartmentList(departmentEntities);
     }
 
+    public List<DepartmentEntity> getDepartmentByCollegeId(String collegeId) {
+        return find("FROM Department d LEFT JOIN FETCH d.college c " +
+                "WHERE c.collegeId = :collegeId", Parameters.with("collegeId", UUID.fromString(collegeId)))
+                .list();
+
+    }
+
     public Optional<Department> findDepartment(String departmentId) {
         return find("FROM Department d LEFT JOIN FETCH d.college c " +
                 "WHERE d.departmentId = ?1", UUID.fromString(departmentId))

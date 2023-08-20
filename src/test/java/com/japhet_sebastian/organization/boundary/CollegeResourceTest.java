@@ -4,17 +4,20 @@ import com.japhet_sebastian.AccessTokenProvider;
 import com.japhet_sebastian.KeycloakResource;
 import com.japhet_sebastian.exception.ErrorResponse;
 import com.japhet_sebastian.organization.entity.CollegeDetail;
+import com.japhet_sebastian.organization.entity.DepartmentInput;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static io.restassured.RestAssured.given;
@@ -36,6 +39,10 @@ class CollegeResourceTest extends AccessTokenProvider {
     @TestHTTPEndpoint(CollegeResource.class)
     String selectPath;
 
+    @TestHTTPResource()
+    @TestHTTPEndpoint(DepartmentResource.class)
+    String department;
+
     @Test
     @Order(1)
     void getAll() {
@@ -45,8 +52,8 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .when().get()
                 .then()
                 .statusCode(OK.getStatusCode())
-                .body("$.size()", is(2),
-                        "collegeCode", containsInAnyOrder("CoAF", "CoICT"))
+                .body("$.size()", is(2))
+                .body("collegeCode", containsInAnyOrder("CoAF", "CoICT"))
                 .header("X-Total-Count", String.valueOf(2));
     }
 
@@ -59,8 +66,8 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .when().get("?page=0&size=1")
                 .then()
                 .statusCode(OK.getStatusCode())
-                .body("$.size()", is(1),
-                        "collegeCode", anyOf(contains("CoAF"), contains("CoICT")))
+                .body("$.size()", is(1))
+                .body("collegeCode", anyOf(contains("CoAF"), contains("CoICT")))
                 .header("X-Total-Count", String.valueOf(2));
     }
 
@@ -73,10 +80,9 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .when().get(selectPath)
                 .then()
                 .statusCode(OK.getStatusCode())
-                .body("$.size()", is(2),
-                        "label", containsInAnyOrder(
-                                "College of Agricultural Sciences and Fisheries",
-                                "College of Information and Communication Technology"));
+                .body("$.size()", is(2))
+                .body("label", containsInAnyOrder("College of Agricultural Sciences and Fisheries",
+                        "College of Information and Communication Technology"));
     }
 
     @Test
@@ -102,8 +108,18 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .when().get(uuid)
                 .then()
                 .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("College of Engineering Technology"),
+                        containsString("CoET"),
+                        containsString("Chuo kikuu"),
+                        containsString("Ubungo"),
+                        containsString("15114"),
+                        containsString("Dar es salaam"),
+                        containsString("Tanzania")
+                )
                 .extract().as(CollegeDetail.class);
 
+        assertThat(foundCollegeDetail, is(notNullValue()));
         assertThat(uuid, equalTo(foundCollegeDetail.getCollegeId()));
     }
 
@@ -137,6 +153,25 @@ class CollegeResourceTest extends AccessTokenProvider {
         assertThat(url, is(notNullValue()));
         String uuid = url.substring(url.lastIndexOf("/") + 1);
         assertThat(uuid, matchesRegex(UUID_REGEX));
+
+        CollegeDetail foundCollegeDetail = given()
+                .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
+                .when().get(uuid)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("College of Engineering Technology"),
+                        containsString("CoNAS"),
+                        containsString("Chuo kikuu"),
+                        containsString("Ubungo"),
+                        containsString("15114"),
+                        containsString("Dar es salaam"),
+                        containsString("Tanzania")
+                )
+                .extract().as(CollegeDetail.class);
+
+        assertThat(foundCollegeDetail, is(notNullValue()));
+        assertThat(uuid, equalTo(foundCollegeDetail.getCollegeId()));
     }
 
     @Test
@@ -207,10 +242,38 @@ class CollegeResourceTest extends AccessTokenProvider {
 
     @Test
     @Order(10)
-    void updateCollege() {
+    void saveFailValidationsConstraintViolations() {
+        CollegeDetail collegeDetail = new CollegeDetail();
+        ErrorResponse errorResponse = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
+                .body(collegeDetail)
+                .post()
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(6)));
+        assertThat(errorResponse.getErrors(), containsInAnyOrder(
+                new ErrorResponse.ErrorMessage("createCollege.collegeDetail.collegeName", getErrorMessage("College.name.required")),
+                new ErrorResponse.ErrorMessage("createCollege.collegeDetail.street", getErrorMessage("Address.field.required")),
+                new ErrorResponse.ErrorMessage("createCollege.collegeDetail.ward", getErrorMessage("Address.field.required")),
+                new ErrorResponse.ErrorMessage("createCollege.collegeDetail.city", getErrorMessage("Address.field.required")),
+                new ErrorResponse.ErrorMessage("createCollege.collegeDetail.district", getErrorMessage("Address.field.required")),
+                new ErrorResponse.ErrorMessage("createCollege.collegeDetail.country", getErrorMessage("Address.field.required")))
+        );
+    }
+
+    @Test
+    @Order(11)
+    void updateOnlyCollege() {
         final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+        final String collegeName = "Original college name before update";
+        final String collegeNameUpdated = "Updated college name";
         CollegeDetail collegeDetail = createCollegeDetail();
-        collegeDetail.setCollegeName("Original college name before update");
+        collegeDetail.setCollegeName(collegeName);
+
         String url = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
@@ -233,8 +296,9 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .extract().as(CollegeDetail.class);
 
         assertThat(uuid, equalTo(foundCollegeDetail.getCollegeId()));
+        assertThat(foundCollegeDetail.getCollegeName(), is(equalTo(collegeName)));
 
-        foundCollegeDetail.setCollegeName("Updated college name");
+        foundCollegeDetail.setCollegeName(collegeNameUpdated);
 
         given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
@@ -249,13 +313,22 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .when().get(uuid)
                 .then()
                 .statusCode(OK.getStatusCode())
+                .body(
+                        containsString(collegeNameUpdated),
+                        containsString("CoET"),
+                        containsString("Chuo kikuu"),
+                        containsString("Ubungo"),
+                        containsString("15114"),
+                        containsString("Dar es salaam"),
+                        containsString("Tanzania")
+                )
                 .extract().as(CollegeDetail.class);
 
-        assertThat(collegeDetailUpdated.getCollegeName(), is(equalTo("Updated college name")));
+        assertThat(collegeDetailUpdated.getCollegeName(), is(equalTo(collegeNameUpdated)));
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     void updateFailsNoCollegeName() {
         final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
         CollegeDetail collegeDetail = createCollegeDetail();
@@ -302,6 +375,327 @@ class CollegeResourceTest extends AccessTokenProvider {
         );
     }
 
+    @Test
+    @Order(13)
+    void updateOnlyAddress() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+        final String collegeName = "Original college name before update address";
+        final String addressStreetUpdated = "Main campus";
+        CollegeDetail collegeDetail = createCollegeDetail();
+        collegeDetail.setCollegeName(collegeName);
+
+        String url = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeDetail)
+                .post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(url, notNullValue());
+        assertThat(collegeDetail.getCollegeName(), is(equalTo(collegeName)));
+        String uuid = url.substring(url.lastIndexOf("/") + 1);
+        assertThat(uuid, matchesRegex(UUID_REGEX));
+
+        CollegeDetail foundCollegeDetail = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(uuid)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().as(CollegeDetail.class);
+
+        assertThat(uuid, equalTo(foundCollegeDetail.getCollegeId()));
+        assertThat(foundCollegeDetail.getCollegeName(), is(equalTo(collegeName)));
+
+        foundCollegeDetail.setStreet(addressStreetUpdated);
+
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .body(foundCollegeDetail)
+                .when().put(foundCollegeDetail.getCollegeId())
+                .then()
+                .statusCode(NO_CONTENT.getStatusCode());
+
+        CollegeDetail collegeDetailUpdated = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(uuid)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString(collegeName),
+                        containsString("CoET"),
+                        containsString(addressStreetUpdated),
+                        containsString("Ubungo"),
+                        containsString("15114"),
+                        containsString("Dar es salaam"),
+                        containsString("Tanzania")
+                )
+                .extract().as(CollegeDetail.class);
+
+        assertThat(collegeDetailUpdated.getCollegeName(), is(equalTo(collegeName)));
+        assertThat(uuid, is(equalTo(collegeDetailUpdated.getCollegeId())));
+    }
+
+    @Test
+    @Order(14)
+    void updateBothCollegeAndAddress() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+        final String collegeName = "Original college name before update college and address";
+        final String addressStreetUpdated = "Mlimani main campus";
+        final String collegeNameUpdated = "Updated college name and street address";
+        CollegeDetail collegeDetail = createCollegeDetail();
+        collegeDetail.setCollegeName(collegeName);
+
+        String url = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeDetail)
+                .post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(url, notNullValue());
+        assertThat(collegeDetail.getCollegeName(), is(equalTo(collegeName)));
+        String uuid = url.substring(url.lastIndexOf("/") + 1);
+        assertThat(uuid, matchesRegex(UUID_REGEX));
+
+        CollegeDetail foundCollegeDetail = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(uuid)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().as(CollegeDetail.class);
+
+        assertThat(uuid, equalTo(foundCollegeDetail.getCollegeId()));
+        assertThat(foundCollegeDetail.getCollegeName(), is(equalTo(collegeName)));
+
+        foundCollegeDetail.setCollegeName(collegeNameUpdated);
+        foundCollegeDetail.setStreet(addressStreetUpdated);
+
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .body(foundCollegeDetail)
+                .when().put(foundCollegeDetail.getCollegeId())
+                .then()
+                .statusCode(NO_CONTENT.getStatusCode());
+
+        CollegeDetail collegeDetailUpdated = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(uuid)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString(collegeNameUpdated),
+                        containsString("CoET"),
+                        containsString(addressStreetUpdated),
+                        containsString("Ubungo"),
+                        containsString("15114"),
+                        containsString("Dar es salaam"),
+                        containsString("Tanzania")
+                )
+                .extract().as(CollegeDetail.class);
+
+        assertThat(collegeDetailUpdated.getCollegeName(), is(equalTo(collegeNameUpdated)));
+        assertThat(collegeDetailUpdated.getStreet(), is(equalTo(addressStreetUpdated)));
+    }
+
+    @Test
+    @Order(15)
+    void deleteCollegeAndAssociatedAddress() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+        final String collegeName = "To be deleted college and address";
+
+        CollegeDetail collegeDetail = createCollegeDetail();
+        collegeDetail.setCollegeName(collegeName);
+
+        // Get all college available
+        Response response = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get()
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().response();
+
+        List<CollegeDetail> collegeDetails = response.jsonPath().getList("$");
+
+        assertThat(collegeDetails, is(not(empty())));
+        assertThat(collegeDetails, hasSize(8));
+
+        // creates new college
+        String url = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeDetail)
+                .post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(url, notNullValue());
+        assertThat(collegeDetail.getCollegeName(), is(equalTo(collegeName)));
+        String uuid = url.substring(url.lastIndexOf("/") + 1);
+        assertThat(uuid, matchesRegex(UUID_REGEX));
+
+        // Get new list of all college available
+        Response results = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get()
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().response();
+
+        List<CollegeDetail> newCollegeDetailsLis = results.jsonPath().getList("$");
+
+        assertThat(newCollegeDetailsLis, is(not(empty())));
+        assertThat(newCollegeDetailsLis, hasSize(9)); // increased by 1
+
+        CollegeDetail collegeDetailFound = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(uuid)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().as(CollegeDetail.class);
+
+        assertThat(collegeDetailFound, is(notNullValue()));
+        assertThat(uuid, is(equalTo(collegeDetailFound.getCollegeId())));
+        assertThat(collegeDetailFound.getCollegeName(), is(equalTo(collegeName)));
+
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .when().delete(uuid)
+                .then()
+                .statusCode(NO_CONTENT.getStatusCode());
+
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(uuid)
+                .then()
+                .statusCode(NOT_FOUND.getStatusCode());
+
+        // Get new list of all college available after deletion
+        Response deleted = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get()
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().response();
+
+        List<CollegeDetail> newDeletedList = deleted.jsonPath().getList("$");
+
+        assertThat(newDeletedList, is(not(empty())));
+        assertThat(newDeletedList, hasSize(8)); // reduced by 1
+    }
+
+
+    @Test
+    @Order(16)
+    void deleteCollegeAndAssociatedAddressAndDepartment() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+        final String collegeName = "To be deleted college and address";
+
+        CollegeDetail collegeDetail = createCollegeDetail();
+        collegeDetail.setCollegeName(collegeName);
+
+        // Get all colleges available
+        Response response = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get()
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().response();
+
+        List<CollegeDetail> collegeDetails = response.jsonPath().getList("$");
+
+        assertThat(collegeDetails, is(not(empty())));
+        assertThat(collegeDetails, hasSize(8));
+
+        // creates new college
+        String collegeUrl = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeDetail)
+                .post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeUrl, notNullValue());
+        assertThat(collegeDetail.getCollegeName(), is(equalTo(collegeName)));
+        String uuid = collegeUrl.substring(collegeUrl.lastIndexOf("/") + 1);
+        assertThat(uuid, matchesRegex(UUID_REGEX));
+
+        // add new department to a created college
+        DepartmentInput departmentInput = createDepartment();
+        departmentInput.setCollegeId(uuid);
+        String departmentUrl = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentInput)
+                .post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentUrl, notNullValue());
+        String departmentUUID = departmentUrl.substring(departmentUrl.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get new list of all college available
+        Response results = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get()
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().response();
+
+        List<CollegeDetail> newCollegeDetailsLis = results.jsonPath().getList("$");
+
+        assertThat(newCollegeDetailsLis, is(not(empty())));
+        assertThat(newCollegeDetailsLis, hasSize(9)); // increased by 1
+
+        CollegeDetail collegeDetailFound = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(uuid)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().as(CollegeDetail.class);
+
+        assertThat(collegeDetailFound, is(notNullValue()));
+        assertThat(uuid, is(equalTo(collegeDetailFound.getCollegeId())));
+        assertThat(collegeDetailFound.getCollegeName(), is(equalTo(collegeName)));
+
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .when().delete(uuid)
+                .then()
+                .statusCode(NO_CONTENT.getStatusCode());
+
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(uuid)
+                .then()
+                .statusCode(NOT_FOUND.getStatusCode());
+
+        // Get new list of all college available after deletion
+        Response deleted = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get()
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().response();
+
+        List<CollegeDetail> newDeletedList = deleted.jsonPath().getList("$");
+
+        assertThat(newDeletedList, is(not(empty())));
+        assertThat(newDeletedList, hasSize(8)); // reduced by 1
+    }
+
     private CollegeDetail createCollegeDetail() {
         CollegeDetail collegeDetail = new CollegeDetail();
         collegeDetail.setCollegeName("College of Engineering Technology");
@@ -313,6 +707,14 @@ class CollegeResourceTest extends AccessTokenProvider {
         collegeDetail.setCity("Dar es salaam");
         collegeDetail.setCountry("Tanzania");
         return collegeDetail;
+    }
+
+    private DepartmentInput createDepartment() {
+        DepartmentInput departmentInput = new DepartmentInput();
+        departmentInput.setDepartmentName("Deleted Dept");
+        departmentInput.setDepartmentCode("DEL012");
+        departmentInput.setCollegeId(null);
+        return departmentInput;
     }
 
     private String getErrorMessage(String key) {
