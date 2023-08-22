@@ -2,7 +2,10 @@ package com.japhet_sebastian.organization.control;
 
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.boundary.PageRequest;
-import com.japhet_sebastian.organization.entity.*;
+import com.japhet_sebastian.organization.entity.Address;
+import com.japhet_sebastian.organization.entity.DepartmentDetail;
+import com.japhet_sebastian.organization.entity.DepartmentEntity;
+import com.japhet_sebastian.organization.entity.DepartmentInput;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -72,14 +75,14 @@ public class DepartmentService implements DepartmentInterface {
         this.departmentMapper.updateDepartmentInputFromDepartmentEntity(departmentEntity, departmentInput);
     }
 
-    public void updateDepartment(@Valid DepartmentUpdate departmentUpdate) {
-        String departmentId = departmentUpdate.getDepartmentId();
+    public void updateDepartment(@Valid DepartmentInput department) {
+        String departmentId = department.getDepartmentId();
         DepartmentEntity departmentEntity = this.departmentRepository.findByIdOptional(UUID.fromString(departmentId))
                 .orElseThrow(() -> new ServiceException("No department found for departmentId[%s]", departmentId));
 
-        this.departmentMapper.updateDepartmentEntityFromDepartmentUpdate(departmentUpdate, departmentEntity);
+        this.departmentMapper.updateDepartmentEntityFromDepartmentInput(department, departmentEntity);
         this.departmentRepository.persist(departmentEntity);
-        this.departmentMapper.updateDepartmentUpdateFromDepartmentEntity(departmentEntity, departmentUpdate);
+        this.departmentMapper.updateDepartmentInputFromDepartmentEntity(departmentEntity, department);
     }
 
     public void deleteDepartment(@NotNull String departmentId) {

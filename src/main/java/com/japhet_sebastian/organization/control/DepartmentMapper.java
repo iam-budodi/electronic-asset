@@ -3,7 +3,6 @@ package com.japhet_sebastian.organization.control;
 import com.japhet_sebastian.organization.entity.Department;
 import com.japhet_sebastian.organization.entity.DepartmentEntity;
 import com.japhet_sebastian.organization.entity.DepartmentInput;
-import com.japhet_sebastian.organization.entity.DepartmentUpdate;
 import org.mapstruct.*;
 
 import java.util.List;
@@ -33,14 +32,14 @@ public interface DepartmentMapper {
 
     void updateDepartmentInputFromDepartmentEntity(DepartmentEntity departmentEntity, @MappingTarget DepartmentInput departmentInput);
 
-//    void updateDepartmentEntityFromDepartment(Department department, @MappingTarget DepartmentEntity departmentEntity);
+    void updateDepartmentEntityFromDepartmentInput(DepartmentInput departmentInput, @MappingTarget DepartmentEntity departmentEntity);
 //
 //    void updateDepartmentFromDepartmentEntity(DepartmentEntity departmentEntity, @MappingTarget Department department);
 
 
-    void updateDepartmentEntityFromDepartmentUpdate(DepartmentUpdate departmentUpdate, @MappingTarget DepartmentEntity departmentEntity);
-
-    void updateDepartmentUpdateFromDepartmentEntity(DepartmentEntity departmentEntity, @MappingTarget DepartmentUpdate departmentUpdate);
+//    void updateDepartmentEntityFromDepartmentUpdate(DepartmentUpdate departmentUpdate, @MappingTarget DepartmentEntity departmentEntity);
+//
+//    void updateDepartmentUpdateFromDepartmentEntity(DepartmentEntity departmentEntity, @MappingTarget DepartmentUpdate departmentUpdate);
 
 
     @AfterMapping

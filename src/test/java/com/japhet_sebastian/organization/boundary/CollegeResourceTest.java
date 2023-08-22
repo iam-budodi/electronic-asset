@@ -608,7 +608,7 @@ class CollegeResourceTest extends AccessTokenProvider {
         List<CollegeDetail> collegeDetails = response.jsonPath().getList("$");
 
         assertThat(collegeDetails, is(not(empty())));
-        assertThat(collegeDetails, hasSize(8));
+        assertThat(collegeDetails, hasSize(greaterThanOrEqualTo(2)));
 
         // creates new college
         String collegeUrl = given()

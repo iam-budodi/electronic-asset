@@ -4,7 +4,6 @@ import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.control.DepartmentService;
 import com.japhet_sebastian.organization.entity.DepartmentDetail;
 import com.japhet_sebastian.organization.entity.DepartmentInput;
-import com.japhet_sebastian.organization.entity.DepartmentUpdate;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -130,7 +129,7 @@ public class DepartmentResource extends AbstractDepartmentType {
                     description = "Department updated",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON,
-                            schema = @Schema(implementation = DepartmentUpdate.class, type = SchemaType.OBJECT))),
+                            schema = @Schema(implementation = DepartmentInput.class, type = SchemaType.OBJECT))),
             @APIResponse(
                     responseCode = "404",
                     description = "No Department found for a given identifier",
@@ -151,7 +150,7 @@ public class DepartmentResource extends AbstractDepartmentType {
     public Response updateDepartment(
             @Parameter(description = "departmentId", required = true) @PathParam("departmentId") @NotNull String departmentId,
             @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = DepartmentUpdate.class))) @Valid DepartmentUpdate department) {
+                    schema = @Schema(implementation = DepartmentInput.class))) @Valid DepartmentInput department) {
         if (Objects.isNull(department.getDepartmentId()) || department.getDepartmentId().isEmpty())
             throw new ServiceException("Department does not have departmentId");
 
