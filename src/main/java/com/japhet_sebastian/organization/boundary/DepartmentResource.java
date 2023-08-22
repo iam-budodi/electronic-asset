@@ -25,7 +25,6 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
-import org.jboss.logging.Logger;
 
 import java.net.URI;
 import java.util.List;
@@ -45,9 +44,6 @@ public class DepartmentResource extends AbstractDepartmentType {
 
     @Inject
     DepartmentService departmentService;
-
-    @Inject
-    Logger LOGGER;
 
     @GET
     @Operation(summary = "Get all available departments information")
@@ -115,7 +111,7 @@ public class DepartmentResource extends AbstractDepartmentType {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON)),
             @APIResponse(
                     responseCode = "400",
-                    description = "Department already exists for department name",
+                    description = "Department with same name already exists",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON))
     })
     public Response saveDepartment(@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,

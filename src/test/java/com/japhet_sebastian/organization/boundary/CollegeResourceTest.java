@@ -19,6 +19,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static jakarta.ws.rs.core.Response.Status.*;
@@ -30,10 +31,6 @@ import static org.hamcrest.Matchers.*;
 @TestHTTPEndpoint(CollegeResource.class)
 @QuarkusTestResource(KeycloakResource.class)
 class CollegeResourceTest extends AccessTokenProvider {
-
-    @TestHTTPResource("collegeId")
-    @TestHTTPEndpoint(CollegeResource.class)
-    String stringId;
 
     @TestHTTPResource("select")
     @TestHTTPEndpoint(CollegeResource.class)
@@ -126,11 +123,11 @@ class CollegeResourceTest extends AccessTokenProvider {
     @Test
     @Order(5)
     void getNotFound() {
-        final String uuid = "450921b5-5def-4fab-b3f6-2bea30ee7099";
+        final String randomUuidString = UUID.randomUUID().toString();
         given()
                 .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
                 .contentType(ContentType.JSON)
-                .when().get(uuid)
+                .when().get(randomUuidString)
                 .then()
                 .statusCode(NOT_FOUND.getStatusCode());
     }
@@ -230,7 +227,6 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .extract().as(ErrorResponse.class);
-
 
         assertThat(errorResponse.getErrorId(), is(nullValue()));
         assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(2)));
@@ -629,7 +625,7 @@ class CollegeResourceTest extends AccessTokenProvider {
         String uuid = collegeUrl.substring(collegeUrl.lastIndexOf("/") + 1);
         assertThat(uuid, matchesRegex(UUID_REGEX));
 
-        // add new department to a created college
+        // add new department to a created colleger
         DepartmentInput departmentInput = createDepartment();
         departmentInput.setCollegeId(uuid);
         String departmentUrl = given()
@@ -679,6 +675,15 @@ class CollegeResourceTest extends AccessTokenProvider {
         given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .when().get(uuid)
+                .then()
+                .statusCode(NOT_FOUND.getStatusCode());
+
+
+        given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+//                .pathParam("departmentId", departmentUUID)
+                .get(department + "/{departmentId}", departmentUUID)
                 .then()
                 .statusCode(NOT_FOUND.getStatusCode());
 

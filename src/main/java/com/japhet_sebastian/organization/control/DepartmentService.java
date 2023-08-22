@@ -64,7 +64,7 @@ public class DepartmentService implements DepartmentInterface {
                 .findDepartmentByName(departmentInput.getDepartmentName()).isPresent();
 
         if (isDepartmentPresent)
-            throw new ServiceException("Invalid object, department with the same name already exists");
+            throw new ServiceException("Department with same name already exists");
 
         DepartmentEntity departmentEntity = this.departmentDetailMapper
                 .toDepartmentEntity(this.departmentMapper.toDepartment(departmentInput));
