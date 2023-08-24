@@ -24,7 +24,7 @@ public class CollegeRepository implements PanacheRepositoryBase<CollegeEntity, U
     public List<College> allColleges(PageRequest pageRequest) {
         if (pageRequest.getSearch() != null)
             pageRequest.setSearch("%" + pageRequest.getSearch().toLowerCase(Locale.ROOT) + "%");
-        String query = "FROM College c WHERE :search IS NULL OR LOWER(c.collegeName) LIKE :search " +
+        String query = "FROM College c LEFT JOIN FETCH c.address WHERE :search IS NULL OR LOWER(c.collegeName) LIKE :search " +
                 "OR LOWER(c.collegeCode) LIKE :search";
 
         List<CollegeEntity> collegeEntities = find(

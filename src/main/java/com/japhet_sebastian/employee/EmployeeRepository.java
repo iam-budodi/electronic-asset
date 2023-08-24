@@ -46,8 +46,8 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
         String query = getString(pageRequest);
 
         List<EmployeeEntity> employeeEntities = find(query, Sort
-                .by("e.firstName", Sort.Direction.Descending).and("e.lastName", Sort.Direction.Descending)
-                .and("e.hireDate", Sort.Direction.Descending),
+                        .by("e.firstName", Sort.Direction.Descending).and("e.lastName", Sort.Direction.Descending)
+                        .and("e.hireDate", Sort.Direction.Descending),
                 params)
                 .page(Page.of(pageRequest.getPageNum(), pageRequest.getPageSize()))
                 .list();

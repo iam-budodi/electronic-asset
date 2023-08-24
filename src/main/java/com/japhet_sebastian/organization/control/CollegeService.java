@@ -68,7 +68,7 @@ public class CollegeService implements CollegeInterface {
         this.collegeRepository.persist(collegeEntity);
 
         AddressEntity addressEntity = this.collegeMapper.toAddressEntity(collegeDetail);
-        addressEntity.setCollege(collegeEntity);
+//        addressEntity.setCollege(collegeEntity);
         this.addressRepository.persist(addressEntity);
 
         this.collegeMapper.updateCollegeDetailFromCollegeEntity(collegeEntity, collegeDetail);

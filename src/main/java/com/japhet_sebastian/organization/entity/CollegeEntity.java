@@ -15,10 +15,7 @@ import java.util.UUID;
 @NamedQueries({@NamedQuery(name = "College.name", query = "FROM College WHERE LOWER(collegeName) = :name")})
 @Schema(description = "College Representation")
 public class CollegeEntity {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "college_uuid")
     private UUID collegeId;
 
     @Schema(required = true)
@@ -32,6 +29,11 @@ public class CollegeEntity {
     @Pattern(regexp = "^[\\p{L}\\p{Nd} _]+$", message = "{Alphanumeric.character}")
     @Column(name = "college_code")
     private String collegeCode;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "college_uuid", foreignKey = @ForeignKey(name = "college_address_fk_constraint"))
+    AddressEntity address;
 
     public CollegeEntity() {
     }

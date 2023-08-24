@@ -3,7 +3,6 @@ package com.japhet_sebastian.supplier;
 import com.assets.management.assets.model.valueobject.SupplierType;
 import com.japhet_sebastian.employee.BaseEntity;
 import com.japhet_sebastian.organization.entity.AddressEntity;
-import io.quarkus.panache.common.Parameters;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +10,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -34,9 +32,7 @@ import java.util.UUID;
 public class SupplierEntity extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "supplier_uuid")
-    public UUID supplier_uuid;
+    public UUID supplierId;
 
     @NotNull
     @Schema(required = true)
@@ -82,11 +78,9 @@ public class SupplierEntity extends BaseEntity {
     public String description;
 
     @Schema(required = true)
-    @OneToOne(
-            mappedBy = "supplier",
-            orphanRemoval = true,
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "supplier_uuid", foreignKey = @ForeignKey(name = "supplier_address_fk_constraint"))
     public AddressEntity address;
 
 //    public static Optional<SupplierEntity> findByEmailAndPhone(String email, String phone) {

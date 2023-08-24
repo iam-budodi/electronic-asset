@@ -1,5 +1,6 @@
 package com.japhet_sebastian.employee;
 
+import com.japhet_sebastian.organization.entity.AddressEntity;
 import com.japhet_sebastian.organization.entity.DepartmentEntity;
 import com.japhet_sebastian.vo.EmploymentStatus;
 import jakarta.persistence.*;
@@ -21,37 +22,34 @@ import java.util.UUID;
 @Schema(description = "Employee representation")
 public class EmployeeEntity extends Person {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "employee_uuid")
-    private UUID employeeId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "employee_uuid", foreignKey = @ForeignKey(name = "employee_address_fk_constraint"))
+    public AddressEntity address;
 
+    @Id
+    private UUID employeeId;
     @NotEmpty
     @Schema(required = true)
     @Column(name = "work_id")
     private String workId;
-
     @NotEmpty
     @Schema(required = true)
     @Column(name = "birthdate")
     private LocalDate dateOfBirth;
-
     @NotEmpty
     @Schema(required = true)
     @Column(name = "hire_date", nullable = false)
     private LocalDate hireDate;
-
     @NotEmpty
     @Schema(required = true)
     @ElementCollection
     @Enumerated(EnumType.STRING)
     @Column(name = "employment_status", nullable = false)
     private Set<EmploymentStatus> status;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "department_uuid", foreignKey = @ForeignKey(name = "employee_department_fk_constraint", foreignKeyDefinition = ""))
     private DepartmentEntity department;
-
     @Transient
     private Integer age;
 

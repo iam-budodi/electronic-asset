@@ -1,8 +1,5 @@
 package com.japhet_sebastian.organization.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.japhet_sebastian.employee.EmployeeEntity;
-import com.japhet_sebastian.supplier.SupplierEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
@@ -14,6 +11,11 @@ import java.util.UUID;
 @Entity(name = "Address")
 @Table(name = "addresses")
 public class AddressEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "address_uuid")
+    private UUID addressId;
 
     @NotEmpty(message = "{Address.field.required}")
     @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
@@ -49,25 +51,6 @@ public class AddressEntity {
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     @Column(length = 32, nullable = false)
     public String country;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "employee_uuid", foreignKey = @ForeignKey(name = "employee_address_fk_constraint"))
-    public EmployeeEntity employee;
-
-    @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "supplier_fk", foreignKey = @ForeignKey(name = "supplier_address_fk_constraint"))
-    public SupplierEntity supplier;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "college_uuid", foreignKey = @ForeignKey(name = "college_address_fk_constraint"))
-    public CollegeEntity college;
-
-    @Id
-    private UUID addressId;
-
 
     public AddressEntity() {
     }
@@ -128,30 +111,6 @@ public class AddressEntity {
         this.country = country;
     }
 
-    public EmployeeEntity getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(EmployeeEntity employee) {
-        this.employee = employee;
-    }
-
-    public SupplierEntity getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(SupplierEntity supplier) {
-        this.supplier = supplier;
-    }
-
-    public CollegeEntity getCollege() {
-        return college;
-    }
-
-    public void setCollege(CollegeEntity college) {
-        this.college = college;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -162,16 +121,13 @@ public class AddressEntity {
                 && Objects.equals(getDistrict(), address.getDistrict())
                 && Objects.equals(getCity(), address.getCity())
                 && Objects.equals(getPostalCode(), address.getPostalCode())
-                && Objects.equals(getCountry(), address.getCountry())
-                && Objects.equals(getEmployee(), address.getEmployee())
-                && Objects.equals(getSupplier(), address.getSupplier())
-                && Objects.equals(getCollege(), address.getCollege());
+                && Objects.equals(getCountry(), address.getCountry());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getAddressId(), getStreet(), getWard(), getDistrict(), getCity(),
-                getPostalCode(), getCountry(), getEmployee(), getSupplier(), getCollege());
+                getPostalCode(), getCountry());
     }
 
     @Override
@@ -183,10 +139,7 @@ public class AddressEntity {
                 ", district='" + district + '\'' +
                 ", city='" + city + '\'' +
                 ", postalCode='" + postalCode + '\'' +
-                ", country='" + country + '\'' +
-                ", employee=" + employee +
-                ", supplier=" + supplier +
-                ", college=" + college +
+                ", country='" + country +
                 '}';
     }
 }

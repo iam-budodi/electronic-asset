@@ -32,9 +32,9 @@ public interface CollegeMapper {
 
     @Mappings({
             @Mapping(target = "addressId", ignore = true),
-            @Mapping(target = "supplier", ignore = true),
-            @Mapping(target = "employee", ignore = true),
-            @Mapping(target = "college", ignore = true),
+//            @Mapping(target = "supplier", ignore = true),
+//            @Mapping(target = "employee", ignore = true),
+//            @Mapping(target = "college", ignore = true),
             @Mapping(target = "street", source = "collegeDetail.street"),
             @Mapping(target = "ward", source = "collegeDetail.ward"),
             @Mapping(target = "district", source = "collegeDetail.district"),

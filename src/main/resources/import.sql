@@ -1,24 +1,16 @@
+-- ADDRESSES
+insert into addresses (city, country, district_name, postal_code, street_name, ward_name, address_uuid)
+VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi', 'kijitonyama',
+        '64365d7c-354d-11ee-be56-0242ac120002');
+insert into addresses (city, country, district_name, postal_code, street_name, ward_name, address_uuid)
+VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi', 'kijitonyama',
+        '849ea0ce-354d-11ee-be56-0242ac120002');
+
 -- COLLEGES
 insert into colleges (college_uuid, college_name, college_code)
 VALUES ('64365d7c-354d-11ee-be56-0242ac120002', 'College of Information and Communication Technology', 'CoICT');
 insert into colleges (college_uuid, college_name, college_code)
 VALUES ('849ea0ce-354d-11ee-be56-0242ac120002', 'College of Agricultural Sciences and Fisheries', 'CoAF');
-
--- ADDRESSES
-insert into addresses (city, country, district_name, postal_code, street_name, ward_name, college_uuid)
-VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi', 'kijitonyama',
-        '64365d7c-354d-11ee-be56-0242ac120002');
-insert into addresses (city, country, district_name, postal_code, street_name, ward_name, college_uuid)
-VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi', 'kijitonyama',
-        '849ea0ce-354d-11ee-be56-0242ac120002');
-
--- ADDRESSES FOR EMPLOYEE
-insert into addresses (city, country, district_name, postal_code, street_name, ward_name, employee_uuid)
-VALUES ('Dar es Salaam', 'Tanzania', 'Ubungo', '15114', 'mavulunza', 'kimara',
-        '849ea0de-354d-11ee-be56-0242ac120024');
-insert into addresses (city, country, district_name, postal_code, street_name, ward_name, employee_uuid)
-VALUES ('Dar es Salaam', 'Tanzania', 'Ubungo', '15004', 'corner', 'kimara',
-        '849ea0ee-354d-11ee-be56-0242ac120024');
 
 -- DEPARTMENT TABLE - add 4 more dept
 insert into departments (department_uuid, department_code, description, department_name, college_uuid)
@@ -28,15 +20,30 @@ insert into departments (department_uuid, department_code, description, departme
 VALUES ('849ea0ce-354d-11ee-be56-0242ac120024', 'TE', 'Telecommunication engineering', 'Telecommunication Engineering',
         '64365d7c-354d-11ee-be56-0242ac120002');
 
+-- ADDRESSES FOR EMPLOYEE
+insert into addresses (city, country, district_name, postal_code, street_name, ward_name, address_uuid)
+VALUES ('Dar es Salaam', 'Tanzania', 'Ubungo', '15114', 'mavulunza', 'kimara',
+        '849ea0de-354d-11ee-be56-0242ac120024');
+insert into addresses (city, country, district_name, postal_code, street_name, ward_name, address_uuid)
+VALUES ('Dar es Salaam', 'Tanzania', 'Ubungo', '15004', 'corner', 'kimara',
+        '849ea0ee-354d-11ee-be56-0242ac120024');
+
 -- -- EMPLOYEE TABLE - add at least 19 more employee
-insert into employees (employee_uuid, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name,
+insert into employees (employee_uuid, registered_at, registered_by, email_address, first_name, gender, last_name,
+                       middle_name,
                        phone_number, birthdate, hire_date, work_id, department_uuid)
-VALUES ('849ea0de-354d-11ee-be56-0242ac120024', '2023-03-30', 'Habiba', 'hellen@gmail.com', 'hellen', 'F', 'John', 'Malaba', '255716656596', '1990-01-02',
+VALUES ('849ea0de-354d-11ee-be56-0242ac120024', '2023-03-30', 'Habiba', 'hellen@gmail.com', 'hellen', 'F', 'John',
+        'Malaba', '255716656596', '1990-01-02',
         '2022-07-28', '19-04-20022', '849ea0ce-354d-11ee-be56-0242ac120022');
-insert into employees (employee_uuid, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name,
+insert into employees (employee_uuid, registered_at, registered_by, email_address, first_name, gender, last_name,
+                       middle_name,
                        phone_number, birthdate, hire_date, work_id, department_uuid)
-VALUES ('849ea0ee-354d-11ee-be56-0242ac120024', '2023-03-30', 'Habiba', 'lu3@gmail.com', 'Michael', 'M', 'Mbaga', 'Joseph', '255713333396', '1970-09-09',
+VALUES ('849ea0ee-354d-11ee-be56-0242ac120024', '2023-03-30', 'Habiba', 'lu3@gmail.com', 'Michael', 'M', 'Mbaga',
+        'Joseph', '255713333396', '1970-09-09',
         '2017-12-01', '19-04-02349', '849ea0ce-354d-11ee-be56-0242ac120022');
+
+
+
 -- insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name,
 --                        phone_number, birthdate, hire_date, work_id, department_fk)
 -- VALUES (202, '2023-02-20', 'Lulu', 'burhan@gmail.com', 'Burhan', 'M', 'Kihambwe', 'Salum', '255673320098', '1991-06-12',
