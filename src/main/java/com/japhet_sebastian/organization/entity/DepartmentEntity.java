@@ -39,7 +39,7 @@ public class DepartmentEntity {
     @Column(length = 64)
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "college_uuid", nullable = false, foreignKey = @ForeignKey(name = "college_department_fk_constraint"))
     private CollegeEntity college;
 

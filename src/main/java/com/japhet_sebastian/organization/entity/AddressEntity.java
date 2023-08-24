@@ -50,9 +50,9 @@ public class AddressEntity {
     @Column(length = 32, nullable = false)
     public String country;
 
-    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_fk", foreignKey = @ForeignKey(name = "employee_address_fk_constraint"))
+    @MapsId
+    @JoinColumn(name = "employee_uuid", foreignKey = @ForeignKey(name = "employee_address_fk_constraint"))
     public EmployeeEntity employee;
 
     @JsonIgnore

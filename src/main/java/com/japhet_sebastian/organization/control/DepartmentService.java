@@ -1,11 +1,11 @@
 package com.japhet_sebastian.organization.control;
 
 import com.japhet_sebastian.exception.ServiceException;
-import com.japhet_sebastian.organization.boundary.PageRequest;
 import com.japhet_sebastian.organization.entity.Address;
 import com.japhet_sebastian.organization.entity.DepartmentDetail;
 import com.japhet_sebastian.organization.entity.DepartmentEntity;
 import com.japhet_sebastian.organization.entity.DepartmentInput;
+import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

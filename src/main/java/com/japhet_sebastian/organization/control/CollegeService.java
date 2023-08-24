@@ -1,11 +1,11 @@
 package com.japhet_sebastian.organization.control;
 
 import com.japhet_sebastian.exception.ServiceException;
-import com.japhet_sebastian.organization.boundary.PageRequest;
 import com.japhet_sebastian.organization.entity.Address;
 import com.japhet_sebastian.organization.entity.AddressEntity;
 import com.japhet_sebastian.organization.entity.CollegeDetail;
 import com.japhet_sebastian.organization.entity.CollegeEntity;
+import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

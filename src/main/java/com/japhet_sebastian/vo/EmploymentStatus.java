@@ -1,4 +1,4 @@
-package com.assets.management.assets.model.valueobject;
+package com.japhet_sebastian.vo;
 
 public enum EmploymentStatus {
     CONTRACT,

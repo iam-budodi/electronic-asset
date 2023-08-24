@@ -1,8 +1,8 @@
 package com.japhet_sebastian.organization.control;
 
-import com.japhet_sebastian.organization.boundary.PageRequest;
 import com.japhet_sebastian.organization.entity.Address;
 import com.japhet_sebastian.organization.entity.AddressEntity;
+import com.japhet_sebastian.vo.PageRequest;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;
 import io.quarkus.panache.common.Parameters;

@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Size;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Entity
 @Table(
@@ -31,6 +32,11 @@ import java.util.Optional;
 })
 @Schema(description = "Supplier representation")
 public class SupplierEntity extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "supplier_uuid")
+    public UUID supplier_uuid;
 
     @NotNull
     @Schema(required = true)
@@ -83,8 +89,8 @@ public class SupplierEntity extends BaseEntity {
             fetch = FetchType.LAZY)
     public AddressEntity address;
 
-    public static Optional<SupplierEntity> findByEmailAndPhone(String email, String phone) {
-        return find("#Supplier.getEmailOrPhone", Parameters.with("email", email).and("phone", phone).map())
-                .firstResultOptional();
-    }
+//    public static Optional<SupplierEntity> findByEmailAndPhone(String email, String phone) {
+//        return find("#Supplier.getEmailOrPhone", Parameters.with("email", email).and("phone", phone).map())
+//                .firstResultOptional();
+//    }
 }

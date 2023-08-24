@@ -33,9 +33,6 @@ public class CollegeEntity {
     @Column(name = "college_code")
     private String collegeCode;
 
-//    @OneToOne(mappedBy = "college", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
-//    private AddressEntity location;
-
     public CollegeEntity() {
     }
 
@@ -68,14 +65,6 @@ public class CollegeEntity {
     public void setCollegeCode(String collegeCode) {
         this.collegeCode = collegeCode;
     }
-
-//    public AddressEntity getLocation() {
-//        return location;
-//    }
-//
-//    public void setLocation(AddressEntity location) {
-//        this.location = location;
-//    }
 
     @Override
     public boolean equals(Object o) {

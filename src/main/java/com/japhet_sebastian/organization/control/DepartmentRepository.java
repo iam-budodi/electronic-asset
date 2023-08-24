@@ -1,8 +1,8 @@
 package com.japhet_sebastian.organization.control;
 
-import com.japhet_sebastian.organization.boundary.PageRequest;
 import com.japhet_sebastian.organization.entity.Department;
 import com.japhet_sebastian.organization.entity.DepartmentEntity;
+import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;

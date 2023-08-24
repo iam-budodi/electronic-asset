@@ -3,6 +3,7 @@ package com.japhet_sebastian.organization.boundary;
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.control.CollegeService;
 import com.japhet_sebastian.organization.entity.CollegeDetail;
+import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;

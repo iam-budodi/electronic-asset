@@ -4,6 +4,7 @@ import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.control.DepartmentService;
 import com.japhet_sebastian.organization.entity.DepartmentDetail;
 import com.japhet_sebastian.organization.entity.DepartmentInput;
+import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
