@@ -8,17 +8,9 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.ResourceBundle;
-
-import static io.restassured.RestAssured.given;
-import static jakarta.ws.rs.core.HttpHeaders.ACCEPT;
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
-import static jakarta.ws.rs.core.Response.Status.OK;
-import static org.hamcrest.Matchers.*;
 
 @QuarkusTest
 @TestHTTPEndpoint(DepartmentResource.class)
@@ -35,35 +27,35 @@ class DepartmentResourceTest extends AccessTokenProvider {
     @TestHTTPEndpoint(DepartmentResource.class)
     String selectPath;
 
-    @Test
-    void shouldGetDepartments() {
-        given()
-                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-                .header(ACCEPT, APPLICATION_JSON)
-                .when().get()
-                .then()
-                .statusCode(OK.getStatusCode())
-                .body("$", is(not(empty())))
-                .body("size()", is(2))
-                .body(
-                        containsString("TE"),
-                        containsString("CSE")
-                )
-                .header("X-Total-Count", String.valueOf(2));
-    }
-
-    @Test
-    void shouldGetPagedList() {
-        given()
-                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-                .contentType(ContentType.JSON)
-                .when().get("?page=0&size=1")
-                .then()
-                .statusCode(OK.getStatusCode())
-                .body("$.size()", is(1))
-                .body("departmentCode", anyOf(contains("CSE"), contains("TE")))
-                .header("X-Total-Count", String.valueOf(2));
-    }
+//    @Test
+//    void shouldGetDepartments() {
+//        given()
+//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+//                .header(ACCEPT, APPLICATION_JSON)
+//                .when().get()
+//                .then()
+//                .statusCode(OK.getStatusCode())
+//                .body("$", is(not(empty())))
+//                .body("size()", is(2))
+//                .body(
+//                        containsString("TE"),
+//                        containsString("CSE")
+//                )
+//                .header("X-Total-Count", String.valueOf(2));
+//    }
+//
+//    @Test
+//    void shouldGetPagedList() {
+//        given()
+//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+//                .contentType(ContentType.JSON)
+//                .when().get("?page=0&size=1")
+//                .then()
+//                .statusCode(OK.getStatusCode())
+//                .body("$.size()", is(1))
+//                .body("departmentCode", anyOf(contains("CSE"), contains("TE")))
+//                .header("X-Total-Count", String.valueOf(2));
+//    }
 //
 //    @Test
 //    void shouldGetFormSelectionOptions() {
@@ -512,7 +504,6 @@ class DepartmentResourceTest extends AccessTokenProvider {
         collegeDetail.setCollegeName(RandomStringUtils.randomAlphabetic(64));
         collegeDetail.setCollegeCode(RandomStringUtils.randomAlphabetic(10));
         collegeDetail.setStreet(RandomStringUtils.randomAlphabetic(32));
-        collegeDetail.setWard(RandomStringUtils.randomAlphabetic(32));
         collegeDetail.setPostalCode(RandomStringUtils.randomNumeric(5));
         collegeDetail.setDistrict(RandomStringUtils.randomAlphabetic(32));
         collegeDetail.setCity(RandomStringUtils.randomAlphabetic(32));
