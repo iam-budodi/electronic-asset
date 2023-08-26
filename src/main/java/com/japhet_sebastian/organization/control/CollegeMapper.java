@@ -1,6 +1,9 @@
 package com.japhet_sebastian.organization.control;
 
-import com.japhet_sebastian.organization.entity.*;
+import com.japhet_sebastian.organization.entity.AddressEntity;
+import com.japhet_sebastian.organization.entity.College;
+import com.japhet_sebastian.organization.entity.CollegeDetail;
+import com.japhet_sebastian.organization.entity.CollegeEntity;
 import org.mapstruct.*;
 
 import java.util.List;
@@ -36,7 +39,7 @@ public interface CollegeMapper {
 //            @Mapping(target = "employee", ignore = true),
 //            @Mapping(target = "college", ignore = true),
             @Mapping(target = "street", source = "collegeDetail.street"),
-            @Mapping(target = "ward", source = "collegeDetail.ward"),
+//            @Mapping(target = "ward", source = "collegeDetail.ward"),
             @Mapping(target = "district", source = "collegeDetail.district"),
             @Mapping(target = "city", source = "collegeDetail.city"),
             @Mapping(target = "postalCode", source = "collegeDetail.postalCode"),
@@ -44,19 +47,31 @@ public interface CollegeMapper {
     })
     AddressEntity toAddressEntity(CollegeDetail collegeDetail);
 
+    //    @Mappings({
+//            @Mapping(target = "collegeId", expression = "java(college.getCollegeId().toString())"),
+//            @Mapping(target = "collegeName", source = "college.collegeName"),
+//            @Mapping(target = "collegeCode", source = "college.collegeCode"),
+////            @Mapping(target = "address.addressId", expression = "java(addressEntity.getAddressId().toString())"),
+//            @Mapping(target = "street", source = "address.street"),
+//            @Mapping(target = "ward", source = "address.ward"),
+//            @Mapping(target = "district", source = "address.district"),
+//            @Mapping(target = "city", source = "address.city"),
+//            @Mapping(target = "postalCode", source = "address.postalCode"),
+//            @Mapping(target = "country", source = "address.country")
+//    })
+//    CollegeDetail toCollegeDetail(College college, Address address);
+//
     @Mappings({
-            @Mapping(target = "collegeId", expression = "java(college.getCollegeId().toString())"),
-            @Mapping(target = "collegeName", source = "college.collegeName"),
-            @Mapping(target = "collegeCode", source = "college.collegeCode"),
-//            @Mapping(target = "address.addressId", expression = "java(addressEntity.getAddressId().toString())"),
-            @Mapping(target = "street", source = "address.street"),
-            @Mapping(target = "ward", source = "address.ward"),
-            @Mapping(target = "district", source = "address.district"),
-            @Mapping(target = "city", source = "address.city"),
-            @Mapping(target = "postalCode", source = "address.postalCode"),
-            @Mapping(target = "country", source = "address.country")
+            @Mapping(target = "collegeId", expression = "java(collegeEntity.getCollegeId().toString())"),
+            @Mapping(target = "collegeName", source = "collegeEntity.collegeName"),
+            @Mapping(target = "collegeCode", source = "collegeEntity.collegeCode"),
+            @Mapping(target = "street", source = "collegeEntity.address.street"),
+            @Mapping(target = "postalCode", source = "collegeEntity.address.postalCode"),
+            @Mapping(target = "district", source = "collegeEntity.address.district"),
+            @Mapping(target = "city", source = "collegeEntity.address.city"),
+            @Mapping(target = "country", source = "collegeEntity.address.country")
     })
-    CollegeDetail toCollegeDetail(College college, Address address);
+    CollegeDetail toCollegeDetail(CollegeEntity collegeEntity);
 
     void updateEntityFromDomain(College domain, @MappingTarget CollegeEntity entity);
 

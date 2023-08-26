@@ -1,7 +1,6 @@
 package com.japhet_sebastian.organization.control;
 
 import com.japhet_sebastian.exception.ServiceException;
-import com.japhet_sebastian.organization.entity.Address;
 import com.japhet_sebastian.organization.entity.DepartmentDetail;
 import com.japhet_sebastian.organization.entity.DepartmentEntity;
 import com.japhet_sebastian.organization.entity.DepartmentInput;
@@ -15,7 +14,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class DepartmentService implements DepartmentInterface {
@@ -33,14 +31,15 @@ public class DepartmentService implements DepartmentInterface {
     DepartmentMapper departmentMapper;
 
     public List<DepartmentDetail> listDepartments(PageRequest pageRequest) {
-        return this.departmentRepository.departments(pageRequest)
-                .stream()
-                .map(department -> {
-                    String addressId = department.getCollege().getCollegeId();
-                    Address address = this.addressRepository.findAddress(addressId)
-                            .orElseThrow(() -> new ServiceException("No address found for collegeId[%s]", addressId));
-                    return this.departmentDetailMapper.toDepartmentDetails(department, address);
-                }).collect(Collectors.toList());
+//        return this.departmentRepository.departments(pageRequest)
+//                .stream()
+//                .map(department -> {
+//                    String addressId = department.getCollege().getCollegeId();
+//                    Address address = this.addressRepository.findAddress(addressId)
+//                            .orElseThrow(() -> new ServiceException("No address found for collegeId[%s]", addressId));
+//                    return this.departmentDetailMapper.toDepartmentDetails(department, address);
+//                }).collect(Collectors.toList());
+        return null;
     }
 
     public Long totalDepartments() {
@@ -48,14 +47,15 @@ public class DepartmentService implements DepartmentInterface {
     }
 
     public Optional<DepartmentDetail> getDepartment(@NotNull String departmentId) {
-        return this.departmentRepository.findDepartment(departmentId)
-                .stream()
-                .map(department -> {
-                    String addressId = department.getCollege().getCollegeId();
-                    Address address = this.addressRepository.findAddress(addressId)
-                            .orElseThrow(() -> new ServiceException("No address found for collegeId[%s]", addressId));
-                    return this.departmentDetailMapper.toDepartmentDetails(department, address);
-                }).findFirst();
+//        return this.departmentRepository.findDepartment(departmentId)
+//                .stream()
+//                .map(department -> {
+//                    String addressId = department.getCollege().getCollegeId();
+//                    AddressEntity address = this.addressRepository.findAddress(UUID.fromString(addressId))
+//                            .orElseThrow(() -> new ServiceException("No address found for collegeId[%s]", addressId));
+//                    return this.departmentDetailMapper.toDepartmentDetails(department, address);
+//                }).findFirst();
+        return Optional.empty();
     }
 
     public List<SelectOptions> selected() {

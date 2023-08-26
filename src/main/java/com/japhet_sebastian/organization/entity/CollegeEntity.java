@@ -15,33 +15,25 @@ import java.util.UUID;
 @NamedQueries({@NamedQuery(name = "College.name", query = "FROM College WHERE LOWER(collegeName) = :name")})
 @Schema(description = "College Representation")
 public class CollegeEntity {
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "college_uuid", foreignKey = @ForeignKey(name = "college_address_fk_constraint"))
+    AddressEntity address;
     @Id
     private UUID collegeId;
-
     @Schema(required = true)
     @NotEmpty(message = "{College.name.required}")
     @Size(min = 2, max = 64, message = "{Sixty-four.string.length}")
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     @Column(name = "college_name", length = 64, nullable = false)
     private String collegeName;
-
     @Size(min = 2, max = 10, message = "{Alphanumeric.character.length}")
     @Pattern(regexp = "^[\\p{L}\\p{Nd} _]+$", message = "{Alphanumeric.character}")
     @Column(name = "college_code")
     private String collegeCode;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "college_uuid", foreignKey = @ForeignKey(name = "college_address_fk_constraint"))
-    AddressEntity address;
-
     public CollegeEntity() {
-    }
-
-    public CollegeEntity(UUID collegeId, String collegeName, String collegeCode) {
-        this.collegeId = collegeId;
-        this.collegeName = collegeName;
-        this.collegeCode = collegeCode;
     }
 
     public UUID getCollegeId() {
@@ -68,27 +60,34 @@ public class CollegeEntity {
         this.collegeCode = collegeCode;
     }
 
+    public AddressEntity getAddress() {
+        return address;
+    }
+
+    public void setAddress(AddressEntity address) {
+        this.address = address;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CollegeEntity entity)) return false;
-        return Objects.equals(getCollegeId(), entity.getCollegeId())
-                && Objects.equals(getCollegeName(), entity.getCollegeName())
-                && Objects.equals(getCollegeCode(), entity.getCollegeCode());
+        if (!(o instanceof CollegeEntity that)) return false;
+        return Objects.equals(getCollegeId(), that.getCollegeId()) && Objects.equals(getCollegeName(), that.getCollegeName()) && Objects.equals(getCollegeCode(), that.getCollegeCode()) && Objects.equals(getAddress(), that.getAddress());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCollegeId(), getCollegeName(), getCollegeCode() /*, getLocation()*/);
+        return Objects.hash(getCollegeId(), getCollegeName(), getCollegeCode(), getAddress());
     }
 
     @Override
-    public String toString() {
+    public String
+    toString() {
         return "CollegeEntity{" +
                 "collegeId=" + collegeId +
                 ", collegeName='" + collegeName + '\'' +
                 ", collegeCode='" + collegeCode + '\'' +
-//                ", location=" + location +
+                ", address=" + address +
                 '}';
     }
 }

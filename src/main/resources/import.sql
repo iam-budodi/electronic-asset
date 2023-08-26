@@ -1,10 +1,8 @@
 -- ADDRESSES
-insert into addresses (city, country, district_name, postal_code, street_name, ward_name, address_uuid)
-VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi', 'kijitonyama',
-        '64365d7c-354d-11ee-be56-0242ac120002');
-insert into addresses (city, country, district_name, postal_code, street_name, ward_name, address_uuid)
-VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi', 'kijitonyama',
-        '849ea0ce-354d-11ee-be56-0242ac120002');
+insert into addresses (city, country, district_name, postal_code, street_name, address_uuid)
+VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi', '64365d7c-354d-11ee-be56-0242ac120002');
+insert into addresses (city, country, district_name, postal_code, street_name, address_uuid)
+VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi', '849ea0ce-354d-11ee-be56-0242ac120002');
 
 -- COLLEGES
 insert into colleges (college_uuid, college_name, college_code)
@@ -21,12 +19,10 @@ VALUES ('849ea0ce-354d-11ee-be56-0242ac120024', 'TE', 'Telecommunication enginee
         '64365d7c-354d-11ee-be56-0242ac120002');
 
 -- ADDRESSES FOR EMPLOYEE
-insert into addresses (city, country, district_name, postal_code, street_name, ward_name, address_uuid)
-VALUES ('Dar es Salaam', 'Tanzania', 'Ubungo', '15114', 'mavulunza', 'kimara',
-        '849ea0de-354d-11ee-be56-0242ac120024');
-insert into addresses (city, country, district_name, postal_code, street_name, ward_name, address_uuid)
-VALUES ('Dar es Salaam', 'Tanzania', 'Ubungo', '15004', 'corner', 'kimara',
-        '849ea0ee-354d-11ee-be56-0242ac120024');
+insert into addresses (city, country, district_name, postal_code, street_name, address_uuid)
+VALUES ('Dar es Salaam', 'Tanzania', 'Ubungo', '15114', 'mavulunza', '849ea0de-354d-11ee-be56-0242ac120024');
+insert into addresses (city, country, district_name, postal_code, street_name, address_uuid)
+VALUES ('Dar es Salaam', 'Tanzania', 'Ubungo', '15004', 'corner', '849ea0ee-354d-11ee-be56-0242ac120024');
 
 -- -- EMPLOYEE TABLE - add at least 19 more employee
 insert into employees (employee_uuid, registered_at, registered_by, email_address, first_name, gender, last_name,

@@ -6,6 +6,8 @@ import com.japhet_sebastian.vo.EmploymentStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -48,6 +50,7 @@ public class EmployeeEntity extends Person {
     @Column(name = "employment_status", nullable = false)
     private Set<EmploymentStatus> status;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "department_uuid", foreignKey = @ForeignKey(name = "employee_department_fk_constraint", foreignKeyDefinition = ""))
     private DepartmentEntity department;
     @Transient

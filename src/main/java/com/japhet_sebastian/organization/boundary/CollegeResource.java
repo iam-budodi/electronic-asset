@@ -26,7 +26,6 @@ import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Objects;
 
 import static com.japhet_sebastian.organization.boundary.CollegeResource.RESOURCE_PATH;
@@ -53,9 +52,13 @@ public class CollegeResource extends AbstractCollegeType {
                     mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = CollegeDetail.class, type = SchemaType.ARRAY)))
     public Response allColleges(@BeanParam PageRequest pageRequest) {
-        List<CollegeDetail> colleges = this.collegeService.listColleges(pageRequest);
-        Long totalCount = this.collegeService.totalColleges();
-        return Response.ok(colleges).header("X-Total-Count", totalCount).build();
+//        List<CollegeDetail> colleges = this.collegeService.listColleges(pageRequest);
+//        Long totalCount = this.collegeService.totalColleges();
+//        return Response.ok(colleges).header("X-Total-Count", totalCount).build();
+
+        return Response.ok(this.collegeService.listColleges(pageRequest))
+                .header("X-Total-Count", this.collegeService.totalColleges())
+                .build();
     }
 
     @GET
@@ -77,7 +80,7 @@ public class CollegeResource extends AbstractCollegeType {
             @Parameter(description = "collegeId", required = true)
             @PathParam("collegeId") @NotNull String collegeId) {
         return this.collegeService.getCollege(collegeId)
-                .map(college -> Response.ok(college).build())
+                .map(collegeDetail -> Response.ok(collegeDetail).build())
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
     }
 

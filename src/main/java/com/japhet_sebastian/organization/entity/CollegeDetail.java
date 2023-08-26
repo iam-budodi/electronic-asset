@@ -6,17 +6,22 @@ import jakarta.validation.constraints.Size;
 
 import java.util.Objects;
 
-public class CollegeDetail extends College {
+public class CollegeDetail {
 
+    private String collegeId;
+
+    @NotEmpty(message = "{College.name.required}")
+    @Size(min = 2, max = 64, message = "{Sixty-four.string.length}")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
+    private String collegeName;
+
+    @Size(min = 2, max = 10, message = "{Alphanumeric.character.length}")
+    @Pattern(regexp = "^[\\p{L}\\p{Nd} _]+$", message = "{Alphanumeric.character}")
+    private String collegeCode;
     @NotEmpty(message = "{Address.field.required}")
     @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     private String street;
-
-    @NotEmpty(message = "{Address.field.required}")
-    @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
-    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
-    private String ward;
 
     @NotEmpty(message = "{Address.field.required}")
     @Size(min = 2, max = 32, message = "{Thirty-two.string.length}")
@@ -37,20 +42,36 @@ public class CollegeDetail extends College {
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     private String country;
 
+    public String getCollegeId() {
+        return collegeId;
+    }
+
+    public void setCollegeId(String collegeId) {
+        this.collegeId = collegeId;
+    }
+
+    public String getCollegeName() {
+        return collegeName;
+    }
+
+    public void setCollegeName(String collegeName) {
+        this.collegeName = collegeName;
+    }
+
+    public String getCollegeCode() {
+        return collegeCode;
+    }
+
+    public void setCollegeCode(String collegeCode) {
+        this.collegeCode = collegeCode;
+    }
+
     public String getStreet() {
         return street;
     }
 
     public void setStreet(String street) {
         this.street = street;
-    }
-
-    public String getWard() {
-        return ward;
-    }
-
-    public void setWard(String ward) {
-        this.ward = ward;
     }
 
     public String getDistrict() {
@@ -90,19 +111,21 @@ public class CollegeDetail extends College {
         if (this == o) return true;
         if (!(o instanceof CollegeDetail that)) return false;
         if (!super.equals(o)) return false;
-        return Objects.equals(getStreet(), that.getStreet()) && Objects.equals(getWard(), that.getWard()) && Objects.equals(getDistrict(), that.getDistrict()) && Objects.equals(getCity(), that.getCity()) && Objects.equals(getPostalCode(), that.getPostalCode()) && Objects.equals(getCountry(), that.getCountry());
+        return Objects.equals(getCollegeId(), that.getCollegeId()) && Objects.equals(getCollegeName(), that.getCollegeName()) && Objects.equals(getCollegeCode(), that.getCollegeCode()) && Objects.equals(getStreet(), that.getStreet()) && Objects.equals(getDistrict(), that.getDistrict()) && Objects.equals(getCity(), that.getCity()) && Objects.equals(getPostalCode(), that.getPostalCode()) && Objects.equals(getCountry(), that.getCountry());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getStreet(), getWard(), getDistrict(), getCity(), getPostalCode(), getCountry());
+        return Objects.hash(super.hashCode(), getCollegeId(), getCollegeName(), getCollegeCode(), getStreet(), getDistrict(), getCity(), getPostalCode(), getCountry());
     }
 
     @Override
     public String toString() {
         return "CollegeDetail{" +
-                "street='" + street + '\'' +
-                ", ward='" + ward + '\'' +
+                "collegeId='" + collegeId + '\'' +
+                ", collegeName='" + collegeName + '\'' +
+                ", collegeCode='" + collegeCode + '\'' +
+                ", street='" + street + '\'' +
                 ", district='" + district + '\'' +
                 ", city='" + city + '\'' +
                 ", postalCode='" + postalCode + '\'' +

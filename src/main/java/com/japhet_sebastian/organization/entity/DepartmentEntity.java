@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -40,6 +42,7 @@ public class DepartmentEntity {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "college_uuid", nullable = false, foreignKey = @ForeignKey(name = "college_department_fk_constraint"))
     private CollegeEntity college;
 
