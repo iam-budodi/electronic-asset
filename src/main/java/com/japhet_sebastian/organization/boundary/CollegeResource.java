@@ -52,10 +52,6 @@ public class CollegeResource extends AbstractCollegeType {
                     mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = CollegeDetail.class, type = SchemaType.ARRAY)))
     public Response allColleges(@BeanParam PageRequest pageRequest) {
-//        List<CollegeDetail> colleges = this.collegeService.listColleges(pageRequest);
-//        Long totalCount = this.collegeService.totalColleges();
-//        return Response.ok(colleges).header("X-Total-Count", totalCount).build();
-
         return Response.ok(this.collegeService.listColleges(pageRequest))
                 .header("X-Total-Count", this.collegeService.totalColleges())
                 .build();

@@ -17,8 +17,6 @@ public class CollegeService implements CollegeInterface {
     @Inject
     CollegeRepository collegeRepository;
 
-
-    // TODO :::: Rewrite everything since address can be obtained directly from the college entity then delete all address implementations
     public List<CollegeDetail> listColleges(PageRequest pageRequest) {
         return this.collegeRepository.allColleges(pageRequest);
     }
