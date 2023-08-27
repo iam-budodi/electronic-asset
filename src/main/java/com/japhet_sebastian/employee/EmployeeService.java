@@ -3,10 +3,12 @@ package com.japhet_sebastian.employee;
 import com.japhet_sebastian.vo.PageRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
 import org.jboss.logging.Logger;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @ApplicationScoped
 public class EmployeeService {
@@ -25,17 +27,20 @@ public class EmployeeService {
     Logger LOGGER;
 
     public List<EmployeeDetail> listEmployees(PageRequest pageRequest) {
-        return this.employeeRepository.allEmployees(pageRequest)
-                .stream()
-                .map(employee -> this.employeeMapper.toEmployeeDetail(employee))
-                .collect(Collectors.toList());
-
+        return this.employeeRepository.allEmployees(pageRequest);
     }
 
     public Long totalEmployees() {
         return this.employeeRepository.count();
     }
 
+    public Optional<EmployeeDetail> getEmployee(@NotNull String employeeId) {
+        return this.employeeRepository.findEmployee(employeeId);
+    }
+
+    public List<EmployeeDetail> departmentsReport(LocalDate startDate, LocalDate endDate) {
+        return this.employeeRepository.reporting(startDate, endDate);
+    }
 
 //    public Employee addEmployee(@Valid Employee employee) {
 //        employee.address.employee = employee;
@@ -44,24 +49,7 @@ public class EmployeeService {
 //        return employee;
 //    }
 
-//
-//    @Transactional(Transactional.TxType.SUPPORTS)
-//    public List<Employee> unPaginatedList(LocalDate startDate, LocalDate endDate) {
-//        String queryString = "SELECT e FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.status LEFT JOIN FETCH e.address LEFT JOIN FETCH d.college " +
-//                "WHERE e.registeredAt BETWEEN :startDate AND :endDate";
-//
-//        return Employee.find(queryString, Sort.by("e.firstName", Sort.Direction.Descending),
-//                Parameters.with("startDate", startDate).and("endDate", endDate)).list();
-//    }
-//
-//    @Transactional(Transactional.TxType.SUPPORTS)
-//    public Optional<Employee> findById(@NotNull Long employeeId) {
-//        return Employee.find(
-//                        "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH d.college LEFT JOIN FETCH e.address LEFT JOIN FETCH e.status "
-//                                + "WHERE e.id = :employeeId ", Parameters.with("employeeId", employeeId))
-//                .firstResultOptional();
-//    }
-//
+
 //    public void updateEmployee(@Valid Employee employee, @NotNull Long empId) {
 //        Employee.findByIdOptional(empId)
 //                .map(found -> Panache.getEntityManager().merge(employee))

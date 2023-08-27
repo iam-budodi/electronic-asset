@@ -1,24 +1,23 @@
 package com.japhet_sebastian.employee;
 
 import com.japhet_sebastian.vo.PageRequest;
-import io.quarkus.oidc.IdToken;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
-
-import java.util.List;
 
 import static com.japhet_sebastian.employee.EmployeeResource.RESOURCE_PATH;
 
@@ -36,10 +35,6 @@ public class EmployeeResource {
     Logger LOGGER;
 
     @Inject
-    @IdToken
-    JsonWebToken idToken;
-
-    @Inject
     SecurityIdentity keycloakSecurityContext;
 
     @Inject
@@ -54,43 +49,49 @@ public class EmployeeResource {
                     mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = EmployeeDetail.class, type = SchemaType.ARRAY)))
     public Response listEmployees(@BeanParam PageRequest pageRequest) {
-        LOGGER.info("ID TOKEN : " + idToken.getName());
-        LOGGER.info("KEYCLOAK : " + keycloakSecurityContext.getPrincipal().getName());
         return Response.ok(this.employeeService.listEmployees(pageRequest))
                 .header("X-Total-Count", this.employeeService.totalEmployees())
                 .build();
     }
 
-//    @GET
-//    @Path("report")
-//    @Operation(summary = "Retrieves a specified range of employees record for generating report")
-//    @APIResponses({
-//            @APIResponse(responseCode = "200",
-//                    content = @Content(mediaType = MediaType.APPLICATION_JSON,
-//                            schema = @Schema(implementation = Employee.class, type = SchemaType.ARRAY)),
-//                    description = "Generate employees report"),
-//            @APIResponse(responseCode = "204", description = "No data for report"),
-//    })
-//    public Response unPaginatedList(
-//            @Parameter(description = "Search date", required = false) @QueryParam("start") LocalDate startDate,
-//            @Parameter(description = "Search endDate", required = false) @QueryParam("end") LocalDate endDate
-//    ) {
-//
-//        List<Employee> employees = employeeService.unPaginatedList(startDate, endDate);
-//        if (employees.size() == 0) return Response.status(Status.NO_CONTENT).build();
-//        return Response.ok(employees).build();
-//
-//    }
-//
-//    @GET
-//    @Path("/{id}")
-//    @Transactional(Transactional.TxType.SUPPORTS)
-//    @Operation(summary = "Returns the employee for a given identifier")
-//    @APIResponses({@APIResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Employee.class)), description = "Returns a found employee"), @APIResponse(responseCode = "400", description = "Invalid input"), @APIResponse(responseCode = "404", description = "Employee is not found for a given identifier")})
-//    public Response findEmployee(@Parameter(description = "Employee Identifier", required = true) @PathParam("id") @NotNull Long empId) {
-//        return employeeService.findById(empId).map(employee -> Response.ok(employee).build()).orElseGet(() -> Response.status(Status.NOT_FOUND).build());
-//    }
-//
+    @GET
+    @Path("report")
+    @Operation(summary = "Generate report for a specified range of employees record")
+    @APIResponse(
+            responseCode = "200",
+            description = "Generate employees report",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(implementation = EmployeeDetail.class, type = SchemaType.ARRAY)))
+    public Response getReport(@BeanParam ReportPage reportPage) {
+        return Response
+                .ok(this.employeeService.departmentsReport(reportPage.getStartDate(), reportPage.getEndDate()))
+                .build();
+    }
+
+    @GET
+    @Path("/{employeeId}")
+    @Operation(summary = "Get employee for a given identifier")
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Get a found employee object",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = EmployeeDetail.class, type = SchemaType.OBJECT))),
+            @APIResponse(
+                    responseCode = "404",
+                    description = "Employee does not exist for a given identifier",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON))
+    })
+    public Response findEmployee(
+            @Parameter(description = "employeeId", required = true)
+            @PathParam("employeeId") @NotNull String employeeId) {
+        return employeeService.getEmployee(employeeId)
+                .map(employeeDetail -> Response.ok(employeeDetail).build())
+                .orElseGet(() -> Response.status(Response.Status.NOT_FOUND).build());
+    }
+
 //    @GET
 //    @Path("/select")
 //    @Transactional(Transactional.TxType.SUPPORTS)

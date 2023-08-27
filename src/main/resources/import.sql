@@ -31,13 +31,13 @@ insert into employees (employee_uuid, registered_at, registered_by, email_addres
 VALUES ('849ea0de-354d-11ee-be56-0242ac120024', '2023-03-30', 'Habiba', 'hellen@gmail.com', 'hellen', 'F', 'John',
         'Malaba', '255716656596', '1990-01-02',
         '2022-07-28', '19-04-20022', '849ea0ce-354d-11ee-be56-0242ac120022');
+
 insert into employees (employee_uuid, registered_at, registered_by, email_address, first_name, gender, last_name,
                        middle_name,
                        phone_number, birthdate, hire_date, work_id, department_uuid)
 VALUES ('849ea0ee-354d-11ee-be56-0242ac120024', '2023-03-30', 'Habiba', 'lu3@gmail.com', 'Michael', 'M', 'Mbaga',
         'Joseph', '255713333396', '1970-09-09',
         '2017-12-01', '19-04-02349', '849ea0ce-354d-11ee-be56-0242ac120022');
-
 
 
 -- insert into employees (id, registered_at, registered_by, email_address, first_name, gender, last_name, middle_name,

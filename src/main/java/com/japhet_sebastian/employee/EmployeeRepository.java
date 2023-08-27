@@ -7,9 +7,12 @@ import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
 import org.jboss.logging.Logger;
 
+import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity, UUID> {
@@ -21,8 +24,7 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
     Logger LOGGER;
 
     private String getString(PageRequest pageRequest) {
-        LOGGER.info("DATE : " + pageRequest.getDate());
-        String query = "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN d.college " +
+        String query = "FROM Employee e LEFT JOIN FETCH e.department d " +
                 "WHERE :search IS NULL OR LOWER(e.firstName) LIKE :search " +
                 "OR LOWER(e.lastName) LIKE :search " +
                 "OR LOWER(e.workId) LIKE :search " +
@@ -31,11 +33,10 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
 
         if (pageRequest.getDate() != null) query += "AND e.hireDate = :date";
         else query += "AND (:date IS NULL OR e.hireDate = :date)";
-        LOGGER.info("QUERY: " + query);
         return query;
     }
 
-    public List<Employee> allEmployees(PageRequest pageRequest) {
+    public List<EmployeeDetail> allEmployees(PageRequest pageRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("search", pageRequest.getSearch());
         params.put("date", pageRequest.getDate());
@@ -44,17 +45,31 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
             pageRequest.setSearch("%" + pageRequest.getSearch().toLowerCase(Locale.ROOT) + "%");
 
         String query = getString(pageRequest);
+        Sort sort = Sort.by("e.firstName", Sort.Direction.Descending)
+                .and("e.lastName", Sort.Direction.Descending)
+                .and("e.hireDate", Sort.Direction.Descending);
 
-        return find(query, Sort
-                        .by("e.firstName", Sort.Direction.Descending).and("e.lastName", Sort.Direction.Descending)
-                        .and("e.hireDate", Sort.Direction.Descending),
-                params)
+        return find(query, sort, params)
                 .page(Page.of(pageRequest.getPageNum(), pageRequest.getPageSize()))
-                .list();
+                .stream().map(this.employeeMapper::toEmployeeDetail)
+                .collect(Collectors.toList());
+    }
 
-        LOGGER.info("LIST : " + employeeEntities);
+    public Optional<EmployeeDetail> findEmployee(@NotNull String employeeId) {
+        return find("FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.status " +
+                "WHERE e.employeeId = :employeeId ", Parameters.with("employeeId", UUID.fromString(employeeId)))
+                .firstResultOptional()
+                .map(this.employeeMapper::toEmployeeDetail);
+    }
 
-        return this.employeeMapper.toEmployeeList(employeeEntities);
+    public List<EmployeeDetail> reporting(LocalDate startDate, LocalDate endDate) {
+        String queryString = "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.status " +
+                "WHERE e.registeredAt BETWEEN :startDate AND :endDate";
+
+        return find(queryString, Sort.by("e.firstName", Sort.Direction.Descending),
+                Parameters.with("startDate", startDate).and("endDate", endDate))
+                .stream().map(this.employeeMapper::toEmployeeDetail)
+                .collect(Collectors.toList());
     }
 
     public boolean checkByEmailOrPhone(String email, String mobile) {
