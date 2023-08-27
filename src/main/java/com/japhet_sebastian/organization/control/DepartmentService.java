@@ -20,26 +20,18 @@ public class DepartmentService implements DepartmentInterface {
 
     @Inject
     DepartmentRepository departmentRepository;
-
-    @Inject
-    AddressRepository addressRepository;
-
-    @Inject
-    DepartmentDetailMapper departmentDetailMapper;
-
-    @Inject
-    DepartmentMapper departmentMapper;
+//
+//    @Inject
+//    AddressRepository addressRepository;
+//
+//    @Inject
+//    DepartmentDetailMapper departmentDetailMapper;
+//
+//    @Inject
+//    DepartmentMapper departmentMapper;
 
     public List<DepartmentDetail> listDepartments(PageRequest pageRequest) {
-//        return this.departmentRepository.departments(pageRequest)
-//                .stream()
-//                .map(department -> {
-//                    String addressId = department.getCollege().getCollegeId();
-//                    Address address = this.addressRepository.findAddress(addressId)
-//                            .orElseThrow(() -> new ServiceException("No address found for collegeId[%s]", addressId));
-//                    return this.departmentDetailMapper.toDepartmentDetails(department, address);
-//                }).collect(Collectors.toList());
-        return null;
+        return this.departmentRepository.departments(pageRequest);
     }
 
     public Long totalDepartments() {
@@ -47,15 +39,7 @@ public class DepartmentService implements DepartmentInterface {
     }
 
     public Optional<DepartmentDetail> getDepartment(@NotNull String departmentId) {
-//        return this.departmentRepository.findDepartment(departmentId)
-//                .stream()
-//                .map(department -> {
-//                    String addressId = department.getCollege().getCollegeId();
-//                    AddressEntity address = this.addressRepository.findAddress(UUID.fromString(addressId))
-//                            .orElseThrow(() -> new ServiceException("No address found for collegeId[%s]", addressId));
-//                    return this.departmentDetailMapper.toDepartmentDetails(department, address);
-//                }).findFirst();
-        return Optional.empty();
+        return this.departmentRepository.findDepartment(departmentId);
     }
 
     public List<SelectOptions> selected() {
@@ -63,31 +47,24 @@ public class DepartmentService implements DepartmentInterface {
     }
 
     public void addDepartment(@Valid DepartmentInput departmentInput) {
-        boolean isDepartmentPresent = this.departmentRepository
-                .findDepartmentByName(departmentInput.getDepartmentName()).isPresent();
-
-        if (isDepartmentPresent)
-            throw new ServiceException("Department with same name already exists");
-
-        DepartmentEntity departmentEntity = this.departmentDetailMapper
-                .toDepartmentEntity(this.departmentMapper.toDepartment(departmentInput));
-        this.departmentRepository.persist(departmentEntity);
-        this.departmentMapper.updateDepartmentInputFromDepartmentEntity(departmentEntity, departmentInput);
+        this.departmentRepository.saveDepartment(departmentInput);
     }
 
     public void updateDepartment(@Valid DepartmentInput department) {
-        String departmentId = department.getDepartmentId();
-        DepartmentEntity departmentEntity = this.departmentRepository.findByIdOptional(UUID.fromString(departmentId))
-                .orElseThrow(() -> new ServiceException("No department found for departmentId[%s]", departmentId));
-
-        this.departmentMapper.updateDepartmentEntityFromDepartmentInput(department, departmentEntity);
-        this.departmentRepository.persist(departmentEntity);
-        this.departmentMapper.updateDepartmentInputFromDepartmentEntity(departmentEntity, department);
+//        String departmentId = department.getDepartmentId();
+//        DepartmentEntity departmentEntity = this.departmentRepository.findByIdOptional(UUID.fromString(departmentId))
+//                .orElseThrow(() -> new ServiceException("No department found for departmentId[%s]", departmentId));
+//
+//        this.departmentMapper.updateDepartmentEntityFromDepartmentInput(department, departmentEntity);
+//        this.departmentRepository.persist(departmentEntity);
+//        this.departmentMapper.updateDepartmentInputFromDepartmentEntity(departmentEntity, department);
+        this.departmentRepository.updateDepartment(department);
     }
 
     public void deleteDepartment(@NotNull String departmentId) {
-        DepartmentEntity departmentEntity = this.departmentRepository.findByIdOptional(UUID.fromString(departmentId))
-                .orElseThrow(() -> new ServiceException("No department found for departmentId[%s]", departmentId));
-        this.departmentRepository.delete(departmentEntity);
+//        DepartmentEntity departmentEntity = this.departmentRepository.findByIdOptional(UUID.fromString(departmentId))
+//                .orElseThrow(() -> new ServiceException("No department found for departmentId[%s]", departmentId));
+//        this.departmentRepository.delete(departmentEntity);
+        this.departmentRepository.deleteDepartment(departmentId);
     }
 }

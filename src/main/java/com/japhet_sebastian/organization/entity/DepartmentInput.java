@@ -23,7 +23,7 @@ public class DepartmentInput {
     @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     private String description;
 
-    //    @NotEmpty(message = "{College.identifier.required}")
+//    @NotEmpty(message = "{College.identifier.required}")
     private String collegeId;
 
 
