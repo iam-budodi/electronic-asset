@@ -56,9 +56,9 @@ public class EmployeeResource {
     public Response listEmployees(@BeanParam PageRequest pageRequest) {
         LOGGER.info("ID TOKEN : " + idToken.getName());
         LOGGER.info("KEYCLOAK : " + keycloakSecurityContext.getPrincipal().getName());
-        List<EmployeeDetail> employeeDetails = employeeService.listEmployees(pageRequest);
-        Long totalCount = this.employeeService.totalEmployees();
-        return Response.ok(employeeDetails).header("X-Total-Count", totalCount).build();
+        return Response.ok(this.employeeService.listEmployees(pageRequest))
+                .header("X-Total-Count", this.employeeService.totalEmployees())
+                .build();
     }
 
 //    @GET

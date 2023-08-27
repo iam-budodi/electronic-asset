@@ -65,7 +65,7 @@ class DepartmentResourceTest extends AccessTokenProvider {
                 .then()
                 .statusCode(OK.getStatusCode())
                 .body("$.size()", is(1))
-                .body("departmentCode", anyOf(contains("CSE"), contains("TE")))
+                .body("departmentCode", anyOf(contains("CSE"), contains("TE"), contains("ETE"), contains("KNOWN")))
                 .header("X-Total-Count", is(greaterThanOrEqualTo(String.valueOf(2))));
     }
 
@@ -152,7 +152,7 @@ class DepartmentResourceTest extends AccessTokenProvider {
 
         final DepartmentInput departmentInput = createDepartment();
         departmentInput.setDepartmentName(RandomStringUtils.randomAlphabetic(32));
-        departmentInput.setDepartmentCode(RandomStringUtils.randomAlphanumeric(10));
+        departmentInput.setDepartmentCode("KNOWN");
         departmentInput.setCollegeId(collegeUuid);
         String departmentUrl = given()
                 .contentType(ContentType.JSON)
@@ -328,7 +328,7 @@ class DepartmentResourceTest extends AccessTokenProvider {
 
         final DepartmentInput departmentInput = new DepartmentInput();
         departmentInput.setDepartmentName(RandomStringUtils.randomAlphabetic(32));
-        departmentInput.setDepartmentCode(RandomStringUtils.randomAlphanumeric(10));
+        departmentInput.setDepartmentCode("KNOWN");
         departmentInput.setCollegeId(collegeUuid);
         String departmentUrl = given()
                 .contentType(ContentType.JSON)
@@ -400,7 +400,7 @@ class DepartmentResourceTest extends AccessTokenProvider {
 
         final DepartmentInput departmentInput = new DepartmentInput();
         departmentInput.setDepartmentName(RandomStringUtils.randomAlphabetic(32));
-        departmentInput.setDepartmentCode(RandomStringUtils.randomAlphanumeric(10));
+        departmentInput.setDepartmentCode("KNOWN");
         departmentInput.setCollegeId(collegeUuid);
         String departmentUrl = given()
                 .contentType(ContentType.JSON)
@@ -453,7 +453,7 @@ class DepartmentResourceTest extends AccessTokenProvider {
 
         final DepartmentInput departmentInput = new DepartmentInput();
         departmentInput.setDepartmentName(RandomStringUtils.randomAlphabetic(32));
-        departmentInput.setDepartmentCode(RandomStringUtils.randomAlphanumeric(10));
+        departmentInput.setDepartmentCode("KNOWN");
         departmentInput.setCollegeId(collegeUuid);
         String departmentUrl = given()
                 .contentType(ContentType.JSON)

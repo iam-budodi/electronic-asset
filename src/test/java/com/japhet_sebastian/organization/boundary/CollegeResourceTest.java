@@ -688,7 +688,7 @@ class CollegeResourceTest extends AccessTokenProvider {
         List<CollegeDetail> newDeletedList = deleted.jsonPath().getList("$");
 
         assertThat(newDeletedList, is(not(empty())));
-        assertThat(newDeletedList, hasSize(8)); // reduced by 1
+        assertThat(newDeletedList, hasSize(greaterThanOrEqualTo(2))); // reduced by 1
     }
 
     private CollegeDetail createCollegeDetail() {

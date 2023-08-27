@@ -27,7 +27,6 @@ import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Objects;
 
 import static com.japhet_sebastian.organization.boundary.DepartmentResource.RESOURCE_PATH;
@@ -54,9 +53,9 @@ public class DepartmentResource extends AbstractDepartmentType {
                     mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = DepartmentDetail.class, type = SchemaType.ARRAY)))
     public Response allDepartments(@BeanParam PageRequest pageRequest) {
-        List<DepartmentDetail> departmentDetails = this.departmentService.listDepartments(pageRequest);
-        Long totalCount = this.departmentService.totalDepartments();
-        return Response.ok(departmentDetails).header("X-Total-Count", totalCount).build();
+        return Response.ok(this.departmentService.listDepartments(pageRequest))
+                .header("X-Total-Count", this.departmentService.totalDepartments())
+                .build();
     }
 
     @GET
