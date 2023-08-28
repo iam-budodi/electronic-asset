@@ -90,7 +90,7 @@ public class DepartmentRepository implements PanacheRepositoryBase<DepartmentEnt
                 "WHERE d.departmentId = ?1", UUID.fromString(departmentId)).firstResultOptional();
     }
 
-    private Optional<DepartmentEntity> checkDepartmentByName(String departmentName) {
+    public Optional<DepartmentEntity> checkDepartmentByName(String departmentName) {
         return find("#Department.getName", Parameters.with("name", departmentName.toLowerCase(Locale.ROOT)))
                 .firstResultOptional();
     }

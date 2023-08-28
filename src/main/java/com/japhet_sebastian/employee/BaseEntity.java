@@ -2,6 +2,7 @@ package com.japhet_sebastian.employee;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -20,12 +21,13 @@ public class BaseEntity {
     @Column(name = "updated_at")
     private LocalDate updatedAt;
 
+    @NotEmpty(message = "{LoggedIn.username.required}")
     @Column(name = "registered_by", length = 64)
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
+    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "{String.special.character}")
     private String registeredBy;
 
     @Column(name = "updated_by")
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
+    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "{String.special.character}")
     private String updatedBy;
 
     public LocalDate getRegisteredAt() {

@@ -20,7 +20,7 @@ import java.util.UUID;
 @Table(name = "employees", uniqueConstraints = {@UniqueConstraint(name = "unique_email_phone",
         columnNames = {"email_address", "phone_number"}),
         @UniqueConstraint(name = "unique_work_id", columnNames = {"work_id"})})
-@NamedQueries({@NamedQuery(name = "Employee.getEmailOrPhone",
+@NamedQueries({@NamedQuery(name = "Employee.getByEmailOrPhone",
         query = "FROM Employee WHERE email = :email OR mobile = :mobile")})
 @Schema(description = "Employee representation")
 public class EmployeeEntity extends Person {
@@ -32,20 +32,23 @@ public class EmployeeEntity extends Person {
 
     @Id
     private UUID employeeId;
-    @NotEmpty
+
     @Schema(required = true)
+    @NotEmpty(message = "{Employee.work-id.required}")
     @Column(name = "work_id")
     private String workId;
-    @NotEmpty
+
     @Schema(required = true)
+    @NotEmpty(message = "{Employee.dob.required}")
     @Column(name = "birthdate")
     private LocalDate dateOfBirth;
-    @NotEmpty
+
     @Schema(required = true)
+    @NotEmpty(message = "{Employee.hire-date.required}")
     @Column(name = "hire_date", nullable = false)
     private LocalDate hireDate;
 
-    @NotEmpty
+    @NotEmpty(message = "{Employee.status.required}")
     @Schema(required = true)
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.LAZY)
@@ -53,11 +56,14 @@ public class EmployeeEntity extends Person {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "employment_status", nullable = false)
     private Set<EmploymentStatus> status;
+
+    @NotEmpty(message = "{Department.field.required}")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @JoinColumn(name = "department_uuid", foreignKey = @ForeignKey(name = "employee_department_fk_constraint", foreignKeyDefinition = ""))
     private DepartmentEntity department;
+
     @Transient
     private Integer age;
 
@@ -82,6 +88,14 @@ public class EmployeeEntity extends Person {
         timeOfService = Period.between(hireDate, LocalDate.now()).getYears();
         age = Period.between(dateOfBirth, LocalDate.now()).getYears();
         retireAt = LocalDate.now().plusYears(60 - (LocalDate.now().getYear() - dateOfBirth.getYear()));
+    }
+
+    public AddressEntity getAddress() {
+        return address;
+    }
+
+    public void setAddress(AddressEntity address) {
+        this.address = address;
     }
 
     public UUID getEmployeeId() {
@@ -161,18 +175,19 @@ public class EmployeeEntity extends Person {
         if (this == o) return true;
         if (!(o instanceof EmployeeEntity that)) return false;
         if (!super.equals(o)) return false;
-        return Objects.equals(getEmployeeId(), that.getEmployeeId()) && Objects.equals(getWorkId(), that.getWorkId()) && Objects.equals(getDateOfBirth(), that.getDateOfBirth()) && Objects.equals(getHireDate(), that.getHireDate()) && Objects.equals(getStatus(), that.getStatus()) && Objects.equals(getDepartment(), that.getDepartment()) && Objects.equals(getAge(), that.getAge()) && Objects.equals(getTimeOfService(), that.getTimeOfService()) && Objects.equals(getRetireAt(), that.getRetireAt());
+        return Objects.equals(getAddress(), that.getAddress()) && Objects.equals(getEmployeeId(), that.getEmployeeId()) && Objects.equals(getWorkId(), that.getWorkId()) && Objects.equals(getDateOfBirth(), that.getDateOfBirth()) && Objects.equals(getHireDate(), that.getHireDate()) && Objects.equals(getStatus(), that.getStatus()) && Objects.equals(getDepartment(), that.getDepartment()) && Objects.equals(getAge(), that.getAge()) && Objects.equals(getTimeOfService(), that.getTimeOfService()) && Objects.equals(getRetireAt(), that.getRetireAt());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getEmployeeId(), getWorkId(), getDateOfBirth(), getHireDate(), getStatus(), getDepartment(), getAge(), getTimeOfService(), getRetireAt());
+        return Objects.hash(super.hashCode(), getAddress(), getEmployeeId(), getWorkId(), getDateOfBirth(), getHireDate(), getStatus(), getDepartment(), getAge(), getTimeOfService(), getRetireAt());
     }
 
     @Override
     public String toString() {
         return "EmployeeEntity{" +
-                "employeeId=" + employeeId +
+                "address=" + address +
+                ", employeeId=" + employeeId +
                 ", workId='" + workId + '\'' +
                 ", dateOfBirth=" + dateOfBirth +
                 ", hireDate=" + hireDate +

@@ -9,11 +9,11 @@ import java.util.Objects;
 public class ReportPage {
 
     @RestQuery("start")
-    @Parameter(description = "Start Date", required = false)
+    @Parameter(description = "startDate", required = true)
     private LocalDate startDate;
 
     @RestQuery("end")
-    @Parameter(description = "End Date", required = false)
+    @Parameter(description = "endDate", required = true)
     private LocalDate endDate;
 
     public LocalDate getStartDate() {

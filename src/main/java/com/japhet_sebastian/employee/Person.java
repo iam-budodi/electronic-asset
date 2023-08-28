@@ -15,20 +15,20 @@ import java.util.Objects;
 @MappedSuperclass
 public class Person extends BaseEntity {
 
-    @NotEmpty
-    @Size(min = 2, max = 64)
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
+    @NotEmpty(message = "{Employee.firstName.required}")
+    @Size(min = 2, max = 64, message = "{Sixty-four.string.length}")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     @Column(name = "first_name", length = 64, nullable = false)
     private String firstName;
 
-    @Size(min = 1, max = 64)
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
+    @Size(min = 1, max = 64, message = "{Sixty-four.string.length}")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     @Column(name = "middle_name", length = 64)
     private String middleName;
 
-    @NotEmpty
-    @Size(min = 2, max = 64)
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
+    @NotEmpty(message = "{Employee.lastName.required}")
+    @Size(min = 2, max = 64, message = "{Sixty-four.string.length}")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     @Column(name = "last_name", length = 64, nullable = false)
     private String lastName;
 
@@ -36,19 +36,18 @@ public class Person extends BaseEntity {
     private Gender gender;
 
     // "^[((((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3})]{10,18}$"
-    @NotEmpty
+    @NotEmpty(message = "{Phone.number.required}")
     @Pattern(
             regexp = "^[((((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3})]{10,18}$",
-            message = "must any of the following format (255) 744 608 510, (255) 744 608-510, (255) 744-608-510, (255)-744-608-510, "
-                    + "+(255)-744-608-510, 0744 608 510, 0744-608-510, 0744608510 and length btn 10 to 18 characters including space")
+            message = "{Phone.number.invalid}")
     @Column(name = "phone_number", length = 18, nullable = false)
     private String mobile;
 
-    @NotEmpty
     @Email
+    @NotEmpty(message = "{Email.required}")
     @Pattern(
             regexp = "^(?=.{1,64}@)[\\p{L}0-9_-]+(\\.[\\p{L}0-9_-]+)*@[^-][\\p{L}0-9-]+(\\.[\\p{L}0-9-]+)*(\\.[\\p{L}]{2,})$",
-            message = "one or more character in not valid for proper email")
+            message = "{Email.invalid}")
     @Column(name = "email_address", nullable = false)
     private String email;
 

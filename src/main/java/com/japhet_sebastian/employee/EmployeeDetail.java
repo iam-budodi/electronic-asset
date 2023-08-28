@@ -13,39 +13,41 @@ public class EmployeeDetail {
 
     private String employeeId;
 
-    @NotEmpty
-    @Size(min = 2, max = 64)
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
+    @NotEmpty(message = "{Employee.firstName.required}")
+    @Size(min = 2, max = 64, message = "{Sixty-four.string.length}")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     private String firstName;
 
-    @Size(min = 1, max = 64)
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters, ' and - special characters")
+    @Size(min = 1, max = 64, message = "{Sixty-four.string.length}")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     private String middleName;
 
-    @NotEmpty
-    @Size(min = 2, max = 64)
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "should include only letters ' and - special characters")
+    @NotEmpty(message = "{Employee.lastName.required}")
+    @Size(min = 2, max = 64, message = "{Sixty-four.string.length}")
+    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
     private String lastName;
 
     private Gender gender;
 
-    @NotEmpty
+    @NotEmpty(message = "{Phone.number.required}")
     @Pattern(
             regexp = "^[((((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3})]{10,18}$",
-            message = "must any of the following format (255) 744 608 510, (255) 744 608-510, (255) 744-608-510, (255)-744-608-510, "
-                    + "+(255)-744-608-510, 0744 608 510, 0744-608-510, 0744608510 and length btn 10 to 18 characters including space")
+            message = "{Phone.number.invalid}")
     private String mobile;
 
-    @NotEmpty
+    @NotEmpty(message = "{Email.required}")
     @Pattern(
             regexp = "^(?=.{1,64}@)[\\p{L}0-9_-]+(\\.[\\p{L}0-9_-]+)*@[^-][\\p{L}0-9-]+(\\.[\\p{L}0-9-]+)*(\\.[\\p{L}]{2,})$",
-            message = "one or more character in not valid for proper email")
+            message = "{Email.invalid}")
     private String email;
 
-    @NotEmpty
+    @NotEmpty(message = "{Employee.status.required}")
     private Set<EmploymentStatus> status;
 
+    @NotEmpty(message = "{Department.field.required}")
     private String departmentName;
+
+    private String timeOfService;
 
     public String getEmployeeId() {
         return employeeId;
@@ -119,16 +121,24 @@ public class EmployeeDetail {
         this.departmentName = departmentName;
     }
 
+    public String getTimeOfService() {
+        return timeOfService;
+    }
+
+    public void setTimeOfService(String timeOfService) {
+        this.timeOfService = timeOfService;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof EmployeeDetail that)) return false;
-        return Objects.equals(getEmployeeId(), that.getEmployeeId()) && Objects.equals(getFirstName(), that.getFirstName()) && Objects.equals(getMiddleName(), that.getMiddleName()) && Objects.equals(getLastName(), that.getLastName()) && getGender() == that.getGender() && Objects.equals(getMobile(), that.getMobile()) && Objects.equals(getEmail(), that.getEmail()) && Objects.equals(getStatus(), that.getStatus()) && Objects.equals(getDepartmentName(), that.getDepartmentName());
+        return Objects.equals(getEmployeeId(), that.getEmployeeId()) && Objects.equals(getFirstName(), that.getFirstName()) && Objects.equals(getMiddleName(), that.getMiddleName()) && Objects.equals(getLastName(), that.getLastName()) && getGender() == that.getGender() && Objects.equals(getMobile(), that.getMobile()) && Objects.equals(getEmail(), that.getEmail()) && Objects.equals(getStatus(), that.getStatus()) && Objects.equals(getDepartmentName(), that.getDepartmentName()) && Objects.equals(getTimeOfService(), that.getTimeOfService());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getEmployeeId(), getFirstName(), getMiddleName(), getLastName(), getGender(), getMobile(), getEmail(), getStatus(), getDepartmentName());
+        return Objects.hash(getEmployeeId(), getFirstName(), getMiddleName(), getLastName(), getGender(), getMobile(), getEmail(), getStatus(), getDepartmentName(), getTimeOfService());
     }
 
     @Override
@@ -143,6 +153,7 @@ public class EmployeeDetail {
                 ", email='" + email + '\'' +
                 ", status=" + status +
                 ", departmentName='" + departmentName + '\'' +
+                ", timeOfService='" + timeOfService + '\'' +
                 '}';
     }
 }

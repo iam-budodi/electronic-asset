@@ -1,5 +1,10 @@
 package com.japhet_sebastian.employee;
 
+import com.japhet_sebastian.exception.ServiceException;
+import com.japhet_sebastian.organization.control.AddressRepository;
+import com.japhet_sebastian.organization.control.DepartmentRepository;
+import com.japhet_sebastian.organization.entity.AddressEntity;
+import com.japhet_sebastian.organization.entity.DepartmentEntity;
 import com.japhet_sebastian.vo.PageRequest;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;
@@ -7,6 +12,7 @@ import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.jboss.logging.Logger;
 
@@ -19,6 +25,12 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
 
     @Inject
     EmployeeMapper employeeMapper;
+
+    @Inject
+    DepartmentRepository departmentRepository;
+
+    @Inject
+    AddressRepository addressRepository;
 
     @Inject
     Logger LOGGER;
@@ -72,9 +84,26 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
                 .collect(Collectors.toList());
     }
 
-    public boolean checkByEmailOrPhone(String email, String mobile) {
-        return find(
-                "#Employee.getEmailOrPhone", Parameters.with("email", email).and("mobile", mobile).map())
-                .firstResultOptional().isPresent();
+     public void saveEmployee(@Valid Employee employee) {
+        DepartmentEntity departmentEntity = departmentRepository
+                .checkDepartmentByName(employee.getDepartmentName())
+                .orElseThrow(() -> new ServiceException("No department for associated employee"));
+
+        // TODO :::: Check is user already exists
+         AddressEntity addressEntity = this.employeeMapper.toAddressEntity(employee);
+         this.addressRepository.persist(addressEntity);
+
+        EmployeeEntity employeeEntity = this.employeeMapper.toEmployeeEntity(employee);
+        employeeEntity.setDepartment(departmentEntity);
+        employeeEntity.setAddress(addressEntity);
+        persist(employeeEntity);
+
+        this.employeeMapper.updateEmployeeFromEmployeeEntity(employeeEntity, employee);
+    }
+
+    private Optional<EmployeeEntity> checkByEmailOrPhone(String email, String mobile) {
+        return find("#Employee.getByEmailOrPhone", Parameters
+                .with("email", email).and("mobile", mobile).map())
+                .firstResultOptional();
     }
 }
