@@ -3,6 +3,7 @@ package com.japhet_sebastian.employee;
 import com.japhet_sebastian.vo.PageRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.jboss.logging.Logger;
 
@@ -42,12 +43,9 @@ public class EmployeeService {
         return this.employeeRepository.reporting(startDate, endDate);
     }
 
-//    public Employee addEmployee(@Valid Employee employee) {
-//        employee.address.employee = employee;
-//        employee.address.id = employee.id;
-//        Employee.persist(employee);
-//        return employee;
-//    }
+    public void addEmployee(@Valid Employee employee) {
+        this.employeeRepository.saveEmployee(employee);
+    }
 
 
 //    public void updateEmployee(@Valid Employee employee, @NotNull Long empId) {

@@ -84,14 +84,18 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
                 .collect(Collectors.toList());
     }
 
-     public void saveEmployee(@Valid Employee employee) {
+    public void saveEmployee(@Valid Employee employee) {
         DepartmentEntity departmentEntity = departmentRepository
                 .checkDepartmentByName(employee.getDepartmentName())
-                .orElseThrow(() -> new ServiceException("No department for associated employee"));
+                .orElseThrow(() -> new ServiceException("Could not find department for associated employee"));
 
-        // TODO :::: Check is user already exists
-         AddressEntity addressEntity = this.employeeMapper.toAddressEntity(employee);
-         this.addressRepository.persist(addressEntity);
+        checkByEmailOrPhone(employee.getEmail(), employee.getMobile())
+                .ifPresent(employeeEntity -> {
+                    throw new ServiceException("Employee exists");
+                });
+
+        AddressEntity addressEntity = this.employeeMapper.toAddressEntity(employee);
+        this.addressRepository.persist(addressEntity);
 
         EmployeeEntity employeeEntity = this.employeeMapper.toEmployeeEntity(employee);
         employeeEntity.setDepartment(departmentEntity);

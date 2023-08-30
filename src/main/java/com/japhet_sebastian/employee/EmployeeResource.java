@@ -4,20 +4,26 @@ import com.japhet_sebastian.vo.PageRequest;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
+
+import java.net.URI;
 
 import static com.japhet_sebastian.employee.EmployeeResource.RESOURCE_PATH;
 
@@ -27,7 +33,7 @@ import static com.japhet_sebastian.employee.EmployeeResource.RESOURCE_PATH;
 @Produces(MediaType.APPLICATION_JSON)
 @SecurityRequirement(name = "Keycloak")
 @Tag(name = "Employee Endpoint", description = "Employees management operations")
-public class EmployeeResource {
+public class EmployeeResource extends AbstractEmployeeType {
 
     public static final String RESOURCE_PATH = "/employees";
 
@@ -109,42 +115,34 @@ public class EmployeeResource {
 //
 //        return Response.ok(employees).build();
 //    }
-//
-//    @POST
-//    @Operation(summary = "Creates a valid employee and stores it into the database")
-//    @APIResponses({
-//            @APIResponse(
-//                    responseCode = "201",
-//                    content = @Content(
-//                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = URI.class)),
-//                    description = "URI of the created employee"),
-//            @APIResponse(responseCode = "400", description = "Invalid input"),
-//            @APIResponse(
-//                    responseCode = "409",
-//                    content = @Content(
-//                            mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = String.class)),
-//                    description = "Employee duplications is not allowed"),
-//            @APIResponse(
-//                    responseCode = "404",
-//                    content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = String.class)),
-//                    description = "Specified department does not exist in the database")})
-//    public Response createEmployee(
-//            @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
-//                    schema = @Schema(implementation = Employee.class))) @Valid Employee employee,
-//            @Context UriInfo uriInfo) {
-//        if (employee.address == null || employee.department == null) return Response.status(Status.BAD_REQUEST).build();
-//        else if (Employee.checkByEmailAndPhone(employee.email, employee.mobile))
-//            if (Employee.checkByEmailAndPhone(employee.email, employee.mobile))
-//                return Response.status(Status.CONFLICT).entity("Email or Phone number is already taken").build();
-//            else if (!Department.findByIdOptional(employee.department.id).isPresent())
-//                return Response.status(Status.NOT_FOUND).entity("Department dont exists").build();
-//
-//        employee.registeredBy = keycloakSecurityContext.getPrincipal().getName();
-//        employee = employeeService.addEmployee(employee);
-//        URI employeeUri = uriInfo.getAbsolutePathBuilder().path(Long.toString(employee.id)).build();
-//        return Response.created(employeeUri).build();
-//    }
-//
+
+    @POST
+    @Operation(summary = "Creates valid employee")
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "201",
+                    description = "Employee created",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = URI.class, type = SchemaType.STRING))),
+            @APIResponse(responseCode = "400", description = "Invalid input"),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Invalid input",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON)),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Could not find department for associated employee",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON))
+    })
+    public Response createEmployee(@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
+            schema = @Schema(implementation = Employee.class))) @Valid Employee employee, @Context UriInfo uriInfo) {
+        employee.setRegisteredBy(keycloakSecurityContext.getPrincipal().getName());
+        this.employeeService.addEmployee(employee);
+        URI employeeUri = employeeUriBuilder(employee.getEmployeeId(), uriInfo).build();
+        return Response.created(employeeUri).build();
+    }
+
 //    @PUT
 //    @Path("/{id}")
 //    @Operation(summary = "Updates an existing employee")

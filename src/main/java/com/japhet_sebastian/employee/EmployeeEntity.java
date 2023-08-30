@@ -6,6 +6,7 @@ import com.japhet_sebastian.organization.entity.DepartmentEntity;
 import com.japhet_sebastian.vo.EmploymentStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -39,12 +40,12 @@ public class EmployeeEntity extends Person {
     private String workId;
 
     @Schema(required = true)
-    @NotEmpty(message = "{Employee.dob.required}")
+    @NotNull(message = "{Employee.dob.required}")
     @Column(name = "birthdate")
     private LocalDate dateOfBirth;
 
     @Schema(required = true)
-    @NotEmpty(message = "{Employee.hire-date.required}")
+    @NotNull(message = "{Employee.hire-date.required}")
     @Column(name = "hire_date", nullable = false)
     private LocalDate hireDate;
 
@@ -57,7 +58,7 @@ public class EmployeeEntity extends Person {
     @Column(name = "employment_status", nullable = false)
     private Set<EmploymentStatus> status;
 
-    @NotEmpty(message = "{Department.field.required}")
+    //    @NotEmpty(message = "{Department.field.required}")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

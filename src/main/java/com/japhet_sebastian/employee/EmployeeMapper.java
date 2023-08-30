@@ -2,8 +2,6 @@ package com.japhet_sebastian.employee;
 
 
 import com.japhet_sebastian.organization.entity.AddressEntity;
-import com.japhet_sebastian.organization.entity.CollegeDetail;
-import com.japhet_sebastian.organization.entity.CollegeEntity;
 import org.mapstruct.*;
 
 import java.util.List;
@@ -48,11 +46,11 @@ public interface EmployeeMapper {
 
     @Mappings({
             @Mapping(target = "addressId", ignore = true),
-            @Mapping(target = "street", source = "employeeDetail.street"),
-            @Mapping(target = "district", source = "employeeDetail.district"),
-            @Mapping(target = "city", source = "employeeDetail.city"),
-            @Mapping(target = "postalCode", source = "employeeDetail.postalCode"),
-            @Mapping(target = "country", source = "employeeDetail.country")
+            @Mapping(target = "street", source = "employee.street"),
+            @Mapping(target = "district", source = "employee.district"),
+            @Mapping(target = "city", source = "employee.city"),
+            @Mapping(target = "postalCode", source = "employee.postalCode"),
+            @Mapping(target = "country", source = "employee.country")
     })
     AddressEntity toAddressEntity(Employee employee);
 
