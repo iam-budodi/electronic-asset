@@ -36,7 +36,7 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
     Logger LOGGER;
 
     private String getString(PageRequest pageRequest) {
-        String query = "FROM Employee e LEFT JOIN FETCH e.department d " +
+        String query = "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address LEFT JOIN FETCH e.status " +
                 "WHERE :search IS NULL OR LOWER(e.firstName) LIKE :search " +
                 "OR LOWER(e.lastName) LIKE :search " +
                 "OR LOWER(e.workId) LIKE :search " +
@@ -48,7 +48,7 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
         return query;
     }
 
-    public List<EmployeeDetail> allEmployees(PageRequest pageRequest) {
+    public List<Employee> allEmployees(PageRequest pageRequest) {
         Map<String, Object> params = new HashMap<>();
         params.put("search", pageRequest.getSearch());
         params.put("date", pageRequest.getDate());
@@ -63,24 +63,20 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
 
         return find(query, sort, params)
                 .page(Page.of(pageRequest.getPageNum(), pageRequest.getPageSize()))
-                .stream().map(this.employeeMapper::toEmployeeDetail)
+                .stream().map(this.employeeMapper::toEmployee)
                 .collect(Collectors.toList());
     }
 
-    public Optional<EmployeeDetail> findEmployee(@NotNull String employeeId) {
-        return find("FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.status " +
-                "WHERE e.employeeId = :employeeId ", Parameters.with("employeeId", UUID.fromString(employeeId)))
+    public Optional<Employee> findEmployee(@NotNull String employeeId) {
+        return find(employeeQuery(), Parameters.with("employeeId", UUID.fromString(employeeId)))
                 .firstResultOptional()
-                .map(this.employeeMapper::toEmployeeDetail);
+                .map(this.employeeMapper::toEmployee);
     }
 
-    public List<EmployeeDetail> reporting(LocalDate startDate, LocalDate endDate) {
-        String queryString = "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.status " +
-                "WHERE e.registeredAt BETWEEN :startDate AND :endDate";
-
-        return find(queryString, Sort.by("e.firstName", Sort.Direction.Descending),
+    public List<Employee> reporting(LocalDate startDate, LocalDate endDate) {
+        return find(reportingQuery(), Sort.by("e.firstName", Sort.Direction.Descending),
                 Parameters.with("startDate", startDate).and("endDate", endDate))
-                .stream().map(this.employeeMapper::toEmployeeDetail)
+                .stream().map(this.employeeMapper::toEmployee)
                 .collect(Collectors.toList());
     }
 
@@ -105,9 +101,36 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
         this.employeeMapper.updateEmployeeFromEmployeeEntity(employeeEntity, employee);
     }
 
+    public void updateEmployee(@Valid Employee employee) {
+        EmployeeEntity employeeEntity = find(employeeQuery(),
+                Parameters.with("employeeId", UUID.fromString(employee.getEmployeeId())))
+                .firstResultOptional()
+                .orElseThrow(() -> new ServiceException("No employee found for employeeId[%s]", employee.getEmployeeId()));
+
+        this.employeeMapper.updateEmployeeEntityFromEmployee(employee, employeeEntity);
+        persist(employeeEntity);
+
+        this.employeeMapper.updateEmployeeFromEmployeeEntity(employeeEntity, employee);
+//
+//        Employee.findByIdOptional(empId)
+//                .map(found -> Panache.getEntityManager().merge(employee))
+//                .orElseThrow(() -> new NotFoundException("Employee dont exist"));
+    }
+
+
     private Optional<EmployeeEntity> checkByEmailOrPhone(String email, String mobile) {
         return find("#Employee.getByEmailOrPhone", Parameters
                 .with("email", email).and("mobile", mobile).map())
                 .firstResultOptional();
+    }
+
+    private String employeeQuery() {
+        return "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address LEFT JOIN FETCH e.status " +
+                "WHERE e.employeeId = :employeeId";
+    }
+
+    private String reportingQuery() {
+        return "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address LEFT JOIN FETCH e.status " +
+                "WHERE e.registeredAt BETWEEN :startDate AND :endDate";
     }
 }

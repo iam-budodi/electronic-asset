@@ -1,5 +1,6 @@
 package com.japhet_sebastian.employee;
 
+import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.vo.PageRequest;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
@@ -24,6 +25,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 
 import java.net.URI;
+import java.util.Objects;
 
 import static com.japhet_sebastian.employee.EmployeeResource.RESOURCE_PATH;
 
@@ -53,7 +55,7 @@ public class EmployeeResource extends AbstractEmployeeType {
             description = "Lists all the employees",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = EmployeeDetail.class, type = SchemaType.ARRAY)))
+                    schema = @Schema(implementation = Employee.class, type = SchemaType.ARRAY)))
     public Response listEmployees(@BeanParam PageRequest pageRequest) {
         return Response.ok(this.employeeService.listEmployees(pageRequest))
                 .header("X-Total-Count", this.employeeService.totalEmployees())
@@ -68,7 +70,7 @@ public class EmployeeResource extends AbstractEmployeeType {
             description = "Generate employees report",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = EmployeeDetail.class, type = SchemaType.ARRAY)))
+                    schema = @Schema(implementation = Employee.class, type = SchemaType.ARRAY)))
     public Response getReport(@BeanParam ReportPage reportPage) {
         return Response
                 .ok(this.employeeService.departmentsReport(reportPage.getStartDate(), reportPage.getEndDate()))
@@ -84,7 +86,7 @@ public class EmployeeResource extends AbstractEmployeeType {
                     description = "Get a found employee object",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON,
-                            schema = @Schema(implementation = EmployeeDetail.class, type = SchemaType.OBJECT))),
+                            schema = @Schema(implementation = Employee.class, type = SchemaType.OBJECT))),
             @APIResponse(
                     responseCode = "404",
                     description = "Employee does not exist for a given identifier",
@@ -94,7 +96,7 @@ public class EmployeeResource extends AbstractEmployeeType {
             @Parameter(description = "employeeId", required = true)
             @PathParam("employeeId") @NotNull String employeeId) {
         return employeeService.getEmployee(employeeId)
-                .map(employeeDetail -> Response.ok(employeeDetail).build())
+                .map(employee -> Response.ok(employee).build())
                 .orElseGet(() -> Response.status(Response.Status.NOT_FOUND).build());
     }
 
@@ -143,25 +145,48 @@ public class EmployeeResource extends AbstractEmployeeType {
         return Response.created(employeeUri).build();
     }
 
-//    @PUT
-//    @Path("/{id}")
-//    @Operation(summary = "Updates an existing employee")
-//    @APIResponses({@APIResponse(responseCode = "204", description = "Employee has been successfully updated"), @APIResponse(responseCode = "400", description = "Invalid input"), @APIResponse(responseCode = "404", description = "Employee to be updated does not exist in the database"), @APIResponse(responseCode = "415", description = "Format is not JSON"), @APIResponse(responseCode = "409", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Employee.class)), description = "Employee payload is not the same as an entity object that needed to be updated")})
-//    public Response updateEmployee(@Parameter(description = "Employee identifier", required = true) @PathParam("id") @NotNull Long empId, @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Employee.class))) @Valid Employee employee) {
-//        if (!empId.equals(employee.id)) return Response.status(Response.Status.CONFLICT).entity(employee).build();
-//        else if (employee.department == null) return Response.status(Status.BAD_REQUEST).build();
-//
-//        employee.address = null;
-//        employee.updatedBy = keycloakSecurityContext.getPrincipal().getName();
-//        try {
-//            employeeService.updateEmployee(employee, empId);
-//        } catch (NotFoundException nf) {
-//            return Response.status(Response.Status.NOT_FOUND).build();
-//        }
-//
-//        return Response.status(Status.NO_CONTENT).build();
-//    }
-//
+    @PUT
+    @Path("/{employeeId}")
+    @Operation(summary = "Updates existing employee")
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "204",
+                    description = "Employee updated",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = Employee.class, type = SchemaType.OBJECT))),
+            @APIResponse(
+                    responseCode = "404",
+                    description = "No employee found for a given identifier",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON)),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Invalid object",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON)),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Employee object does not have employeeId",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON)),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Path variable employeeId does not match Employee.employeeId",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON)),
+    })
+    public Response updateEmployee(
+            @Parameter(description = "employeeId", required = true) @PathParam("employeeId") @NotNull String employeeId,
+            @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(implementation = Employee.class))) @Valid Employee employee) {
+        if (Objects.isNull(employee.getEmployeeId()) || employee.getEmployeeId().isEmpty())
+            throw new ServiceException("Employee does not have employeeId");
+
+        if (!Objects.equals(employeeId, employee.getEmployeeId()))
+            throw new ServiceException("path variable employeeId does not match Employee.employeeId");
+
+        employee.setUpdatedBy(keycloakSecurityContext.getPrincipal().getName());
+        employeeService.updateEmployee(employee);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
 //    @DELETE
 //    @Path("/{id}")
 //    @Operation(summary = "Deletes an existing employee")

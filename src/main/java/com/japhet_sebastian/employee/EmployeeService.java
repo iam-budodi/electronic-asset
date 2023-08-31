@@ -27,7 +27,7 @@ public class EmployeeService {
     @Inject
     Logger LOGGER;
 
-    public List<EmployeeDetail> listEmployees(PageRequest pageRequest) {
+    public List<Employee> listEmployees(PageRequest pageRequest) {
         return this.employeeRepository.allEmployees(pageRequest);
     }
 
@@ -35,11 +35,11 @@ public class EmployeeService {
         return this.employeeRepository.count();
     }
 
-    public Optional<EmployeeDetail> getEmployee(@NotNull String employeeId) {
+    public Optional<Employee> getEmployee(@NotNull String employeeId) {
         return this.employeeRepository.findEmployee(employeeId);
     }
 
-    public List<EmployeeDetail> departmentsReport(LocalDate startDate, LocalDate endDate) {
+    public List<Employee> departmentsReport(LocalDate startDate, LocalDate endDate) {
         return this.employeeRepository.reporting(startDate, endDate);
     }
 
@@ -47,13 +47,9 @@ public class EmployeeService {
         this.employeeRepository.saveEmployee(employee);
     }
 
-
-//    public void updateEmployee(@Valid Employee employee, @NotNull Long empId) {
-//        Employee.findByIdOptional(empId)
-//                .map(found -> Panache.getEntityManager().merge(employee))
-//                .orElseThrow(() -> new NotFoundException("Employee dont exist"));
-//    }
-//
+    public void updateEmployee(@Valid Employee employee) {
+        this.employeeRepository.updateEmployee(employee);
+    }
 //    public void deleteEmployee(@NotNull Long empId) {
 //        Panache.getEntityManager()
 //                .getReference(Employee.class, empId)

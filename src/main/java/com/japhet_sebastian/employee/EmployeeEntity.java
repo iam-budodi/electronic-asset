@@ -1,5 +1,6 @@
 package com.japhet_sebastian.employee;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.japhet_sebastian.organization.entity.AddressEntity;
 import com.japhet_sebastian.organization.entity.DepartmentEntity;
@@ -49,12 +50,20 @@ public class EmployeeEntity extends Person {
     @Column(name = "hire_date", nullable = false)
     private LocalDate hireDate;
 
-    @NotEmpty(message = "{Employee.status.required}")
+//    @JsonIgnore
+//    @NotEmpty(message = "{Employee.status.required}")
+//    @Schema(required = true)
+//    @Enumerated(EnumType.STRING)
+//    @ElementCollection //(fetch = FetchType.LAZY)
+//    @CollectionTable(name = "employment_status", joinColumns = @JoinColumn(name = "employee_uuid"))
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    @Column(name = "employment_status", nullable = false)
+
+
+    @NotNull
     @Schema(required = true)
+    @ElementCollection
     @Enumerated(EnumType.STRING)
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "employment_status", joinColumns = @JoinColumn(name = "employee_uuid"))
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "employment_status", nullable = false)
     private Set<EmploymentStatus> status;
 
