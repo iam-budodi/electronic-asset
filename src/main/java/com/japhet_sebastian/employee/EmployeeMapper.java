@@ -66,4 +66,7 @@ public interface EmployeeMapper {
 
     void updateEmployeeEntityFromEmployee(Employee employee, @MappingTarget EmployeeEntity employeeEntity);
 
+    void updateAddressEntityFromEmployee(Employee employee, @MappingTarget AddressEntity addressEntity);
+
+
 }

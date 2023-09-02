@@ -2,6 +2,7 @@ package com.japhet_sebastian.employee;
 
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.vo.PageRequest;
+import com.japhet_sebastian.vo.SelectOptions;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -100,23 +101,19 @@ public class EmployeeResource extends AbstractEmployeeType {
                 .orElseGet(() -> Response.status(Response.Status.NOT_FOUND).build());
     }
 
-//    @GET
-//    @Path("/select")
-//    @Transactional(Transactional.TxType.SUPPORTS)
-//    @Operation(summary = "Retrieve only employee ID and first name from all employees in the database")
-//    @APIResponses({
-//            @APIResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON,
-//                    schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY)),
-//                    description = "ID and first name for all employees available"),
-//            @APIResponse(responseCode = "204", description = "No employee available in the database")
-//    })
-//    public Response employeesSelectOptions() {
-//        List<SelectOptions> employees = Employee.find("SELECT e.id, e.firstName || ' ' || CONCAT(SUBSTRING(e.middleName, 1, 1), '.') || ' ' || e.lastName FROM Employee e")
-//                .project(SelectOptions.class).list();
-//        if (employees.size() == 0) return Response.status(Status.NO_CONTENT).build();
-//
-//        return Response.ok(employees).build();
-//    }
+    @GET
+    @Path("/select")
+    @Operation(summary = "Get all selection options projection of the employee")
+    @APIResponse(
+            responseCode = "200",
+            description = "ID and first name for all employees available",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY))
+    )
+    public Response selectOptions() {
+        return Response.ok(this.employeeService.selected()).build();
+    }
 
     @POST
     @Operation(summary = "Creates valid employee")
@@ -139,6 +136,7 @@ public class EmployeeResource extends AbstractEmployeeType {
     })
     public Response createEmployee(@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
             schema = @Schema(implementation = Employee.class))) @Valid Employee employee, @Context UriInfo uriInfo) {
+        LOGGER.info("EMPLOYEE RESOURCE : " + employee);
         employee.setRegisteredBy(keycloakSecurityContext.getPrincipal().getName());
         this.employeeService.addEmployee(employee);
         URI employeeUri = employeeUriBuilder(employee.getEmployeeId(), uriInfo).build();
@@ -187,22 +185,22 @@ public class EmployeeResource extends AbstractEmployeeType {
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
-//    @DELETE
-//    @Path("/{id}")
-//    @Operation(summary = "Deletes an existing employee")
-//    @APIResponses({
-//            @APIResponse(responseCode = "204", description = "Employee has been successfully deleted"),
-//            @APIResponse(responseCode = "400", description = "Invalid input"),
-//            @APIResponse(responseCode = "404", description = "Employee to be deleted does not exist in the database"),
-//            @APIResponse(responseCode = "500", description = "Employee not found")})
-//    public Response deleteEmployee(
-//            @Parameter(description = "Employee identifier", required = true) @PathParam("id") @NotNull Long empId
-//    ) {
-//        try {
-//            employeeService.deleteEmployee(empId);
-//        } catch (EntityNotFoundException nfe) {
-//            return Response.status(Status.NOT_FOUND).build();
-//        }
-//        return Response.noContent().build();
-//    }
+    @DELETE
+    @Path("/{employeeId}")
+    @Operation(summary = "Deletes existing employee")
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "204",
+                    description = "Employee deleted",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON)),
+            @APIResponse(
+                    responseCode = "404",
+                    description = "Could not find employee for a given employeeId",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON))
+    })
+    public Response deleteEmployee(@Parameter(description = "employeeId", required = true)
+                                   @PathParam("employeeId") @NotNull String employeeId) {
+        employeeService.deleteEmployee(employeeId);
+        return Response.noContent().build();
+    }
 }

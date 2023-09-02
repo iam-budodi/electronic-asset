@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Set;
 
-public class Employee extends EmployeeBase {
+public class Employee {
 
     private String employeeId;
 
@@ -86,46 +86,37 @@ public class Employee extends EmployeeBase {
     @Pattern(regexp = "^[\\p{L} .'-]+$", message = "{String.special.character}")
     private String registeredBy;
 
-
     @Pattern(regexp = "^[\\p{L} .'-]+$", message = "{String.special.character}")
     private String updatedBy;
 
-    @Override
     public String getEmployeeId() {
         return employeeId;
     }
 
-    @Override
     public void setEmployeeId(String employeeId) {
         this.employeeId = employeeId;
     }
 
-    @Override
     public String getFirstName() {
         return firstName;
     }
 
-    @Override
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
-    @Override
     public String getMiddleName() {
         return middleName;
     }
 
-    @Override
     public void setMiddleName(String middleName) {
         this.middleName = middleName;
     }
 
-    @Override
     public String getLastName() {
         return lastName;
     }
 
-    @Override
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
@@ -138,32 +129,26 @@ public class Employee extends EmployeeBase {
         this.dateOfBirth = dateOfBirth;
     }
 
-    @Override
     public Gender getGender() {
         return gender;
     }
 
-    @Override
     public void setGender(Gender gender) {
         this.gender = gender;
     }
 
-    @Override
     public String getMobile() {
         return mobile;
     }
 
-    @Override
     public void setMobile(String mobile) {
         this.mobile = mobile;
     }
 
-    @Override
     public String getEmail() {
         return email;
     }
 
-    @Override
     public void setEmail(String email) {
         this.email = email;
     }
@@ -184,12 +169,10 @@ public class Employee extends EmployeeBase {
         this.hireDate = hireDate;
     }
 
-    @Override
     public Set<EmploymentStatus> getStatus() {
         return status;
     }
 
-    @Override
     public void setStatus(Set<EmploymentStatus> status) {
         this.status = status;
     }
@@ -202,12 +185,10 @@ public class Employee extends EmployeeBase {
         this.timeOfService = timeOfService;
     }
 
-    @Override
     public String getDepartmentName() {
         return departmentName;
     }
 
-    @Override
     public void setDepartmentName(String departmentName) {
         this.departmentName = departmentName;
     }
@@ -272,38 +253,11 @@ public class Employee extends EmployeeBase {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Employee employee)) return false;
-        if (!super.equals(o)) return false;
         return Objects.equals(getEmployeeId(), employee.getEmployeeId()) && Objects.equals(getFirstName(), employee.getFirstName()) && Objects.equals(getMiddleName(), employee.getMiddleName()) && Objects.equals(getLastName(), employee.getLastName()) && Objects.equals(getDateOfBirth(), employee.getDateOfBirth()) && getGender() == employee.getGender() && Objects.equals(getMobile(), employee.getMobile()) && Objects.equals(getEmail(), employee.getEmail()) && Objects.equals(getWorkId(), employee.getWorkId()) && Objects.equals(getHireDate(), employee.getHireDate()) && Objects.equals(getStatus(), employee.getStatus()) && Objects.equals(getTimeOfService(), employee.getTimeOfService()) && Objects.equals(getDepartmentName(), employee.getDepartmentName()) && Objects.equals(getStreet(), employee.getStreet()) && Objects.equals(getDistrict(), employee.getDistrict()) && Objects.equals(getCity(), employee.getCity()) && Objects.equals(getPostalCode(), employee.getPostalCode()) && Objects.equals(getCountry(), employee.getCountry()) && Objects.equals(getRegisteredBy(), employee.getRegisteredBy()) && Objects.equals(getUpdatedBy(), employee.getUpdatedBy());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getEmployeeId(), getFirstName(), getMiddleName(), getLastName(), getDateOfBirth(), getGender(), getMobile(), getEmail(), getWorkId(), getHireDate(), getStatus(), getTimeOfService(), getDepartmentName(), getStreet(), getDistrict(), getCity(), getPostalCode(), getCountry(), getRegisteredBy(), getUpdatedBy());
-    }
-
-    @Override
-    public String toString() {
-        return "Employee{" +
-                "employeeId='" + employeeId + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", middleName='" + middleName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                ", gender=" + gender +
-                ", mobile='" + mobile + '\'' +
-                ", email='" + email + '\'' +
-                ", workId='" + workId + '\'' +
-                ", hireDate=" + hireDate +
-                ", status=" + status +
-                ", timeOfService='" + timeOfService + '\'' +
-                ", departmentName='" + departmentName + '\'' +
-                ", street='" + street + '\'' +
-                ", district='" + district + '\'' +
-                ", city='" + city + '\'' +
-                ", postalCode='" + postalCode + '\'' +
-                ", country='" + country + '\'' +
-                ", registeredBy='" + registeredBy + '\'' +
-                ", updatedBy='" + updatedBy + '\'' +
-                '}';
+        return Objects.hash(getEmployeeId(), getFirstName(), getMiddleName(), getLastName(), getDateOfBirth(), getGender(), getMobile(), getEmail(), getWorkId(), getHireDate(), getStatus(), getTimeOfService(), getDepartmentName(), getStreet(), getDistrict(), getCity(), getPostalCode(), getCountry(), getRegisteredBy(), getUpdatedBy());
     }
 }

@@ -72,12 +72,12 @@ public class CollegeRepository implements PanacheRepositoryBase<CollegeEntity, U
         this.collegeMapper.updateCollegeEntityFromCollegeDetail(collegeDetail, collegeEntity);
         persist(collegeEntity);
 
-        this.addressRepository.findByIdOptional(collegeEntity.getCollegeId())
-                .map(addressEntity -> {
-                    this.collegeMapper.updateAddressEntityFromCollegeDetail(collegeDetail, addressEntity);
-                    this.addressRepository.persist(addressEntity);
-                    return addressEntity;
-                });
+        this.addressRepository.findByIdOptional(collegeEntity.getCollegeId()).map(addressEntity -> {
+            this.collegeMapper.updateAddressEntityFromCollegeDetail(collegeDetail, addressEntity);
+            addressEntity.setAddressId(collegeEntity.getCollegeId());
+            this.addressRepository.persist(addressEntity);
+            return addressEntity;
+        });
 
         collegeMapper.updateCollegeDetailFromCollegeEntity(collegeEntity, collegeDetail);
     }
@@ -87,7 +87,6 @@ public class CollegeRepository implements PanacheRepositoryBase<CollegeEntity, U
                 .orElseThrow(() -> new ServiceException("No college found for collegeId[%s]", collegeId));
 
         AddressEntity addressEntity = collegeEntity.getAddress();
-
         delete(collegeEntity);
         this.addressRepository.delete(addressEntity);
     }
