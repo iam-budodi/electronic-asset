@@ -1,4 +1,4 @@
-package com.japhet_sebastian.employee;
+package com.japhet_sebastian.employee.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;

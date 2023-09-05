@@ -1,4 +1,4 @@
-package com.japhet_sebastian.employee;
+package com.japhet_sebastian.employee.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.japhet_sebastian.organization.entity.AddressEntity;
@@ -49,24 +49,14 @@ public class EmployeeEntity extends Person {
     @Column(name = "hire_date", nullable = false)
     private LocalDate hireDate;
 
-//    @JsonIgnore
-//    @NotEmpty(message = "{Employee.status.required}")
-//    @Schema(required = true)
-//    @Enumerated(EnumType.STRING)
-//    @ElementCollection //(fetch = FetchType.LAZY)
-//    @CollectionTable(name = "employment_status", joinColumns = @JoinColumn(name = "employee_uuid"))
-//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-//    @Column(name = "employment_status", nullable = false)
-
-
-    @NotNull
     @Schema(required = true)
-    @ElementCollection
     @Enumerated(EnumType.STRING)
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "employment_status", joinColumns = @JoinColumn(name = "employee_uuid"))
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "employment_status", nullable = false)
     private Set<EmploymentStatus> status;
 
-    //    @NotEmpty(message = "{Department.field.required}")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

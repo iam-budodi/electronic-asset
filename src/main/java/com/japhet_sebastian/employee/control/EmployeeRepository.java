@@ -1,5 +1,7 @@
-package com.japhet_sebastian.employee;
+package com.japhet_sebastian.employee.control;
 
+import com.japhet_sebastian.employee.entity.Employee;
+import com.japhet_sebastian.employee.entity.EmployeeEntity;
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.control.AddressRepository;
 import com.japhet_sebastian.organization.control.DepartmentRepository;
@@ -33,7 +35,7 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
     AddressRepository addressRepository;
 
     private String getString(PageRequest pageRequest) {
-        String query = "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address LEFT JOIN FETCH e.status " +
+        String query = "SELECT DISTINCT e FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address " +
                 "WHERE :search IS NULL OR LOWER(e.firstName) LIKE :search " +
                 "OR LOWER(e.lastName) LIKE :search " +
                 "OR LOWER(e.workId) LIKE :search " +
@@ -145,12 +147,12 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
     }
 
     private String employeeQuery() {
-        return "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address LEFT JOIN FETCH e.status " +
+        return "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address " +
                 "WHERE e.employeeId = :employeeId";
     }
 
     private String reportingQuery() {
-        return "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address LEFT JOIN FETCH e.status " +
+        return "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address " +
                 "WHERE e.registeredAt BETWEEN :startDate AND :endDate";
     }
 }

@@ -1,6 +1,8 @@
-package com.japhet_sebastian.employee;
+package com.japhet_sebastian.employee.control;
 
 
+import com.japhet_sebastian.employee.entity.Employee;
+import com.japhet_sebastian.employee.entity.EmployeeEntity;
 import com.japhet_sebastian.organization.entity.AddressEntity;
 import org.mapstruct.*;
 

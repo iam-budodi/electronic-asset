@@ -1,5 +1,6 @@
-package com.japhet_sebastian.employee;
+package com.japhet_sebastian.employee.control;
 
+import com.japhet_sebastian.employee.entity.Employee;
 import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.enterprise.context.ApplicationScoped;

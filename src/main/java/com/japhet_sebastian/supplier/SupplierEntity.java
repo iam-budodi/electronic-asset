@@ -1,7 +1,7 @@
 package com.japhet_sebastian.supplier;
 
 import com.assets.management.assets.model.valueobject.SupplierType;
-import com.japhet_sebastian.employee.BaseEntity;
+import com.japhet_sebastian.employee.entity.BaseEntity;
 import com.japhet_sebastian.organization.entity.AddressEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;

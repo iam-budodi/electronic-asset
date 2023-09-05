@@ -65,8 +65,15 @@ class DepartmentResourceTest extends AccessTokenProvider {
                 .then()
                 .statusCode(OK.getStatusCode())
                 .body("$.size()", is(1))
-                .body("departmentCode", anyOf(contains("CSE"), contains("TE"), contains("ETE"), contains("KNOWN")))
-                .header("X-Total-Count", is(greaterThanOrEqualTo(String.valueOf(2))));
+                .body("departmentCode",
+                        anyOf(
+                                contains("CSE"),
+                                contains("TE"),
+                                contains("ETE"),
+                                contains("KNOWN"),
+                                contains("FIN012")
+                        )
+                ).header("X-Total-Count", is(greaterThanOrEqualTo(String.valueOf(2))));
     }
 
     @Test

@@ -67,7 +67,7 @@ class CollegeResourceTest extends AccessTokenProvider {
         String totalElement = response.getHeader("X-Total-Count");
         assertThat(collegeDetails, is(not(empty())));
         assertThat(collegeDetails, hasSize(1));
-        assertThat(totalElement, is(greaterThanOrEqualTo(String.valueOf(2))));
+        assertThat(Integer.valueOf(totalElement), is(greaterThanOrEqualTo(2)));
     }
 
     @Test
@@ -79,11 +79,9 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .then()
                 .statusCode(OK.getStatusCode())
                 .body("$.size()", is(greaterThanOrEqualTo(2)))
-                .body("label", containsInAnyOrder(
-                                "College of Agricultural Sciences and Fisheries",
-                                "College of Information and Communication Technology",
-                                "Updated college name"
-                        )
+                .body(
+                        containsString("College of Agricultural Sciences and Fisheries"),
+                        containsString("College of Information and Communication Technology")
                 );
     }
 

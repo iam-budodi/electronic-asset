@@ -1,4 +1,4 @@
-package com.japhet_sebastian.employee;
+package com.japhet_sebastian.employee.boundary;
 
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.jboss.resteasy.reactive.RestQuery;

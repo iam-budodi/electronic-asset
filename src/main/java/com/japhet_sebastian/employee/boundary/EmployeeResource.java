@@ -1,5 +1,7 @@
-package com.japhet_sebastian.employee;
+package com.japhet_sebastian.employee.boundary;
 
+import com.japhet_sebastian.employee.control.EmployeeService;
+import com.japhet_sebastian.employee.entity.Employee;
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
@@ -28,7 +30,7 @@ import org.jboss.logging.Logger;
 import java.net.URI;
 import java.util.Objects;
 
-import static com.japhet_sebastian.employee.EmployeeResource.RESOURCE_PATH;
+import static com.japhet_sebastian.employee.boundary.EmployeeResource.RESOURCE_PATH;
 
 @Path(RESOURCE_PATH)
 @Transactional
