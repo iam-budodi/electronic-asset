@@ -3,6 +3,7 @@ package com.japhet_sebastian.employee.boundary;
 import com.japhet_sebastian.AccessTokenProvider;
 import com.japhet_sebastian.KeycloakResource;
 import com.japhet_sebastian.employee.entity.Employee;
+import com.japhet_sebastian.exception.ErrorResponse;
 import com.japhet_sebastian.organization.boundary.CollegeResource;
 import com.japhet_sebastian.organization.boundary.DepartmentResource;
 import com.japhet_sebastian.organization.entity.CollegeDetail;
@@ -18,12 +19,14 @@ import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Period;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
@@ -46,6 +49,10 @@ class EmployeeResourceTest extends AccessTokenProvider {
     @TestHTTPResource
     @TestHTTPEndpoint(DepartmentResource.class)
     String department;
+
+    @TestHTTPResource("report")
+    @TestHTTPEndpoint(EmployeeResource.class)
+    String report;
 
     @TestHTTPResource("select")
     @TestHTTPEndpoint(EmployeeResource.class)
@@ -78,7 +85,21 @@ class EmployeeResourceTest extends AccessTokenProvider {
         List<Employee> employees = response.jsonPath().getList("$");
         assertThat(employees, is(not(empty())));
         assertThat(employees, hasSize(greaterThanOrEqualTo(1)));
-        assertThat(response.getHeader("X-Total-Count"), is(greaterThanOrEqualTo(String.valueOf(2))));
+        assertThat(Integer.valueOf(response.getHeader("X-Total-Count")), is(greaterThanOrEqualTo(2)));
+    }
+
+    @Test
+    void employeesReport() {
+        List<Employee> employees = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .header(ACCEPT, APPLICATION_JSON)
+                .when().get(report + "?start=2023-03-01&end=2023-03-30")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().body().as(employeesReportTypeRef());
+
+        assertThat(employees, is(not(empty())));
+        assertThat(employees, hasSize(2));
     }
 
     @Test
@@ -90,7 +111,10 @@ class EmployeeResourceTest extends AccessTokenProvider {
                 .then()
                 .statusCode(OK.getStatusCode())
                 .body("$.size()", is(greaterThanOrEqualTo(2)))
-                .body("label", containsInAnyOrder("hellen M. John", "Michael J. Mbaga"));
+                .body(
+                        containsString("hellen M. John"),
+                        containsString("Michael J. Mbaga")
+                );
     }
 
     @Test
@@ -345,559 +369,1067 @@ class EmployeeResourceTest extends AccessTokenProvider {
         assertThat(employeeSaved.getDepartmentName(), equalTo(departmentDetail.getDepartmentName()));
     }
 
-//    @Test
-//    @Order(3)
-//    void shouldNotCreateInvalidEmployee() {
-//        final Employee employee = new Employee();
-//        given()
-//                .body(employee)
-//                .header(CONTENT_TYPE, APPLICATION_JSON)
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .when()
-//                .post()
-//                .then()
-//                .statusCode(BAD_REQUEST.getStatusCode());
-//    }
-//
-//    @Test
-//    @Order(4)
-//    void ShouldCreateDepartment() {
-//        final Department dept = new Department();
-//        dept.departmentName = DEPARTMENT_NAME;
-//        dept.description = DEPARTMENT_DESCRIPTION;
-//
-//        // creates department
-//        String deptLocation = given()
-//                .body(dept)
-//                .header(CONTENT_TYPE, APPLICATION_JSON)
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .when()
-//                .post(deptUrl)
-//                .then()
-//                .statusCode(Status.CREATED.getStatusCode())
-////					.header("location", deptUrl + "/2") // leave for testing failure results
-//                .extract().response().getHeader("Location");
-//
-//        // retrieve created URI and extract department Id
-//        String[] elements = deptLocation.split("/");
-//        departmentId = elements[elements.length - 1];
-//        assertThat(departmentId).isNotNull();
-//    }
-//
-//    @Test
-//    @Order(5)
-//    void shouldFetchDepartment() {
-//        // fetch created department
-//        department = given()
-//                .accept(ContentType.JSON)
-//                .pathParam("id", departmentId)
-//                .when()
-//                .get(deptUrl + "/{id}")
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .contentType(ContentType.JSON)
-////					.extract().body().as(getDepartmentTypeRef());
-//                .extract().as(Department.class);
-//
-//        assertThat(department).isNotNull();
-//    }
-//
-//    @Test
-//    @Order(6)
-//    void shouldCreateEmployee() {
-//        // Creating Address object
-//        final Address address = new Address();
-//        address.street = STREET;
-//        address.ward = WARD;
-//        address.district = DISTRICT;
-//        address.city = CITY;
-//        address.postalCode = POSTAL_CODE;
-//        address.country = COUNTRY;
-//
-//        final Employee employee = new Employee();
-//        employee.firstName = DEFAULT_FNAME;
-//        employee.lastName = DEFAULT_LNAME;
-//        employee.email = DEFAULT_EMAIL;
-//        employee.mobile = DEFAULT_PHONE;
-//        employee.gender = DEFAULT_GENDER;
-//        employee.workId = DEFAULT_WORK_ID;
-//        employee.dateOfBirth = DEFAULT_BIRTH_DATE;
-//        employee.hireDate = DEFAULT_HIRE_DATE;
-//        employee.status = DEFAULT_STATUS;
-//        employee.registeredBy = DEFAULT_REGISTERED_BY;
-//        employee.address = address;
-//        employee.department = department;
-//
-//        String location = given()
-//                .body(employee)
-//                .header(CONTENT_TYPE, APPLICATION_JSON)
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .when()
-//                .post()
-//                .then()
-//                .statusCode(Status.CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertTrue(location.contains("employees"));
-//        String[] segments = location.split("/");
-//        employeeId = segments[segments.length - 1];
-//        assertNotNull(employeeId);
-//
-//    }
-//
-//    @Test
-//    @Order(7)
-//    void shouldFindEmployees() {
-//        List<Employee> employees = given()
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .when()
-//                .get()
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .body("", is(not(empty())))
-//                .contentType(APPLICATION_JSON)
-//                .extract().body().as(getEmployeesTypeRef());
-//
-//        assertTrue(employees.size() >= 1);
-//        assertThat(employees.size(), greaterThanOrEqualTo(1));
-//    }
-//
-//    @Test
-//    @Order(8)
-//    void shouldFindEmployee() {
-//        given()
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .pathParam("id", employeeId)
-//                .when()
-//                .get("/{id}")
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .contentType(APPLICATION_JSON)
-//                .body("firstName", is(DEFAULT_FNAME))
-//                .body("lastName", is(DEFAULT_LNAME))
-//                .body("email", is(DEFAULT_EMAIL))
-//                .body("mobile", is(DEFAULT_PHONE))
-//                .body("hireDate", is(DEFAULT_HIRE_DATE.toString()))
-//                .body("status", hasItems("CONTRACT", "FULL_TIME"))
-//                .body("registeredBy", is(DEFAULT_REGISTERED_BY))
-//                .body("department.id", is(Integer.valueOf(departmentId)))
-//                .body("address.id", is(notNullValue()))
-//                .body("address.street", is(STREET))
-//                .body("address.city", is(CITY))
-//                .body("address.postalCode", is(POSTAL_CODE));
-//    }
-//
-//    @Test
-//    @Order(9)
-//    void shouldCountEmployee() {
-//        given()
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .when()
-//                .get(countEndpoint)
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .contentType(APPLICATION_JSON)
-////				.body(containsString(String.valueOf(count)))
-//                .body(is(greaterThanOrEqualTo(String.valueOf(1))));
-//    }
-//
-//    @Test
-//    @Order(10)
-//    void shouldFailToUpdateRandomEmployee() {
-//        final Long randomId = new Random().nextLong();
-//
-//        final Employee employee = new Employee();
-//        employee.id = Long.valueOf(employeeId);
-//        employee.firstName = UPDATED_FNAME;
-//        employee.lastName = UPDATED_LNAME;
-//        employee.email = UPDATED_EMAIL;
-//        employee.mobile = UPDATED_PHONE;
-//        employee.gender = DEFAULT_GENDER;
-//        employee.workId = "UDSM-2023-0012";
-//        employee.dateOfBirth = DEFAULT_BIRTH_DATE;
-//        employee.hireDate = DEFAULT_HIRE_DATE;
-//        employee.status = DEFAULT_STATUS;
-//        employee.registeredBy = DEFAULT_REGISTERED_BY;
-//
-//        given()
-//                .body(employee)
-//                .header(CONTENT_TYPE, APPLICATION_JSON)
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .pathParam("id", randomId)
-//                .when()
-//                .put("/{id}")
-//                .then()
-//                .statusCode(CONFLICT.getStatusCode());
-//    }
-//
-//    @Test
-//    @Order(11)
-//    void shouldFailToUpdateEmployeeWithoutDepartment() {
-//        final Long randomId = new Random().nextLong();
-//
-//        final Employee employee = new Employee();
-//        employee.id = randomId;
-//        employee.firstName = UPDATED_FNAME;
-//        employee.lastName = UPDATED_LNAME;
-//        employee.email = UPDATED_EMAIL;
-//        employee.mobile = UPDATED_PHONE;
-//        employee.gender = DEFAULT_GENDER;
-//        employee.workId = "UDSM-2023-0012";
-//        employee.dateOfBirth = DEFAULT_BIRTH_DATE;
-//        employee.hireDate = DEFAULT_HIRE_DATE;
-//        employee.status = DEFAULT_STATUS;
-//        employee.registeredBy = DEFAULT_REGISTERED_BY;
-//
-//        given()
-//                .body(employee)
-//                .header(CONTENT_TYPE, APPLICATION_JSON)
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .pathParam("id", randomId)
-//                .when()
-//                .put("/{id}")
-//                .then()
-//                .statusCode(BAD_REQUEST.getStatusCode());
-//    }
-//
-//    @Test
-//    @Order(12)
-//    void shouldFailToUpdateUnknownEmployee() {
-//        final Long randomId = new Random().nextLong();
-//
-//        final Employee employee = new Employee();
-//        employee.id = randomId;
-//        employee.firstName = UPDATED_FNAME;
-//        employee.lastName = UPDATED_LNAME;
-//        employee.email = UPDATED_EMAIL;
-//        employee.mobile = UPDATED_PHONE;
-//        employee.gender = DEFAULT_GENDER;
-//        employee.workId = "UDSM-2023-0012";
-//        employee.dateOfBirth = DEFAULT_BIRTH_DATE;
-//        employee.hireDate = DEFAULT_HIRE_DATE;
-//        employee.status = DEFAULT_STATUS;
-//        employee.registeredBy = DEFAULT_REGISTERED_BY;
-//        employee.department = department;
-//
-//        given()
-//                .body(employee)
-//                .header(CONTENT_TYPE, APPLICATION_JSON)
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .pathParam("id", randomId)
-//                .when()
-//                .put("/{id}")
-//                .then()
-//                .statusCode(NOT_FOUND.getStatusCode());
-//    }
-//
-//    @Test
-//    @Order(13)
-//    void shouldNotUpdateAddressWhileUpdatingEmployee() {
-//        // Creating Address object
-//        final Address address = new Address();
-//        address.street = STREET;
-//        address.ward = WARD;
-//        address.district = DISTRICT;
-//        address.city = CITY;
-//        address.postalCode = "15000";
-//        address.country = COUNTRY;
-//
-//        final Employee employee = new Employee();
-//        employee.id = Long.valueOf(employeeId);
-//        employee.firstName = UPDATED_FNAME;
-//        employee.lastName = UPDATED_LNAME;
-//        employee.email = UPDATED_EMAIL;
-//        employee.mobile = UPDATED_PHONE;
-//        employee.gender = DEFAULT_GENDER;
-//        employee.workId = "UDSM-2023-0012";
-//        employee.dateOfBirth = DEFAULT_BIRTH_DATE;
-//        employee.hireDate = DEFAULT_HIRE_DATE;
-//        employee.status = DEFAULT_STATUS;
-//        employee.registeredBy = DEFAULT_REGISTERED_BY;
-//        employee.department = department;
-//        employee.address = address;
-//
-//        given()
-//                .body(employee)
-//                .header(CONTENT_TYPE, APPLICATION_JSON)
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .pathParam("id", employeeId)
-//                .when()
-//                .put("/{id}")
-//                .then()
-//                .statusCode(NO_CONTENT.getStatusCode());
-//    }
-//
-//    @Test
-//    @Order(14)
-//    void shouldCheckAddressIsNotUpdated() {
-//        Employee employee = given()
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .pathParam("id", employeeId)
-//                .when()
-//                .get("/{id}")
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .contentType(APPLICATION_JSON)
-//                .extract().body().as(getEmployeeTypeRef());
-//
-//        assertThat(employee.address.postalCode, not(equalTo("15000")));
-//        assertThat(employee.address.postalCode, is(equalTo(POSTAL_CODE)));
-//    }
-//
-//    @Test
-//    @Order(15)
-//    void shouldUpdateEmployee() {
-//        final Employee employee = new Employee();
-//        employee.id = Long.valueOf(employeeId);
-//        employee.firstName = UPDATED_FNAME;
-//        employee.lastName = UPDATED_LNAME;
-//        employee.email = DEFAULT_EMAIL;
-//        employee.mobile = "+(255) 744 608 510";
-//        employee.gender = DEFAULT_GENDER;
-//        employee.workId = "UDSM-2023-0002";
-//        employee.dateOfBirth = DEFAULT_BIRTH_DATE;
-//        employee.hireDate = DEFAULT_HIRE_DATE;
-//        employee.status = DEFAULT_STATUS;
-//        employee.registeredBy = DEFAULT_REGISTERED_BY;
-//        employee.department = department;
-//
-//        given()
-//                .body(employee)
-//                .header(CONTENT_TYPE, APPLICATION_JSON)
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .pathParam("id", employeeId)
-//                .when()
-//                .put("/{id}")
-//                .then()
-//                .statusCode(NO_CONTENT.getStatusCode());
-//    }
-//
-//    @Test
-//    @Order(16)
-//    void shouldNotDeleteUnknownEmployee() {
-//        Long randomId = new Random().nextLong();
-//        given()
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .pathParam("id", randomId)
-//                .when()
-//                .delete("/{id}")
-//                .then()
-//                .statusCode(NOT_FOUND.getStatusCode());
-//    }
-//
-//    @Test
-//    @Order(17)
-//    void shouldDeleteEmployee() {
-//        given()
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .pathParam("id", employeeId)
-//                .when()
-//                .delete("/{id}")
-//                .then()
-//                .statusCode(NO_CONTENT.getStatusCode());
-//    }
-//
-//    @Test
-//    @Order(18)
-//    void shouldFailDeleteUnexistingEmployeeFromDepartment() {
-//        // delete associated employee from employees table
-//        given()
-//                .accept(ContentType.JSON)
-//                .pathParam("id", departmentId)
-//                .queryParam("empid", employeeId)
-//                .when()
-//                .delete(deptUrl + "/{id}/employee")
-//                .then()
-//                .statusCode(NOT_FOUND.getStatusCode());
-//    }
-//
-//    @Test
-//    @Order(19)
-//    void shouldResetDepartment() {
-//        // reset department table
-//        given()
-//                .accept(ContentType.JSON)
-//                .pathParam("id", departmentId)
-//                .when()
-//                .delete(deptUrl + "/{id}")
-//                .then()
-//                .statusCode(NO_CONTENT.getStatusCode());
-//    }
-//
-//    @Test
-//    @Order(20)
-//    void shouldNotCreateEmployeeWhenSupplyingNullValuesForRequiredFields() {
-//        final Address address = new Address();
-//        address.street = STREET;
-//        address.ward = WARD;
-//        address.district = DISTRICT;
-//        address.city = CITY;
-//        address.postalCode = POSTAL_CODE;
-//        address.country = COUNTRY;
-//
-//        final Employee employee = new Employee();
-//        employee.firstName = DEFAULT_FNAME;
-//        employee.lastName = DEFAULT_LNAME;
-//        employee.email = null;
-//        employee.mobile = DEFAULT_PHONE;
-//        employee.gender = DEFAULT_GENDER;
-//        employee.dateOfBirth = DEFAULT_BIRTH_DATE;
-//        employee.hireDate = DEFAULT_HIRE_DATE;
-//        employee.status = DEFAULT_STATUS;
-//        employee.registeredBy = DEFAULT_REGISTERED_BY;
-//        employee.address = null;
-//        employee.department = department;
-//
-//        given()
-//                .body(employee)
-//                .header(CONTENT_TYPE, APPLICATION_JSON)
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .when()
-//                .post()
-//                .then()
-//                .statusCode(BAD_REQUEST.getStatusCode());
-//
-//    }
-//
-//    @Test
-//    @Order(21)
-//    void shouldNotCreateEmployeeWhenInvalidCharatersSuppliedOnNamesFields() {
-//        final Address address = new Address();
-//        address.street = STREET;
-//        address.ward = WARD;
-//        address.district = DISTRICT;
-//        address.city = CITY;
-//        address.postalCode = POSTAL_CODE;
-//        address.country = COUNTRY;
-//
-//        final Employee employee = new Employee();
-//        employee.firstName = "J@ph3t";
-//        employee.lastName = DEFAULT_LNAME;
-//        employee.email = DEFAULT_EMAIL;
-//        employee.mobile = DEFAULT_PHONE;
-//        employee.gender = DEFAULT_GENDER;
-//        employee.dateOfBirth = DEFAULT_BIRTH_DATE;
-//        employee.hireDate = DEFAULT_HIRE_DATE;
-//        employee.status = DEFAULT_STATUS;
-//        employee.registeredBy = DEFAULT_REGISTERED_BY;
-//        employee.address = address;
-//        employee.department = department;
-//
-//        given()
-//                .body(employee)
-//                .header(CONTENT_TYPE, APPLICATION_JSON)
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .when()
-//                .post()
-//                .then()
-//                .statusCode(BAD_REQUEST.getStatusCode());
-//
-//    }
-//
-//    @Test
-//    @Order(22)
-//    void shouldNotCreateEmployeeWhenInvalidCharateruppliedOnEmailField() {
-//        final Address address = new Address();
-//        address.street = STREET;
-//        address.ward = WARD;
-//        address.district = DISTRICT;
-//        address.city = CITY;
-//        address.postalCode = POSTAL_CODE;
-//        address.country = COUNTRY;
-//
-//        final Employee employee = new Employee();
-//        employee.firstName = DEFAULT_FNAME;
-//        employee.lastName = DEFAULT_LNAME;
-//        employee.email = "j@phetseba@gmail.com";
-//        employee.mobile = DEFAULT_PHONE;
-//        employee.gender = DEFAULT_GENDER;
-//        employee.dateOfBirth = DEFAULT_BIRTH_DATE;
-//        employee.hireDate = DEFAULT_HIRE_DATE;
-//        employee.status = DEFAULT_STATUS;
-//        employee.registeredBy = DEFAULT_REGISTERED_BY;
-//        employee.address = address;
-//        employee.department = department;
-//
-//        given()
-//                .body(employee)
-//                .header(CONTENT_TYPE, APPLICATION_JSON)
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .when()
-//                .post()
-//                .then()
-//                .statusCode(BAD_REQUEST.getStatusCode());
-//
-//    }
-//
-//    @Test
-//    @Order(23)
-//    void shouldNotCreateEmployeeWhenInvalidCharaterSuppliedOnMobileNumberField() {
-//        final Address address = new Address();
-//        address.street = STREET;
-//        address.ward = WARD;
-//        address.district = DISTRICT;
-//        address.city = CITY;
-//        address.postalCode = POSTAL_CODE;
-//        address.country = COUNTRY;
-//
-//        final Employee employee = new Employee();
-//        employee.firstName = DEFAULT_FNAME;
-//        employee.lastName = DEFAULT_LNAME;
-//        employee.email = DEFAULT_EMAIL;
-//        employee.mobile = "(255)744.111.789";
-//        employee.gender = DEFAULT_GENDER;
-//        employee.dateOfBirth = DEFAULT_BIRTH_DATE;
-//        employee.hireDate = DEFAULT_HIRE_DATE;
-//        employee.status = DEFAULT_STATUS;
-//        employee.registeredBy = DEFAULT_REGISTERED_BY;
-//        employee.address = address;
-//        employee.department = department;
-//
-//        given()
-//                .body(employee)
-//                .header(CONTENT_TYPE, APPLICATION_JSON)
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .when()
-//                .post()
-//                .then()
-//                .statusCode(BAD_REQUEST.getStatusCode());
-//
-//    }
-//
-//    @Test
-//    @Order(24)
-//    void shouldNotCreateEmployeeWithoutAddress() {
-//        final Address address = new Address();
-//        address.street = STREET;
-//        address.ward = WARD;
-//        address.district = DISTRICT;
-//        address.city = CITY;
-//        address.postalCode = POSTAL_CODE;
-//        address.country = COUNTRY;
-//
-//        final Employee employee = new Employee();
-//        employee.firstName = DEFAULT_FNAME;
-//        employee.lastName = DEFAULT_LNAME;
-//        employee.email = DEFAULT_EMAIL;
-//        employee.mobile = DEFAULT_PHONE;
-//        employee.gender = DEFAULT_GENDER;
-//        employee.dateOfBirth = DEFAULT_BIRTH_DATE;
-//        employee.hireDate = DEFAULT_HIRE_DATE;
-//        employee.status = DEFAULT_STATUS;
-//        employee.registeredBy = DEFAULT_REGISTERED_BY;
-//        employee.department = department;
-//
-//        given()
-//                .body(employee)
-//                .header(CONTENT_TYPE, APPLICATION_JSON)
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .when()
-//                .post()
-//                .then()
-//                .statusCode(BAD_REQUEST.getStatusCode());
-//    }
+    @Test
+    void saveEmployeeFailsMissingAllRequiredFields() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
 
-    private TypeRef<List<Employee>> getEmployeesTypeRef() {
+        // create college
+        final CollegeDetail collegeDetail = createCollegeDetail();
+        collegeDetail.setCollegeName("Employee missing required");
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeDetail).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // create department
+        final DepartmentInput departmentInput = createDepartment();
+        departmentInput.setDepartmentName("Employee missing required");
+        departmentInput.setCollegeId(collegeUUID);
+        String departmentURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentInput)
+                .post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentURL, notNullValue());
+        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get the created department
+        DepartmentDetail departmentDetail = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUUID)))
+                .extract().as(DepartmentDetail.class);
+
+        // add employee
+        final Employee employee = new Employee();
+        employee.setDepartmentName(departmentDetail.getDepartmentName());
+        ErrorResponse errorResponse = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(11)));
+        assertThat(errorResponse.getErrors(), containsInAnyOrder(
+                new ErrorResponse.ErrorMessage("createEmployee.employee.firstName", getErrorMessage("Employee.firstName.required")),
+                new ErrorResponse.ErrorMessage("createEmployee.employee.lastName", getErrorMessage("Employee.lastName.required")),
+                new ErrorResponse.ErrorMessage("createEmployee.employee.country", getErrorMessage("Address.field.required")),
+                new ErrorResponse.ErrorMessage("createEmployee.employee.city", getErrorMessage("Address.field.required")),
+                new ErrorResponse.ErrorMessage("createEmployee.employee.dateOfBirth", getErrorMessage("Employee.dob.required")),
+                new ErrorResponse.ErrorMessage("createEmployee.employee.email", getErrorMessage("Email.required")),
+                new ErrorResponse.ErrorMessage("createEmployee.employee.status", getErrorMessage("Employee.status.required")),
+                new ErrorResponse.ErrorMessage("createEmployee.employee.street", getErrorMessage("Address.field.required")),
+                new ErrorResponse.ErrorMessage("createEmployee.employee.district", getErrorMessage("Address.field.required")),
+                new ErrorResponse.ErrorMessage("createEmployee.employee.mobile", getErrorMessage("Phone.number.required")),
+                new ErrorResponse.ErrorMessage("createEmployee.employee.hireDate", getErrorMessage("Employee.hire-date.required"))
+                )
+        );
+    }
+
+    @Test
+    void saveEmployeeFailsEmployeeExists() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+        // create college
+        final CollegeDetail collegeDetail = createCollegeDetail();
+        collegeDetail.setCollegeName("Employee exists");
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeDetail).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // create department
+        final DepartmentInput departmentInput = createDepartment();
+        departmentInput.setDepartmentName("Employee exists");
+        departmentInput.setCollegeId(collegeUUID);
+        String departmentURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentInput)
+                .post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentURL, notNullValue());
+        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get the created department
+        DepartmentDetail departmentDetail = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUUID)))
+                .extract().as(DepartmentDetail.class);
+
+        // add employee
+        final Employee employee = createEmployee();
+        employee.setFirstName("Japhet exists");
+        employee.setLastName("Sebastian exists");
+        employee.setEmail("japhetseba@gmail.com");
+        employee.setMobile("0744608510");
+        employee.setWorkId("UDSM2013-00007");
+        employee.setDepartmentName(departmentDetail.getDepartmentName());
+        ErrorResponse errorResponse = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), notNullValue());
+        assertThat(errorResponse.getErrors(), contains(new ErrorResponse.ErrorMessage("Employee exists")));
+    }
+
+    @Test
+    void saveEmployeeFailsDepartmentNotFound() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+        // create college
+        final CollegeDetail collegeDetail = createCollegeDetail();
+        collegeDetail.setCollegeName("Employee department not found");
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeDetail).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // init department
+        final DepartmentInput departmentInput = createDepartment();
+        departmentInput.setDepartmentName("Employee department not found");
+
+        // add employee
+        final Employee employee = createEmployee();
+        employee.setFirstName("Japhet exists");
+        employee.setLastName("Sebastian exists");
+        employee.setEmail("japhetseba@gmail.com");
+        employee.setMobile("0744608510");
+        employee.setWorkId("UDSM2013-00007");
+        employee.setDepartmentName(departmentInput.getDepartmentName());
+        ErrorResponse errorResponse = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), notNullValue());
+        assertThat(errorResponse.getErrors(), contains(new ErrorResponse.ErrorMessage("Could not find department for associated employee")));
+    }
+
+    @Test
+    void updateOnlyEmployee() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+        // create college
+        final CollegeDetail collegeDetail = createCollegeDetail();
+        collegeDetail.setCollegeName("Employee updated");
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeDetail).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // create department
+        final DepartmentInput departmentInput = createDepartment();
+        departmentInput.setDepartmentName("Employee updated");
+        departmentInput.setCollegeId(collegeUUID);
+        String departmentURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentInput)
+                .post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentURL, notNullValue());
+        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get the created department
+        DepartmentDetail departmentDetail = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUUID)))
+                .extract().as(DepartmentDetail.class);
+
+        // add employee
+        final Employee employee = createEmployee();
+        employee.setFirstName("Japhet before update");
+        employee.setLastName("Sebastian before update");
+        employee.setEmail("japhet.seba@gmail.com");
+        employee.setMobile("0744608519");
+        employee.setWorkId("UDSM2013-00008");
+        employee.setDepartmentName(departmentDetail.getDepartmentName());
+        String employeeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(employeeURL, notNullValue());
+        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
+        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
+
+        // Check created employee
+        Employee employeeSaved = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Japhet before update"),
+                        containsString("Sebastian before update"),
+                        containsString("japhet.seba@gmail.com"),
+                        containsString("0744608519"),
+                        containsString("UDSM2013-00008")
+                )
+                .extract().as(Employee.class);
+
+        assertThat(employeeSaved, is(notNullValue()));
+        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
+        assertThat(employeeSaved.getDepartmentName(), equalTo(departmentDetail.getDepartmentName()));
+
+        // update employee name
+        employeeSaved.setFirstName("Japhet updated");
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .body(employeeSaved)
+                .when().put(employeeUUID)
+                .then()
+                .statusCode(NO_CONTENT.getStatusCode());
+
+        // confirm it is updated
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Japhet updated")
+                );
+    }
+
+    @Test
+    void updateEmployeeAddress() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+        // create college
+        final CollegeDetail collegeDetail = createCollegeDetail();
+        collegeDetail.setCollegeName("Employee address updated");
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeDetail).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // create department
+        final DepartmentInput departmentInput = createDepartment();
+        departmentInput.setDepartmentName("Employee address updated");
+        departmentInput.setCollegeId(collegeUUID);
+        String departmentURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentInput)
+                .post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentURL, notNullValue());
+        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get the created department
+        DepartmentDetail departmentDetail = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUUID)))
+                .extract().as(DepartmentDetail.class);
+
+        // add employee
+        final Employee employee = createEmployee();
+        employee.setFirstName("Japhet address update");
+        employee.setLastName("Sebastian address update");
+        employee.setEmail("japhet.sebastian@gmail.com");
+        employee.setMobile("0744608520");
+        employee.setWorkId("UDSM2013-00009");
+        employee.setDepartmentName(departmentDetail.getDepartmentName());
+        String employeeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(employeeURL, notNullValue());
+        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
+        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
+
+        // Check created employee
+        Employee employeeSaved = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Japhet address update"),
+                        containsString("Sebastian address update"),
+                        containsString("japhet.sebastian@gmail.com"),
+                        containsString("0744608520"),
+                        containsString("UDSM2013-00009")
+                )
+                .extract().as(Employee.class);
+
+        assertThat(employeeSaved, is(notNullValue()));
+        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
+        assertThat(employeeSaved.getDepartmentName(), equalTo(departmentDetail.getDepartmentName()));
+
+        // update employee name
+        employeeSaved.setLastName("Sebastian updated");
+        employeeSaved.setStreet("Saranga street updated");
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .body(employeeSaved)
+                .when().put(employeeUUID)
+                .then()
+                .statusCode(NO_CONTENT.getStatusCode());
+
+        // confirm it is updated
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Sebastian updated"),
+                        containsString("Saranga street updated")
+                );
+    }
+
+    @Test
+    void updateEmployeeDepartment() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+        // create college
+        final CollegeDetail collegeDetail = createCollegeDetail();
+        collegeDetail.setCollegeName("Employee department");
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeDetail).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // create department
+        final DepartmentInput departmentInput = createDepartment();
+        departmentInput.setDepartmentName("Employee department");
+        departmentInput.setCollegeId(collegeUUID);
+        String departmentURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentInput)
+                .post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentURL, notNullValue());
+        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get the created department
+        DepartmentDetail departmentDetail = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUUID)))
+                .extract().as(DepartmentDetail.class);
+
+        // add employee
+        final Employee employee = createEmployee();
+        employee.setFirstName("Japhet department");
+        employee.setLastName("Sebastian department");
+        employee.setEmail("japhet.department@gmail.com");
+        employee.setMobile("0744608522");
+        employee.setWorkId("UDSM2013-00010");
+        employee.setDepartmentName(departmentDetail.getDepartmentName());
+        String employeeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(employeeURL, notNullValue());
+        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
+        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
+
+        // Check created employee
+        Employee employeeSaved = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Japhet department"),
+                        containsString("Sebastian department"),
+                        containsString("japhet.department@gmail.com"),
+                        containsString("0744608522"),
+                        containsString("UDSM2013-00010")
+                )
+                .extract().as(Employee.class);
+
+        assertThat(employeeSaved, is(notNullValue()));
+        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
+        assertThat(employeeSaved.getDepartmentName(), equalTo(departmentDetail.getDepartmentName()));
+
+
+        // create department to update
+        final DepartmentInput departmentUpdated = createDepartment();
+        departmentUpdated.setDepartmentName("Department updated");
+        departmentUpdated.setCollegeId(collegeUUID);
+        String departmentUpdatedURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentUpdated)
+                .post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentUpdatedURL, notNullValue());
+        String departmentUpdatedUUID = departmentUpdatedURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUpdatedUUID, matchesRegex(UUID_REGEX));
+
+        // Get the updated department
+        DepartmentDetail departmentUpdatedDetail = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUpdatedUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUpdatedUUID)))
+                .extract().as(DepartmentDetail.class);
+
+        // update employee department
+        employeeSaved.setDepartmentName(departmentUpdatedDetail.getDepartmentName());
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .body(employeeSaved)
+                .when().put(employeeUUID)
+                .then()
+                .statusCode(NO_CONTENT.getStatusCode());
+
+        // confirm it is updated
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Department updated")
+                );
+    }
+
+    @Test
+    void updateFailsEmployeeEmptyStringId() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+        // create college
+        final CollegeDetail collegeDetail = createCollegeDetail();
+        collegeDetail.setCollegeName("Employee empty ID");
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeDetail).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // create department
+        final DepartmentInput departmentInput = createDepartment();
+        departmentInput.setDepartmentName("Employee empty ID");
+        departmentInput.setCollegeId(collegeUUID);
+        String departmentURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentInput)
+                .post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentURL, notNullValue());
+        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get the created department
+        DepartmentDetail departmentDetail = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUUID)))
+                .extract().as(DepartmentDetail.class);
+
+        // add employee
+        final Employee employee = createEmployee();
+        employee.setFirstName("Japhet empty ID");
+        employee.setLastName("Sebastian empty ID");
+        employee.setEmail("japhet.empty@gmail.com");
+        employee.setMobile("0744608523");
+        employee.setWorkId("UDSM2013-00011");
+        employee.setDepartmentName(departmentDetail.getDepartmentName());
+        String employeeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(employeeURL, notNullValue());
+        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
+        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
+
+        // Check created employee
+        Employee employeeSaved = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Japhet empty ID"),
+                        containsString("Sebastian empty ID"),
+                        containsString("japhet.empty@gmail.com"),
+                        containsString("0744608523"),
+                        containsString("UDSM2013-00011")
+                )
+                .extract().as(Employee.class);
+
+        assertThat(employeeSaved, is(notNullValue()));
+        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
+        assertThat(employeeSaved.getDepartmentName(), equalTo(departmentDetail.getDepartmentName()));
+
+        // fail to update employee with empty ID
+        employeeSaved.setEmployeeId("");
+        ErrorResponse errorResponse = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .body(employeeSaved)
+                .when().put(employeeUUID)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
+        assertThat(errorResponse.getErrors(),
+                contains(new ErrorResponse.ErrorMessage("Employee does not have employeeId"))
+        );
+    }
+
+    @Test
+    void updateFailsEmployeeNullId() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+        // create college
+        final CollegeDetail collegeDetail = createCollegeDetail();
+        collegeDetail.setCollegeName("Employee null ID");
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeDetail).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // create department
+        final DepartmentInput departmentInput = createDepartment();
+        departmentInput.setDepartmentName("Employee null ID");
+        departmentInput.setCollegeId(collegeUUID);
+        String departmentURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentInput)
+                .post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentURL, notNullValue());
+        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get the created department
+        DepartmentDetail departmentDetail = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUUID)))
+                .extract().as(DepartmentDetail.class);
+
+        // add employee
+        final Employee employee = createEmployee();
+        employee.setFirstName("Japhet null ID");
+        employee.setLastName("Sebastian null ID");
+        employee.setEmail("japhet.null@gmail.com");
+        employee.setMobile("0744608524");
+        employee.setWorkId("UDSM2013-00012");
+        employee.setDepartmentName(departmentDetail.getDepartmentName());
+        String employeeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(employeeURL, notNullValue());
+        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
+        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
+
+        // Check created employee
+        Employee employeeSaved = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Japhet null ID"),
+                        containsString("Sebastian null ID"),
+                        containsString("japhet.null@gmail.com"),
+                        containsString("0744608524"),
+                        containsString("UDSM2013-00012")
+                )
+                .extract().as(Employee.class);
+
+        assertThat(employeeSaved, is(notNullValue()));
+        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
+        assertThat(employeeSaved.getDepartmentName(), equalTo(departmentDetail.getDepartmentName()));
+
+        // fail to update employee with empty ID
+        employeeSaved.setEmployeeId(null);
+        ErrorResponse errorResponse = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .body(employeeSaved)
+                .when().put(employeeUUID)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
+        assertThat(errorResponse.getErrors(),
+                contains(new ErrorResponse.ErrorMessage("Employee does not have employeeId"))
+        );
+    }
+
+    @Test
+    void updateFailsEmployeeIdMismatch() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+        // create college
+        final CollegeDetail collegeDetail = createCollegeDetail();
+        collegeDetail.setCollegeName("Employee ID mismatch");
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeDetail).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // create department
+        final DepartmentInput departmentInput = createDepartment();
+        departmentInput.setDepartmentName("Employee ID mismatch");
+        departmentInput.setCollegeId(collegeUUID);
+        String departmentURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentInput)
+                .post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentURL, notNullValue());
+        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get the created department
+        DepartmentDetail departmentDetail = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUUID)))
+                .extract().as(DepartmentDetail.class);
+
+        // add employee
+        final Employee employee = createEmployee();
+        employee.setFirstName("Japhet ID mismatch");
+        employee.setLastName("Sebastian ID mismatch");
+        employee.setEmail("japhet.mismatch@gmail.com");
+        employee.setMobile("0744608525");
+        employee.setWorkId("UDSM2013-00013");
+        employee.setDepartmentName(departmentDetail.getDepartmentName());
+        String employeeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(employeeURL, notNullValue());
+        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
+        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
+
+        // Check created employee
+        Employee employeeSaved = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Japhet ID mismatch"),
+                        containsString("Sebastian ID mismatch"),
+                        containsString("japhet.mismatch@gmail.com"),
+                        containsString("0744608525"),
+                        containsString("UDSM2013-00013")
+                )
+                .extract().as(Employee.class);
+
+        assertThat(employeeSaved, is(notNullValue()));
+        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
+        assertThat(employeeSaved.getDepartmentName(), equalTo(departmentDetail.getDepartmentName()));
+
+        // fail to update employee with empty ID
+        employeeSaved.setEmployeeId(RandomStringUtils.randomAlphabetic(15));
+        ErrorResponse errorResponse = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .body(employeeSaved)
+                .when().put(employeeUUID)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
+        assertThat(errorResponse.getErrors(),
+                contains(new ErrorResponse.ErrorMessage("path variable employeeId does not match Employee.employeeId"))
+        );
+    }
+
+    @Test
+    void updateFailsEmployeeDepartmentNotFound() {
+        final Employee employee = createEmployee();
+        employee.setEmployeeId(UUID.randomUUID().toString());
+        employee.setFirstName("Japhet not found");
+        employee.setLastName("Sebastian not found");
+        employee.setEmail("japhet.mismatch@gmail.com");
+        employee.setMobile("0744608525");
+        employee.setWorkId("UDSM2013-00013");
+        employee.setDepartmentName(RandomStringUtils.randomAlphabetic(20));
+
+        ErrorResponse errorResponse = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .body(employee)
+                .when().put(employee.getEmployeeId())
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
+        assertThat(errorResponse.getErrors(),
+                contains(new ErrorResponse.ErrorMessage("Could not find department for associated employee"))
+        );
+    }
+
+  @Test
+    void updateFailsEmployeeNotFound() {
+      final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+      // create college
+      final CollegeDetail collegeDetail = createCollegeDetail();
+      collegeDetail.setCollegeName("Employee not found");
+      String collegeURL = given()
+              .contentType(ContentType.JSON)
+              .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+              .body(collegeDetail).post(college)
+              .then()
+              .statusCode(CREATED.getStatusCode())
+              .extract().response().getHeader("Location");
+
+      assertThat(collegeURL, notNullValue());
+      String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+      assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+      // create department
+      final DepartmentInput departmentInput = createDepartment();
+      departmentInput.setDepartmentName("Employee not found");
+      departmentInput.setCollegeId(collegeUUID);
+      String departmentURL = given()
+              .contentType(ContentType.JSON)
+              .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+              .body(departmentInput)
+              .post(department)
+              .then()
+              .statusCode(CREATED.getStatusCode())
+              .extract().response().getHeader("Location");
+
+      assertThat(departmentURL, notNullValue());
+      String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+      assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+      // Get the created department
+      DepartmentDetail departmentDetail = given()
+              .header(ACCEPT, APPLICATION_JSON)
+              .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+              .when().get(department + "/{departmentId}", departmentUUID)
+              .then()
+              .statusCode(OK.getStatusCode())
+              .body("departmentId", is(equalTo(departmentUUID)))
+              .extract().as(DepartmentDetail.class);
+
+        // add employee
+        final Employee employee = createEmployee();
+        employee.setEmployeeId(UUID.randomUUID().toString());
+        employee.setFirstName("Japhet not found");
+        employee.setLastName("Sebastian not found");
+        employee.setEmail("japhet.mismatch@gmail.com");
+        employee.setMobile("0744608525");
+        employee.setWorkId("UDSM2013-00013");
+        employee.setDepartmentName(departmentDetail.getDepartmentName());
+
+        ErrorResponse errorResponse = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .body(employee)
+                .when().put(employee.getEmployeeId())
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
+        assertThat(errorResponse.getErrors(),
+                contains(new ErrorResponse.ErrorMessage(String.format("No employee found for employeeId[%s]", employee.getEmployeeId())))
+        );
+    }
+
+    @Test
+    void deleteEmployeeFailsNotFound() {
+        String employeeUUID = UUID.randomUUID().toString();
+        ErrorResponse errorResponse = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().delete(employeeUUID)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
+        assertThat(errorResponse.getErrors(),
+                contains(new ErrorResponse.ErrorMessage(String.format("Could not find employee for employeeId[%s]", employeeUUID)))
+        );
+    }
+
+
+    @Test
+    void deleteEmployee() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+        // create college
+        final CollegeDetail collegeDetail = createCollegeDetail();
+        collegeDetail.setCollegeName("Employee deleted");
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeDetail).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // create department
+        final DepartmentInput departmentInput = createDepartment();
+        departmentInput.setDepartmentName("Employee deleted");
+        departmentInput.setCollegeId(collegeUUID);
+        String departmentURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentInput)
+                .post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentURL, notNullValue());
+        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get the created department
+        DepartmentDetail departmentDetail = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUUID)))
+                .extract().as(DepartmentDetail.class);
+
+        // add employee
+        final Employee employee = createEmployee();
+        employee.setFirstName("Japhet deleted");
+        employee.setLastName("Sebastian deleted");
+        employee.setEmail("japhet.deleted@gmail.com");
+        employee.setMobile("0744608533");
+        employee.setWorkId("UDSM2013-00077");
+        employee.setDepartmentName(departmentDetail.getDepartmentName());
+        String employeeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(employeeURL, notNullValue());
+        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
+        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
+
+        // Check created employee
+        Employee employeeSaved = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Japhet deleted"),
+                        containsString("Sebastian deleted"),
+                        containsString("japhet.deleted@gmail.com"),
+                        containsString("0744608533"),
+                        containsString("UDSM2013-00077")
+                )
+                .extract().as(Employee.class);
+
+        assertThat(employeeSaved, is(notNullValue()));
+        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
+        assertThat(employeeSaved.getDepartmentName(), equalTo(departmentDetail.getDepartmentName()));
+
+        // delete employee
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().delete(employeeUUID)
+                .then()
+                .statusCode(NO_CONTENT.getStatusCode());
+
+        // confirm deletion
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(NOT_FOUND.getStatusCode());
+    }
+
+    private TypeRef<List<Employee>> employeesReportTypeRef() {
         return new TypeRef<List<Employee>>() {
         };
     }
@@ -924,13 +1456,6 @@ class EmployeeResourceTest extends AccessTokenProvider {
         employee.setCity("Dar es Salaam");
         employee.setCountry("Tanzania");
         return employee;
-
-
-//        private static final String UPDATED_FNAME = "Japhet - updated";
-//        private static final String UPDATED_LNAME = "Sebastian - updated";
-//        private static final String UPDATED_EMAIL = "luluyshaban@gmail.com";
-//        private static final String UPDATED_PHONE = "+(255)-716-656-596";
-
     }
 
     private CollegeDetail createCollegeDetail() {
@@ -953,4 +1478,9 @@ class EmployeeResourceTest extends AccessTokenProvider {
         departmentInput.setCollegeId(null);
         return departmentInput;
     }
+
+    private String getErrorMessage(String key) {
+        return ResourceBundle.getBundle("ValidationMessages").getString(key);
+    }
+
 }

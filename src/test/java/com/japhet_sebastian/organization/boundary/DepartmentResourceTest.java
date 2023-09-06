@@ -41,7 +41,7 @@ class DepartmentResourceTest extends AccessTokenProvider {
 
     @Test
     void shouldGetDepartments() {
-        given()
+        String totalItem = given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .header(ACCEPT, APPLICATION_JSON)
                 .when().get()
@@ -53,12 +53,14 @@ class DepartmentResourceTest extends AccessTokenProvider {
                         containsString("TE"),
                         containsString("CSE")
                 )
-                .header("X-Total-Count", is(greaterThanOrEqualTo(String.valueOf(2))));
+                .extract().response().getHeader("X-Total-Count");
+
+        assertThat(Integer.valueOf(totalItem), is(greaterThanOrEqualTo(2)));
     }
 
     @Test
     void shouldGetPagedList() {
-        given()
+        String totalItem = given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .contentType(ContentType.JSON)
                 .when().get("?page=0&size=1")
@@ -73,7 +75,9 @@ class DepartmentResourceTest extends AccessTokenProvider {
                                 contains("KNOWN"),
                                 contains("FIN012")
                         )
-                ).header("X-Total-Count", is(greaterThanOrEqualTo(String.valueOf(2))));
+                ).extract().response().getHeader("X-Total-Count");
+
+        assertThat(Integer.valueOf(totalItem), is(greaterThanOrEqualTo(2)));
     }
 
     @Test

@@ -50,7 +50,7 @@ class CollegeResourceTest extends AccessTokenProvider {
         String totalElement = response.getHeader("X-Total-Count");
         assertThat(collegeDetails, is(not(empty())));
         assertThat(collegeDetails, hasSize(greaterThanOrEqualTo(2)));
-        assertThat(totalElement, is(greaterThanOrEqualTo(String.valueOf(2))));
+        assertThat(Integer.valueOf(totalElement), is(greaterThanOrEqualTo(2)));
     }
 
     @Test
@@ -197,8 +197,7 @@ class CollegeResourceTest extends AccessTokenProvider {
         ErrorResponse errorResponse = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
-                .body(collegeDetail)
-                .post()
+                .body(collegeDetail).post()
                 .then()
                 .statusCode(INTERNAL_SERVER_ERROR.getStatusCode())
                 .extract().as(ErrorResponse.class);
