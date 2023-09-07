@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import java.util.Objects;
 
@@ -17,25 +18,24 @@ public class Person extends BaseEntity {
 
     @NotEmpty(message = "{Employee.firstName.required}")
     @Size(min = 2, max = 64, message = "{Sixty-four.string.length}")
-    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
+    @Pattern(regexp = "^[\\p{L} .'-?!;,]+$", message = "{String.special.character}")
     @Column(name = "first_name", length = 64, nullable = false)
     private String firstName;
 
     @Size(min = 1, max = 64, message = "{Sixty-four.string.length}")
-    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
+    @Pattern(regexp = "^[\\p{L} .'-?!;,]+$", message = "{String.special.character}")
     @Column(name = "middle_name", length = 64)
     private String middleName;
 
     @NotEmpty(message = "{Employee.lastName.required}")
     @Size(min = 2, max = 64, message = "{Sixty-four.string.length}")
-    @Pattern(regexp = "^[\\p{L} .'-/]+$", message = "{String.special.character}")
+    @Pattern(regexp = "^[\\p{L} .'-?!;,]+$", message = "{String.special.character}")
     @Column(name = "last_name", length = 64, nullable = false)
     private String lastName;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    // "^[((((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3})]{10,18}$"
     @NotEmpty(message = "{Phone.number.required}")
     @Pattern(
             regexp = "^[((((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3})]{10,18}$",
@@ -43,6 +43,7 @@ public class Person extends BaseEntity {
     @Column(name = "phone_number", length = 18, nullable = false)
     private String mobile;
 
+    @Schema(required = true)
     @Email
     @NotEmpty(message = "{Email.required}")
     @Pattern(
