@@ -1,13 +1,10 @@
-package com.japhet_sebastian.employee.control;
+package com.japhet_sebastian.employee;
 
-import com.japhet_sebastian.employee.entity.Employee;
-import com.japhet_sebastian.employee.entity.EmployeeEntity;
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.control.AddressRepository;
 import com.japhet_sebastian.organization.control.DepartmentRepository;
 import com.japhet_sebastian.organization.entity.AddressEntity;
 import com.japhet_sebastian.organization.entity.DepartmentEntity;
-import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;
@@ -26,7 +23,7 @@ import java.util.stream.Collectors;
 public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity, UUID> {
 
     @Inject
-    EmployeeMapper employeeMapper;
+    EmployeeMapperDto employeeMapper;
 
     @Inject
     DepartmentRepository departmentRepository;
@@ -34,7 +31,7 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
     @Inject
     AddressRepository addressRepository;
 
-    private String getString(PageRequest pageRequest) {
+    private String getString(EmployeePage employeePage) {
         String query = "SELECT DISTINCT e FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address " +
                 "WHERE :search IS NULL OR LOWER(e.firstName) LIKE :search " +
                 "OR LOWER(e.lastName) LIKE :search " +
@@ -42,26 +39,26 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
                 "OR LOWER(e.firstName) || ' ' || LOWER(e.lastName) LIKE :search " +
                 "OR LOWER(e.email) LIKE :search ";
 
-        if (pageRequest.getDate() != null) query += "AND e.hireDate = :date";
+        if (employeePage.getDate() != null) query += "AND e.hireDate = :date";
         else query += "AND (:date IS NULL OR e.hireDate = :date)";
         return query;
     }
 
-    public List<Employee> allEmployees(PageRequest pageRequest) {
+    public List<Employee> allEmployees(EmployeePage employeePage) {
         Map<String, Object> params = new HashMap<>();
-        params.put("search", pageRequest.getSearch());
-        params.put("date", pageRequest.getDate());
+        params.put("search", employeePage.getSearch());
+        params.put("date", employeePage.getDate());
 
-        if (pageRequest.getSearch() != null)
-            pageRequest.setSearch("%" + pageRequest.getSearch().toLowerCase(Locale.ROOT) + "%");
+        if (employeePage.getSearch() != null)
+            employeePage.setSearch("%" + employeePage.getSearch().toLowerCase(Locale.ROOT) + "%");
 
-        String query = getString(pageRequest);
+        String query = getString(employeePage);
         Sort sort = Sort.by("e.firstName", Sort.Direction.Descending)
                 .and("e.lastName", Sort.Direction.Descending)
                 .and("e.hireDate", Sort.Direction.Descending);
 
         return find(query, sort, params)
-                .page(Page.of(pageRequest.getPageNum(), pageRequest.getPageSize()))
+                .page(Page.of(employeePage.getPageNumber(), employeePage.getPageSize()))
                 .stream().map(this.employeeMapper::toEmployee)
                 .collect(Collectors.toList());
     }
@@ -86,8 +83,8 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
 
     public void saveEmployee(@Valid Employee employee) {
         DepartmentEntity departmentEntity = getDepartment(employee);
-        checkByEmailOrPhone(employee.getEmail(), employee.getMobile())
-                .ifPresent(employeeEntity -> {
+        checkByEmailOrPhone(employee.getEmail(), employee.getMobile()).ifPresent(
+                employeeEntity -> {
                     throw new ServiceException("Employee exists");
                 });
 

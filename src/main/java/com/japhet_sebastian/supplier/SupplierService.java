@@ -1,54 +1,75 @@
 package com.japhet_sebastian.supplier;
 
-
-import com.japhet_sebastian.vo.PageRequest;
-import io.quarkus.panache.common.Parameters;
-import io.quarkus.panache.common.Sort;
+import com.japhet_sebastian.exception.ServiceException;
+import com.japhet_sebastian.organization.control.AddressRepository;
+import com.japhet_sebastian.organization.entity.AddressEntity;
+import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.Optional;
 
 @ApplicationScoped
-public class SupplierService {
+public class SupplierService implements SupplierInterface {
 
     @Inject
     SupplierRepository supplierRepository;
 
-    public List<SupplierEntity> listSuppliers(PageRequest pageRequest) {
-        return supplierRepository.allSuppliers(pageRequest);
+    @Inject
+    AddressRepository addressRepository;
+
+    @Inject
+    SupplierMapper supplierMapper;
+
+    public List<SupplierDto> listSuppliers(SupplierPage supplierPage) {
+        return supplierMapper.toListDto(supplierRepository.allSuppliers(supplierPage).list());
     }
-//
-//    public Supplier createSupplier(@Valid Supplier supplier) {
-//        supplier.address.supplier = supplier;
-//        supplier.address.id = supplier.id;
-//        Supplier.persist(supplier);
-//        return supplier;
-//    }
-//
-//    public void updateSupplier(@Valid Supplier supplier, @NotNull Long supplierId) {
-//        supplier.address = null;
-//        Supplier
-//                .findByIdOptional(supplierId)
-//                .map(found -> Panache.getEntityManager().merge(supplier))
-//                .orElseThrow(() -> new NotFoundException("Supplier dont exists"));
-//    }
-//
-//    public void deleteSupplier(@NotNull Long supplierId) {
-//        Panache
-//                .getEntityManager()
-//                .getReference(Supplier.class, supplierId)
-//                .delete();
-//    }
-//
-//
-//    public Optional<Supplier> findSupplier(@NotNull Long supplierId) {
-//        return Supplier.find("FROM Supplier s "
-//                                + "LEFT JOIN FETCH s.address "
-//                                + "WHERE s.id = :supplierId",
-//                        Parameters.with("supplierId", supplierId))
-//                .firstResultOptional();
-//    }
+
+    public Optional<SupplierDto> findSupplier(@NotNull String supplierId) {
+        return this.supplierRepository.findSupplier(supplierId).map(supplierMapper::toDto);
+    }
+
+    public Long supplierCount() {
+        return supplierRepository.count();
+    }
+
+    public List<SelectOptions> selectOptions() {
+        return supplierRepository.selectProjection();
+    }
+
+    public void saveSupplier(@Valid SupplierDto supplierDto) {
+        supplierRepository.searchByEmailOrPhone(supplierDto.companyEmail, supplierDto.companyPhone)
+                .ifPresent(employeeEntity -> {
+                    throw new ServiceException("Email/phone number is taken");
+                });
+
+        SupplierEntity supplierEntity = supplierMapper.toSupplierEntity(supplierDto);
+        addressRepository.persist(supplierEntity.getAddress());
+        supplierRepository.persist(supplierEntity);
+        supplierMapper.partialDtoUpdate(supplierEntity, supplierDto);
+    }
+
+    public void updateSupplier(@Valid SupplierDto supplierDto) {
+        SupplierEntity supplierEntity = checkSupplier(supplierDto.supplierId);
+        supplierEntity = supplierMapper.partialEntityUpdate(supplierDto, supplierEntity);
+        supplierEntity.getAddress().setAddressId(supplierEntity.getSupplierId());
+        addressRepository.persist(supplierEntity.getAddress());
+        supplierRepository.persist(supplierEntity);
+        supplierMapper.partialDtoUpdate(supplierEntity, supplierDto);
+    }
+
+    public void deleteSupplier(@NotNull String supplierId) {
+        SupplierEntity supplierEntity = checkSupplier(supplierId);
+        AddressEntity addressEntity = supplierEntity.getAddress();
+        supplierRepository.delete(supplierEntity);
+        addressRepository.delete(addressEntity);
+    }
+
+    private SupplierEntity checkSupplier(String supplierId) {
+        return supplierRepository.findSupplier(supplierId)
+                .orElseThrow(() -> new ServiceException("No supplier found for supplierId[%s]", supplierId));
+    }
 }

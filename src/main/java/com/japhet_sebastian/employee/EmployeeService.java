@@ -1,7 +1,5 @@
-package com.japhet_sebastian.employee.control;
+package com.japhet_sebastian.employee;
 
-import com.japhet_sebastian.employee.entity.Employee;
-import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -22,8 +20,8 @@ public class EmployeeService {
     @Inject
     EmployeeRepository employeeRepository;
 
-    public List<Employee> listEmployees(PageRequest pageRequest) {
-        return this.employeeRepository.allEmployees(pageRequest);
+    public List<Employee> listEmployees(EmployeePage employeePage) {
+        return this.employeeRepository.allEmployees(employeePage);
     }
 
     public Long totalEmployees() {

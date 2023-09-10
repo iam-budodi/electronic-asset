@@ -1,9 +1,6 @@
-package com.japhet_sebastian.employee.boundary;
+package com.japhet_sebastian.employee;
 
-import com.japhet_sebastian.employee.control.EmployeeService;
-import com.japhet_sebastian.employee.entity.Employee;
 import com.japhet_sebastian.exception.ServiceException;
-import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
@@ -25,12 +22,11 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
-import org.jboss.logging.Logger;
 
 import java.net.URI;
 import java.util.Objects;
 
-import static com.japhet_sebastian.employee.boundary.EmployeeResource.RESOURCE_PATH;
+import static com.japhet_sebastian.employee.EmployeeResource.RESOURCE_PATH;
 
 @Path(RESOURCE_PATH)
 @Transactional
@@ -41,9 +37,6 @@ import static com.japhet_sebastian.employee.boundary.EmployeeResource.RESOURCE_P
 public class EmployeeResource extends AbstractEmployeeType {
 
     public static final String RESOURCE_PATH = "/employees";
-
-    @Inject
-    Logger LOGGER;
 
     @Inject
     SecurityIdentity keycloakSecurityContext;
@@ -59,8 +52,8 @@ public class EmployeeResource extends AbstractEmployeeType {
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = Employee.class, type = SchemaType.ARRAY)))
-    public Response listEmployees(@BeanParam PageRequest pageRequest) {
-        return Response.ok(this.employeeService.listEmployees(pageRequest))
+    public Response listEmployees(@BeanParam EmployeePage employeePage) {
+        return Response.ok(this.employeeService.listEmployees(employeePage))
                 .header("X-Total-Count", this.employeeService.totalEmployees())
                 .build();
     }
@@ -126,7 +119,6 @@ public class EmployeeResource extends AbstractEmployeeType {
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON,
                             schema = @Schema(implementation = URI.class, type = SchemaType.STRING))),
-            @APIResponse(responseCode = "400", description = "Invalid input"),
             @APIResponse(
                     responseCode = "400",
                     description = "Invalid input",
@@ -138,7 +130,6 @@ public class EmployeeResource extends AbstractEmployeeType {
     })
     public Response createEmployee(@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
             schema = @Schema(implementation = Employee.class))) @Valid Employee employee, @Context UriInfo uriInfo) {
-        LOGGER.info("EMPLOYEE RESOURCE : " + employee);
         employee.setRegisteredBy(keycloakSecurityContext.getPrincipal().getName());
         this.employeeService.addEmployee(employee);
         URI employeeUri = employeeUriBuilder(employee.getEmployeeId(), uriInfo).build();

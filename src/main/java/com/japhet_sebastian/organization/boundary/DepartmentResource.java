@@ -4,7 +4,6 @@ import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.control.DepartmentService;
 import com.japhet_sebastian.organization.entity.DepartmentDetail;
 import com.japhet_sebastian.organization.entity.DepartmentInput;
-import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -52,8 +51,8 @@ public class DepartmentResource extends AbstractDepartmentType {
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = DepartmentDetail.class, type = SchemaType.ARRAY)))
-    public Response allDepartments(@BeanParam PageRequest pageRequest) {
-        return Response.ok(this.departmentService.listDepartments(pageRequest))
+    public Response allDepartments(@BeanParam OrgPage orgPage) {
+        return Response.ok(this.departmentService.listDepartments(orgPage))
                 .header("X-Total-Count", this.departmentService.totalDepartments())
                 .build();
     }
@@ -113,8 +112,9 @@ public class DepartmentResource extends AbstractDepartmentType {
                     description = "Department with same name already exists",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON))
     })
-    public Response saveDepartment(@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
-            schema = @Schema(implementation = DepartmentInput.class))) @Valid DepartmentInput departmentInput, @Context UriInfo uriInfo) {
+    public Response saveDepartment(
+            @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(implementation = DepartmentInput.class))) @Valid DepartmentInput departmentInput, @Context UriInfo uriInfo) {
         this.departmentService.addDepartment(departmentInput);
         URI departmentUri = departmentUriBuilder(departmentInput.getDepartmentId(), uriInfo).build();
         return Response.created(departmentUri).build();

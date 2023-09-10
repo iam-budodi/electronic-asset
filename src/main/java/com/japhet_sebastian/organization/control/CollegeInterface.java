@@ -1,7 +1,7 @@
 package com.japhet_sebastian.organization.control;
 
+import com.japhet_sebastian.organization.boundary.OrgPage;
 import com.japhet_sebastian.organization.entity.CollegeDetail;
-import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface CollegeInterface {
 
-    List<CollegeDetail> listColleges(PageRequest pageRequest);
+    List<CollegeDetail> listColleges(OrgPage orgPage);
 
     Optional<CollegeDetail> getCollege(@NotNull String collegeId);
 

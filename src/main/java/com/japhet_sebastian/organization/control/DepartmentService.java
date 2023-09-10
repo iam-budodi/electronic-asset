@@ -1,8 +1,8 @@
 package com.japhet_sebastian.organization.control;
 
+import com.japhet_sebastian.organization.boundary.OrgPage;
 import com.japhet_sebastian.organization.entity.DepartmentDetail;
 import com.japhet_sebastian.organization.entity.DepartmentInput;
-import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -18,8 +18,8 @@ public class DepartmentService implements DepartmentInterface {
     @Inject
     DepartmentRepository departmentRepository;
 
-    public List<DepartmentDetail> listDepartments(PageRequest pageRequest) {
-        return this.departmentRepository.departments(pageRequest);
+    public List<DepartmentDetail> listDepartments(OrgPage orgPage) {
+        return this.departmentRepository.departments(orgPage);
     }
 
     public Long totalDepartments() {

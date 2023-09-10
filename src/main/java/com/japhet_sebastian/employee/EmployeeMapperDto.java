@@ -1,14 +1,12 @@
-package com.japhet_sebastian.employee.control;
+package com.japhet_sebastian.employee;
 
 
-import com.japhet_sebastian.employee.entity.Employee;
-import com.japhet_sebastian.employee.entity.EmployeeEntity;
 import com.japhet_sebastian.organization.entity.AddressEntity;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "cdi",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public interface EmployeeMapper {
+public interface EmployeeMapperDto {
 
 //    List<Employee> toEmployeeList(List<EmployeeEntity> employeeEntities);
 

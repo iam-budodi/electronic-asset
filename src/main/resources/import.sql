@@ -101,12 +101,15 @@ VALUES ('849ea0ee-354d-11ee-be56-0242ac120024', '2023-03-30', 'Habiba', 'lu3@gma
 
 -- ADDRESSES FOR SUPPLIER
 insert into addresses (city, country, district_name, postal_code, street_name, address_uuid)
-VALUES ('Dar es Salaam', 'Tanzania', 'Kinondoni', '15004', 'Jangid Plaza 3rd floor, room 310', '71f2f7cd-85c0-4bfd-ab3a-9326f706ceb2');
+VALUES ('Dar es Salaam', 'Tanzania', 'Kinondoni', '15004', 'Jangid Plaza 3rd floor, room 310',
+        '71f2f7cd-85c0-4bfd-ab3a-9326f706ceb2');
 
 -- -- SUPPLIER TABLE - at least 4 more supplier
-insert into suppliers (supplier_uuid, registered_at, registered_by, description, company_email, company_name, company_phone,
+insert into suppliers (supplier_uuid, registered_at, registered_by, description, company_email, company_name,
+                       company_phone,
                        supplier_type, company_website)
-VALUES ('71f2f7cd-85c0-4bfd-ab3a-9326f706ceb2', '2020-09-12', 'Habiba', 'Supplies Office enablers like routers and switch',
+VALUES ('71f2f7cd-85c0-4bfd-ab3a-9326f706ceb2', '2020-09-12', 'Habiba',
+        'Supplies Office enablers like routers and switch',
         'support@networkassociate.co.tz', 'Network Associate', '+255222111777', 'WHOLESALER',
         'https://www.networkassociate.co.tz');
 -- insert into suppliers (id, registered_at, registered_by, description, company_email, company_name, company_phone,

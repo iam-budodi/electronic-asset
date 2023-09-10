@@ -1,10 +1,10 @@
 package com.japhet_sebastian.organization.control;
 
 import com.japhet_sebastian.exception.ServiceException;
+import com.japhet_sebastian.organization.boundary.OrgPage;
 import com.japhet_sebastian.organization.entity.AddressEntity;
 import com.japhet_sebastian.organization.entity.CollegeDetail;
 import com.japhet_sebastian.organization.entity.CollegeEntity;
-import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;
@@ -30,14 +30,15 @@ public class CollegeRepository implements PanacheRepositoryBase<CollegeEntity, U
     @Inject
     AddressRepository addressRepository;
 
-    public List<CollegeDetail> allColleges(PageRequest pageRequest) {
-        if (pageRequest.getSearch() != null)
-            pageRequest.setSearch("%" + pageRequest.getSearch().toLowerCase(Locale.ROOT) + "%");
-        String query = "FROM College c LEFT JOIN FETCH c.address WHERE :search IS NULL OR LOWER(c.collegeName) LIKE :search " +
+    public List<CollegeDetail> allColleges(OrgPage orgPage) {
+        if (orgPage.getSearch() != null)
+            orgPage.setSearch("%" + orgPage.getSearch().toLowerCase(Locale.ROOT) + "%");
+        String query = "FROM College c LEFT JOIN FETCH c.address " +
+                "WHERE :search IS NULL OR LOWER(c.collegeName) LIKE :search " +
                 "OR LOWER(c.collegeCode) LIKE :search";
 
-        return find(query, Sort.by("c.collegeName"), Parameters.with("search", pageRequest.getSearch()))
-                .page(Page.of(pageRequest.getPageNum(), pageRequest.getPageSize()))
+        return find(query, Sort.by("c.collegeName"), Parameters.with("search", orgPage.getSearch()))
+                .page(Page.of(orgPage.getPageNumber(), orgPage.getPageSize()))
                 .stream().map(this.collegeMapper::toCollegeDetail)
                 .collect(Collectors.toList());
     }

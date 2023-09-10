@@ -1,10 +1,10 @@
 package com.japhet_sebastian.organization.control;
 
 import com.japhet_sebastian.exception.ServiceException;
+import com.japhet_sebastian.organization.boundary.OrgPage;
 import com.japhet_sebastian.organization.entity.DepartmentDetail;
 import com.japhet_sebastian.organization.entity.DepartmentEntity;
 import com.japhet_sebastian.organization.entity.DepartmentInput;
-import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;
@@ -27,15 +27,15 @@ public class DepartmentRepository implements PanacheRepositoryBase<DepartmentEnt
     @Inject
     DepartmentMapper departmentMapper;
 
-    public List<DepartmentDetail> departments(PageRequest pageRequest) {
-        if (pageRequest.getSearch() != null)
-            pageRequest.setSearch("%" + pageRequest.getSearch().toLowerCase(Locale.ROOT) + "%");
+    public List<DepartmentDetail> departments(OrgPage orgPage) {
+        if (orgPage.getSearch() != null)
+            orgPage.setSearch("%" + orgPage.getSearch().toLowerCase(Locale.ROOT) + "%");
         String query = "FROM Department d LEFT JOIN FETCH  d.college c LEFT JOIN FETCH c.address " +
                 "WHERE :search IS NULL OR LOWER(d.departmentName) LIKE :search " +
                 "OR LOWER(d.departmentCode) LIKE :search";
 
-        return find(query, Sort.by("c.collegeName"), Parameters.with("search", pageRequest.getSearch()))
-                .page(Page.of(pageRequest.getPageNum(), pageRequest.getPageSize()))
+        return find(query, Sort.by("c.collegeName"), Parameters.with("search", orgPage.getSearch()))
+                .page(Page.of(orgPage.getPageNumber(), orgPage.getPageSize()))
                 .stream().map(this.departmentMapper::toDepartmentDetail)
                 .collect(Collectors.toList());
 

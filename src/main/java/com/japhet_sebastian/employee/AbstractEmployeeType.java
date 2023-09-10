@@ -1,4 +1,4 @@
-package com.japhet_sebastian.employee.boundary;
+package com.japhet_sebastian.employee;
 
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;

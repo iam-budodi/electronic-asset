@@ -1,7 +1,7 @@
 package com.japhet_sebastian.organization.control;
 
+import com.japhet_sebastian.organization.boundary.OrgPage;
 import com.japhet_sebastian.organization.entity.CollegeDetail;
-import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -17,8 +17,8 @@ public class CollegeService implements CollegeInterface {
     @Inject
     CollegeRepository collegeRepository;
 
-    public List<CollegeDetail> listColleges(PageRequest pageRequest) {
-        return this.collegeRepository.allColleges(pageRequest);
+    public List<CollegeDetail> listColleges(OrgPage orgPage) {
+        return this.collegeRepository.allColleges(orgPage);
     }
 
     public Optional<CollegeDetail> getCollege(@NotNull String collegeId) {
@@ -45,23 +45,3 @@ public class CollegeService implements CollegeInterface {
         this.collegeRepository.deleteCollege(collegeId);
     }
 }
-
-
-// return this.collegeRepository.allColleges(pageRequest)
-//         .stream()
-//         .map(college -> {
-//         String collegeId = college.getCollegeId();
-//         Address address = this.addressRepository.findAddress(collegeId)
-//         .orElseThrow(() -> new ServiceException("No address found for collegeId[%s]", collegeId));
-//         return this.collegeMapper.toCollegeDetail(college, address);
-//         }).collect(Collectors.toList());
-
-
-//return this.collegeRepository.findByIdOptional(UUID.fromString(collegeId))
-//        .stream()
-//        .map(collegeEntity -> {
-//        String collegeStrId = collegeEntity.getCollegeId().toString();
-//        Address address = this.addressRepository.findAddress(collegeStrId)
-//        .orElseThrow(() -> new ServiceException("No address found for collegeId[%s]", collegeStrId));
-//        return this.collegeMapper.toCollegeDetail(this.collegeMapper.toCollege(collegeEntity), address);
-//        }).findFirst();

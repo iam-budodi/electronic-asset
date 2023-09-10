@@ -1,4 +1,4 @@
-package com.japhet_sebastian.employee.entity;
+package com.japhet_sebastian.employee;
 
 import com.japhet_sebastian.vo.EmploymentStatus;
 import com.japhet_sebastian.vo.Gender;

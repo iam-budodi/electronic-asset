@@ -1,4 +1,4 @@
-package com.japhet_sebastian.employee.entity;
+package com.japhet_sebastian.employee;
 
 import com.japhet_sebastian.vo.Gender;
 import jakarta.persistence.Column;
@@ -9,10 +9,17 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-import java.util.Objects;
 
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
 @MappedSuperclass
 public class Person extends BaseEntity {
 
@@ -52,76 +59,4 @@ public class Person extends BaseEntity {
     @Column(name = "email_address", nullable = false)
     private String email;
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Person person)) return false;
-        if (!super.equals(o)) return false;
-        return Objects.equals(getFirstName(), person.getFirstName()) && Objects.equals(getMiddleName(), person.getMiddleName()) && Objects.equals(getLastName(), person.getLastName()) && getGender() == person.getGender() && Objects.equals(getMobile(), person.getMobile()) && Objects.equals(getEmail(), person.getEmail());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), getFirstName(), getMiddleName(), getLastName(), getGender(), getMobile(), getEmail());
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "firstName='" + firstName + '\'' +
-                ", middleName='" + middleName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", gender=" + gender +
-                ", mobile='" + mobile + '\'' +
-                ", email='" + email + '\'' +
-                '}';
-    }
 }

@@ -3,7 +3,6 @@ package com.japhet_sebastian.organization.boundary;
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.control.CollegeService;
 import com.japhet_sebastian.organization.entity.CollegeDetail;
-import com.japhet_sebastian.vo.PageRequest;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -51,8 +50,8 @@ public class CollegeResource extends AbstractCollegeType {
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = CollegeDetail.class, type = SchemaType.ARRAY)))
-    public Response allColleges(@BeanParam PageRequest pageRequest) {
-        return Response.ok(this.collegeService.listColleges(pageRequest))
+    public Response allColleges(@BeanParam OrgPage orgPage) {
+        return Response.ok(this.collegeService.listColleges(orgPage))
                 .header("X-Total-Count", this.collegeService.totalColleges())
                 .build();
     }
@@ -85,7 +84,7 @@ public class CollegeResource extends AbstractCollegeType {
     @Operation(summary = "Get all selection options projection of the college")
     @APIResponse(
             responseCode = "200",
-            description = "Return an object with identifier and name as key value pair",
+            description = "Get key value pair representation",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY))

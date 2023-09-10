@@ -1,18 +1,21 @@
 package com.japhet_sebastian.vo;
 
 import jakarta.ws.rs.DefaultValue;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.jboss.resteasy.reactive.RestQuery;
 
-import java.time.LocalDate;
-import java.util.Objects;
-
+@Getter
+@Setter
+@EqualsAndHashCode
 public class PageRequest {
 
     @RestQuery("page")
     @DefaultValue("0")
     @Parameter(description = "Page index")
-    private Integer pageNum;
+    private Integer pageNumber;
 
     @RestQuery("size")
     @DefaultValue("10")
@@ -20,54 +23,8 @@ public class PageRequest {
     private Integer pageSize;
 
     @RestQuery("search")
-    @Parameter(description = "Search query parameter")
+    @Parameter(description = "Search parameter")
     private String search;
 
-    @RestQuery("date")
-    @Parameter(description = "Date query parameter")
-    private LocalDate date;
 
-    public Integer getPageNum() {
-        return pageNum;
-    }
-
-    public void setPageNum(Integer pageNum) {
-        this.pageNum = pageNum;
-    }
-
-    public Integer getPageSize() {
-        return pageSize;
-    }
-
-    public void setPageSize(Integer pageSize) {
-        this.pageSize = pageSize;
-    }
-
-    public String getSearch() {
-        return search;
-    }
-
-    public void setSearch(String search) {
-        this.search = search;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PageRequest that)) return false;
-        return Objects.equals(getPageNum(), that.getPageNum()) && Objects.equals(getPageSize(), that.getPageSize()) && Objects.equals(getSearch(), that.getSearch()) && Objects.equals(getDate(), that.getDate());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getPageNum(), getPageSize(), getSearch(), getDate());
-    }
 }
