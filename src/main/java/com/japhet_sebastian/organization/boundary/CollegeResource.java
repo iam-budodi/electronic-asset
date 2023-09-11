@@ -2,7 +2,7 @@ package com.japhet_sebastian.organization.boundary;
 
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.control.CollegeService;
-import com.japhet_sebastian.organization.entity.CollegeDetail;
+import com.japhet_sebastian.organization.entity.CollegeDto;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -49,7 +49,7 @@ public class CollegeResource extends AbstractCollegeType {
             description = "Lists all the colleges",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = CollegeDetail.class, type = SchemaType.ARRAY)))
+                    schema = @Schema(implementation = CollegeDto.class, type = SchemaType.ARRAY)))
     public Response allColleges(@BeanParam OrgPage orgPage) {
         return Response.ok(this.collegeService.listColleges(orgPage))
                 .header("X-Total-Count", this.collegeService.totalColleges())
@@ -65,7 +65,7 @@ public class CollegeResource extends AbstractCollegeType {
                     description = "Get college by college identifier",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON,
-                            schema = @Schema(implementation = CollegeDetail.class, type = SchemaType.OBJECT))),
+                            schema = @Schema(implementation = CollegeDto.class, type = SchemaType.OBJECT))),
             @APIResponse(
                     responseCode = "404",
                     description = "College does not exist for a given identifier",
@@ -75,7 +75,7 @@ public class CollegeResource extends AbstractCollegeType {
             @Parameter(description = "collegeId", required = true)
             @PathParam("collegeId") @NotNull String collegeId) {
         return this.collegeService.getCollege(collegeId)
-                .map(collegeDetail -> Response.ok(collegeDetail).build())
+                .map(college -> Response.ok(college).build())
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
     }
 
@@ -112,10 +112,10 @@ public class CollegeResource extends AbstractCollegeType {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON))
     })
     public Response createCollege(@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
-            schema = @Schema(implementation = CollegeDetail.class, type = SchemaType.OBJECT)))
-                                  @Valid CollegeDetail collegeDetail, @Context UriInfo uriInfo) {
-        this.collegeService.addCollege(collegeDetail);
-        URI collegeURI = collegeUriBuilder(collegeDetail.getCollegeId(), uriInfo).build();
+            schema = @Schema(implementation = CollegeDto.class, type = SchemaType.OBJECT)))
+                                  @Valid CollegeDto collegeDto, @Context UriInfo uriInfo) {
+        this.collegeService.saveCollege(collegeDto);
+        URI collegeURI = collegeUriBuilder(collegeDto.getCollegeId(), uriInfo).build();
         return Response.created(collegeURI).build();
     }
 
@@ -128,7 +128,7 @@ public class CollegeResource extends AbstractCollegeType {
                     description = "College updated",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON,
-                            schema = @Schema(implementation = CollegeDetail.class, type = SchemaType.OBJECT))),
+                            schema = @Schema(implementation = CollegeDto.class, type = SchemaType.OBJECT))),
             @APIResponse(
                     responseCode = "404",
                     description = "No College found for a given identifier",
@@ -149,15 +149,15 @@ public class CollegeResource extends AbstractCollegeType {
     public Response updateCollege(
             @Parameter(description = "College identifier", required = true) @PathParam("collegeId") @NotNull String collegeId,
             @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = CollegeDetail.class, type = SchemaType.OBJECT)))
-            @Valid CollegeDetail collegeDetail) {
-        if (Objects.isNull(collegeDetail.getCollegeId()) || collegeDetail.getCollegeId().isEmpty())
+                    schema = @Schema(implementation = CollegeDto.class, type = SchemaType.OBJECT)))
+            @Valid CollegeDto collegeDto) {
+        if (Objects.isNull(collegeDto.getCollegeId()) || collegeDto.getCollegeId().isEmpty())
             throw new ServiceException("College does not have collegeId");
 
-        if (!Objects.equals(collegeId, collegeDetail.getCollegeId()))
+        if (!Objects.equals(collegeId, collegeDto.getCollegeId()))
             throw new ServiceException("path variable collegeId does not match College.collegeId");
 
-        collegeService.updateCollege(collegeDetail);
+        collegeService.updateCollege(collegeDto);
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 

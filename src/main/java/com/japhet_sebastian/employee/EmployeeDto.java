@@ -1,7 +1,9 @@
 package com.japhet_sebastian.employee;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.japhet_sebastian.supplier.AddressDto;
+import com.japhet_sebastian.organization.entity.AddressDto;
+import com.japhet_sebastian.organization.entity.DepartmentDto;
 import com.japhet_sebastian.vo.EmploymentStatus;
 import com.japhet_sebastian.vo.Gender;
 import jakarta.validation.constraints.*;
@@ -16,17 +18,8 @@ import java.util.Set;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EmployeeDto implements Serializable {
-
-    String registeredAt;
-
-    String updatedAt;
-
-    @Pattern(message = "{String.special.character}", regexp = "^[\\p{L} .'-]+$")
-    String registeredBy;
-
-    @Pattern(message = "{String.special.character}", regexp = "^[\\p{L} .'-]+$")
-    String updatedBy;
 
     @Size(message = "{Sixty-four.string.length}", min = 2, max = 64)
     @Pattern(message = "{String.special.character}", regexp = "^[\\p{L} .'-?!;,]+$")
@@ -55,15 +48,19 @@ public class EmployeeDto implements Serializable {
     @NotEmpty(message = "{Email.required}")
     String email;
 
-    @NotNull(message = "{Address.field.required}")
-    AddressDto address;
-
-    String employeeAddress;
-
     String employeeId;
 
     @NotEmpty(message = "{Employee.work-id.required}")
     String workId;
+
+    DepartmentDto department;
+
+    String departmentName;
+
+    @NotNull(message = "{Address.field.required}")
+    AddressDto address;
+
+    String employeeAddress;
 
     @NotNull(message = "{Employee.dob.required}")
     String dateOfBirth;
@@ -71,9 +68,17 @@ public class EmployeeDto implements Serializable {
     @NotNull(message = "{Employee.hire-date.required}")
     String hireDate;
 
+    String timeOfService;
+
     Set<EmploymentStatus> status;
 
-    DepartmentDto department;
+    String registeredAt;
 
-    String departmentName;
+    String updatedAt;
+
+    @Pattern(message = "{String.special.character}", regexp = "^[\\p{L} .'-]+$")
+    String registeredBy;
+
+    @Pattern(message = "{String.special.character}", regexp = "^[\\p{L} .'-]+$")
+    String updatedBy;
 }

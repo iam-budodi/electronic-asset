@@ -2,8 +2,7 @@ package com.japhet_sebastian.organization.boundary;
 
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.control.DepartmentService;
-import com.japhet_sebastian.organization.entity.DepartmentDetail;
-import com.japhet_sebastian.organization.entity.DepartmentInput;
+import com.japhet_sebastian.organization.entity.DepartmentDto;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -50,7 +49,7 @@ public class DepartmentResource extends AbstractDepartmentType {
             description = "Lists all the departments information",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = DepartmentDetail.class, type = SchemaType.ARRAY)))
+                    schema = @Schema(implementation = DepartmentDto.class, type = SchemaType.ARRAY)))
     public Response allDepartments(@BeanParam OrgPage orgPage) {
         return Response.ok(this.departmentService.listDepartments(orgPage))
                 .header("X-Total-Count", this.departmentService.totalDepartments())
@@ -66,7 +65,7 @@ public class DepartmentResource extends AbstractDepartmentType {
                     description = "Get department by department identifier",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON,
-                            schema = @Schema(implementation = DepartmentDetail.class, type = SchemaType.OBJECT))),
+                            schema = @Schema(implementation = DepartmentDto.class, type = SchemaType.OBJECT))),
             @APIResponse(
                     responseCode = "404",
                     description = "Department does not exist for a given identifier",
@@ -114,9 +113,10 @@ public class DepartmentResource extends AbstractDepartmentType {
     })
     public Response saveDepartment(
             @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = DepartmentInput.class))) @Valid DepartmentInput departmentInput, @Context UriInfo uriInfo) {
-        this.departmentService.addDepartment(departmentInput);
-        URI departmentUri = departmentUriBuilder(departmentInput.getDepartmentId(), uriInfo).build();
+                    schema = @Schema(implementation = DepartmentDto.class)))
+            @Valid DepartmentDto departmentDto, @Context UriInfo uriInfo) {
+        this.departmentService.saveDepartment(departmentDto);
+        URI departmentUri = departmentUriBuilder(departmentDto.getDepartmentId(), uriInfo).build();
         return Response.created(departmentUri).build();
     }
 
@@ -129,7 +129,7 @@ public class DepartmentResource extends AbstractDepartmentType {
                     description = "Department updated",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON,
-                            schema = @Schema(implementation = DepartmentInput.class, type = SchemaType.OBJECT))),
+                            schema = @Schema(implementation = DepartmentDto.class, type = SchemaType.OBJECT))),
             @APIResponse(
                     responseCode = "404",
                     description = "No Department found for a given identifier",
@@ -150,7 +150,7 @@ public class DepartmentResource extends AbstractDepartmentType {
     public Response updateDepartment(
             @Parameter(description = "departmentId", required = true) @PathParam("departmentId") @NotNull String departmentId,
             @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = DepartmentInput.class))) @Valid DepartmentInput department) {
+                    schema = @Schema(implementation = DepartmentDto.class))) @Valid DepartmentDto department) {
         if (Objects.isNull(department.getDepartmentId()) || department.getDepartmentId().isEmpty())
             throw new ServiceException("Department does not have departmentId");
 

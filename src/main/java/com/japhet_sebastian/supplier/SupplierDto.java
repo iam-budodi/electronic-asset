@@ -1,6 +1,7 @@
 package com.japhet_sebastian.supplier;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.japhet_sebastian.organization.entity.AddressDto;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 

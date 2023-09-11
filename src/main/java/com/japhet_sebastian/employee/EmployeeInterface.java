@@ -1,27 +1,28 @@
 package com.japhet_sebastian.employee;
 
-import com.japhet_sebastian.supplier.SupplierDto;
-import com.japhet_sebastian.supplier.SupplierPage;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 public interface EmployeeInterface {
-    List<SupplierDto> listSuppliers(SupplierPage supplierPage);
+    List<EmployeeDto> listEmployees(EmployeePage employeePage);
 
-    Optional<SupplierDto> findSupplier(@NotNull String supplierId);
+    Optional<EmployeeDto> getEmployee(@NotNull String employeeId);
 
-    Long supplierCount();
+    Long totalEmployees();
 
-    List<SelectOptions> selectOptions();
+    List<EmployeeDto> departmentsReport(LocalDate startDate, LocalDate endDate);
 
-    void saveSupplier(@Valid SupplierDto supplierDto);
+    List<SelectOptions> selected();
 
-    void updateSupplier(@Valid SupplierDto supplierDto);
+    void saveEmployee(@Valid EmployeeDto employeeDto);
 
-    void deleteSupplier(@NotNull String supplierId);
+    void updateEmployee(@Valid EmployeeDto employeeDto);
+
+    void deleteEmployee(@NotNull String employeeId);
 
 }

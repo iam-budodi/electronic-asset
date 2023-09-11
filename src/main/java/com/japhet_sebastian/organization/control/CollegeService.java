@@ -1,7 +1,11 @@
 package com.japhet_sebastian.organization.control;
 
+import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.boundary.OrgPage;
-import com.japhet_sebastian.organization.entity.CollegeDetail;
+import com.japhet_sebastian.organization.entity.AddressEntity;
+import com.japhet_sebastian.organization.entity.CollegeDto;
+import com.japhet_sebastian.organization.entity.CollegeEntity;
+import com.japhet_sebastian.organization.entity.CollegeMapper;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -17,12 +21,19 @@ public class CollegeService implements CollegeInterface {
     @Inject
     CollegeRepository collegeRepository;
 
-    public List<CollegeDetail> listColleges(OrgPage orgPage) {
-        return this.collegeRepository.allColleges(orgPage);
+    @Inject
+    AddressRepository addressRepository;
+
+    @Inject
+    CollegeMapper collegeMapper;
+
+    public List<CollegeDto> listColleges(OrgPage orgPage) {
+        List<CollegeEntity> collegeEntities = collegeRepository.allColleges(orgPage).list();
+        return collegeMapper.toDtoList(collegeEntities);
     }
 
-    public Optional<CollegeDetail> getCollege(@NotNull String collegeId) {
-        return this.collegeRepository.singleCollege(collegeId);
+    public Optional<CollegeDto> getCollege(@NotNull String collegeId) {
+        return collegeRepository.singleCollege(collegeId).map(collegeMapper::toDto);
     }
 
     public Long totalColleges() {
@@ -33,15 +44,36 @@ public class CollegeService implements CollegeInterface {
         return collegeRepository.selectProjection();
     }
 
-    public void addCollege(@Valid CollegeDetail collegeDetail) {
-        this.collegeRepository.saveCollege(collegeDetail);
+    public void saveCollege(@Valid CollegeDto collegeDto) {
+        collegeRepository.findByEmailOrPhone(collegeDto.getCollegeName(), collegeDto.getCollegeCode())
+                .ifPresent(employeeEntity -> {
+                    throw new ServiceException("College already exists");
+                });
+
+        CollegeEntity collegeEntity = collegeMapper.toEntity(collegeDto);
+        addressRepository.persist(collegeEntity.getAddress());
+        collegeRepository.persist(collegeEntity);
+        collegeMapper.partialDtoUpdate(collegeEntity, collegeDto);
     }
 
-    public void updateCollege(@Valid CollegeDetail collegeDetail) {
-        this.collegeRepository.updateCollege(collegeDetail);
+    public void updateCollege(@Valid CollegeDto collegeDto) {
+        CollegeEntity collegeEntity = checkCollege(collegeDto.getCollegeId());
+        collegeEntity = collegeMapper.partialEntityUpdate(collegeDto, collegeEntity);
+        collegeEntity.getAddress().setAddressId(collegeEntity.getCollegeId());
+        addressRepository.persist(collegeEntity.getAddress());
+        collegeRepository.persist(collegeEntity);
+        collegeMapper.partialDtoUpdate(collegeEntity, collegeDto);
     }
 
     public void deleteCollege(@NotNull String collegeId) {
-        this.collegeRepository.deleteCollege(collegeId);
+        CollegeEntity collegeEntity = checkCollege(collegeId);
+        AddressEntity addressEntity = collegeEntity.getAddress();
+        collegeRepository.delete(collegeEntity);
+        addressRepository.delete(addressEntity);
+    }
+
+    private CollegeEntity checkCollege(String supplierId) {
+        return collegeRepository.singleCollege(supplierId)
+                .orElseThrow(() -> new ServiceException("No college found for collegeId[%s]", supplierId));
     }
 }

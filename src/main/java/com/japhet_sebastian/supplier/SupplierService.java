@@ -29,7 +29,7 @@ public class SupplierService implements SupplierInterface {
     }
 
     public Optional<SupplierDto> findSupplier(@NotNull String supplierId) {
-        return this.supplierRepository.findSupplier(supplierId).map(supplierMapper::toDto);
+        return supplierRepository.findSupplier(supplierId).map(supplierMapper::toDto);
     }
 
     public Long supplierCount() {

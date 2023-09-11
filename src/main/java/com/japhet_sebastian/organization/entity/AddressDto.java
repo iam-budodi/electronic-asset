@@ -1,4 +1,4 @@
-package com.japhet_sebastian.supplier;
+package com.japhet_sebastian.organization.entity;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;

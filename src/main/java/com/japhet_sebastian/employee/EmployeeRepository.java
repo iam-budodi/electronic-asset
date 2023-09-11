@@ -1,35 +1,26 @@
 package com.japhet_sebastian.employee;
 
-import com.japhet_sebastian.exception.ServiceException;
-import com.japhet_sebastian.organization.control.AddressRepository;
-import com.japhet_sebastian.organization.control.DepartmentRepository;
-import com.japhet_sebastian.organization.entity.AddressEntity;
-import com.japhet_sebastian.organization.entity.DepartmentEntity;
 import com.japhet_sebastian.vo.SelectOptions;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;
 import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity, UUID> {
-
-    @Inject
-    EmployeeMapperDto employeeMapper;
-
-    @Inject
-    DepartmentRepository departmentRepository;
-
-    @Inject
-    AddressRepository addressRepository;
+//
+//    @Inject
+//    EmployeeMapperDto employeeMapper;
+//
+//
+//    @Inject
+//    AddressRepository addressRepository;
 
     private String getString(EmployeePage employeePage) {
         String query = "SELECT DISTINCT e FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address " +
@@ -44,7 +35,7 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
         return query;
     }
 
-    public List<Employee> allEmployees(EmployeePage employeePage) {
+    public PanacheQuery<EmployeeEntity> allEmployees(EmployeePage employeePage) {
         Map<String, Object> params = new HashMap<>();
         params.put("search", employeePage.getSearch());
         params.put("date", employeePage.getDate());
@@ -58,22 +49,17 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
                 .and("e.hireDate", Sort.Direction.Descending);
 
         return find(query, sort, params)
-                .page(Page.of(employeePage.getPageNumber(), employeePage.getPageSize()))
-                .stream().map(this.employeeMapper::toEmployee)
-                .collect(Collectors.toList());
+                .page(Page.of(employeePage.getPageNumber(), employeePage.getPageSize()));
     }
 
-    public Optional<Employee> findEmployee(@NotNull String employeeId) {
+    public Optional<EmployeeEntity> findEmployee(@NotNull String employeeId) {
         return find(employeeQuery(), Parameters.with("employeeId", UUID.fromString(employeeId)))
-                .firstResultOptional()
-                .map(this.employeeMapper::toEmployee);
+                .firstResultOptional();
     }
 
-    public List<Employee> reporting(LocalDate startDate, LocalDate endDate) {
+    public PanacheQuery<EmployeeEntity> reporting(LocalDate startDate, LocalDate endDate) {
         return find(reportingQuery(), Sort.by("e.firstName", Sort.Direction.Descending),
-                Parameters.with("startDate", startDate).and("endDate", endDate))
-                .stream().map(this.employeeMapper::toEmployee)
-                .collect(Collectors.toList());
+                Parameters.with("startDate", startDate).and("endDate", endDate));
     }
 
     public List<SelectOptions> selectOptions() {
@@ -81,67 +67,61 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
                 "e.lastName FROM Employee e").project(SelectOptions.class).list();
     }
 
-    public void saveEmployee(@Valid Employee employee) {
-        DepartmentEntity departmentEntity = getDepartment(employee);
-        checkByEmailOrPhone(employee.getEmail(), employee.getMobile()).ifPresent(
-                employeeEntity -> {
-                    throw new ServiceException("Employee exists");
-                });
+//    public void saveEmployee(@Valid Employee employee) {
+//        DepartmentEntity departmentEntity = getDepartment(employee);
+//        checkByEmailOrPhone(employee.getEmail(), employee.getMobile()).ifPresent(
+//                employeeEntity -> {
+//                    throw new ServiceException("Employee exists");
+//                });
+//
+//        AddressEntity addressEntity = this.employeeMapper.toAddressEntity(employee);
+//        this.addressRepository.persist(addressEntity);
+//
+//        EmployeeEntity employeeEntity = this.employeeMapper.toEmployeeEntity(employee);
+//        employeeEntity.setDepartment(departmentEntity);
+//        employeeEntity.setAddress(addressEntity);
+//        persist(employeeEntity);
+//
+//        this.employeeMapper.updateEmployeeFromEmployeeEntity(employeeEntity, employee);
+//    }
 
-        AddressEntity addressEntity = this.employeeMapper.toAddressEntity(employee);
-        this.addressRepository.persist(addressEntity);
+//    public void updateEmployee(@Valid Employee employee) {
+//        DepartmentEntity departmentEntity = getDepartment(employee);
+//        EmployeeEntity employeeEntity = find(employeeQuery(),
+//                Parameters.with("employeeId", UUID.fromString(employee.getEmployeeId())))
+//                .firstResultOptional()
+//                .orElseThrow(() -> new ServiceException("No employee found for employeeId[%s]", employee.getEmployeeId()));
+//
+//        this.employeeMapper.updateEmployeeEntityFromEmployee(employee, employeeEntity);
+//        employeeEntity.setDepartment(departmentEntity);
+//        persist(employeeEntity);
+//
+//        this.addressRepository.findByIdOptional(employeeEntity.getEmployeeId()).map(addressEntity -> {
+//            this.employeeMapper.updateAddressEntityFromEmployee(employee, addressEntity);
+//            addressEntity.setAddressId(employeeEntity.getEmployeeId());
+//            this.addressRepository.persist(addressEntity);
+//            return addressEntity;
+//        });
+//
+//        this.employeeMapper.updateEmployeeFromEmployeeEntity(employeeEntity, employee);
+//    }
 
-        EmployeeEntity employeeEntity = this.employeeMapper.toEmployeeEntity(employee);
-        employeeEntity.setDepartment(departmentEntity);
-        employeeEntity.setAddress(addressEntity);
-        persist(employeeEntity);
+//    public void deleteEmployee(@NotNull String employeeId) {
+//        EmployeeEntity employeeEntity = find(employeeQuery(),
+//                Parameters.with("employeeId", UUID.fromString(employeeId)))
+//                .firstResultOptional()
+//                .orElseThrow(() -> new ServiceException("Could not find employee for employeeId[%s]", employeeId));
+//
+//        AddressEntity addressEntity = employeeEntity.getAddress();
+//        delete(employeeEntity);
+//        this.addressRepository.delete(addressEntity);
+//    }
 
-        this.employeeMapper.updateEmployeeFromEmployeeEntity(employeeEntity, employee);
-    }
-
-    public void updateEmployee(@Valid Employee employee) {
-        DepartmentEntity departmentEntity = getDepartment(employee);
-        EmployeeEntity employeeEntity = find(employeeQuery(),
-                Parameters.with("employeeId", UUID.fromString(employee.getEmployeeId())))
-                .firstResultOptional()
-                .orElseThrow(() -> new ServiceException("No employee found for employeeId[%s]", employee.getEmployeeId()));
-
-        this.employeeMapper.updateEmployeeEntityFromEmployee(employee, employeeEntity);
-        employeeEntity.setDepartment(departmentEntity);
-        persist(employeeEntity);
-
-        this.addressRepository.findByIdOptional(employeeEntity.getEmployeeId()).map(addressEntity -> {
-            this.employeeMapper.updateAddressEntityFromEmployee(employee, addressEntity);
-            addressEntity.setAddressId(employeeEntity.getEmployeeId());
-            this.addressRepository.persist(addressEntity);
-            return addressEntity;
-        });
-
-        this.employeeMapper.updateEmployeeFromEmployeeEntity(employeeEntity, employee);
-    }
-
-    public void deleteEmployee(@NotNull String employeeId) {
-        EmployeeEntity employeeEntity = find(employeeQuery(),
-                Parameters.with("employeeId", UUID.fromString(employeeId)))
-                .firstResultOptional()
-                .orElseThrow(() -> new ServiceException("Could not find employee for employeeId[%s]", employeeId));
-
-        AddressEntity addressEntity = employeeEntity.getAddress();
-        delete(employeeEntity);
-        this.addressRepository.delete(addressEntity);
-    }
-
-    private Optional<EmployeeEntity> checkByEmailOrPhone(String email, String mobile) {
-        return find("#Employee.getByEmailOrPhone", Parameters
-                .with("email", email).and("mobile", mobile).map())
+    public Optional<EmployeeEntity> searchByEmailOrPhone(String email, String mobile) {
+        return find("#Employee.getByEmailOrPhone", Parameters.with("email", email).and("mobile", mobile).map())
                 .firstResultOptional();
     }
 
-    private DepartmentEntity getDepartment(Employee employee) {
-        return departmentRepository
-                .checkDepartmentByName(employee.getDepartmentName())
-                .orElseThrow(() -> new ServiceException("Could not find department for associated employee"));
-    }
 
     private String employeeQuery() {
         return "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address " +
@@ -150,6 +130,6 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
 
     private String reportingQuery() {
         return "FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address " +
-                "WHERE e.registeredAt BETWEEN :startDate AND :endDate";
+                "WHERE DATE(e.registeredAt) BETWEEN :startDate AND :endDate";
     }
 }

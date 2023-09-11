@@ -4,16 +4,26 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Objects;
 import java.util.UUID;
 
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 @Entity(name = "Department")
-@Table(name = "departments", uniqueConstraints = {@UniqueConstraint(name = "unique_department_name",
-        columnNames = {"department_name"})})
+@Table(name = "departments", uniqueConstraints = {
+        @UniqueConstraint(name = "unique_department_name", columnNames = {"department_name"})
+})
 @NamedQueries({@NamedQuery(name = "Department.getName",
         query = "FROM Department d LEFT JOIN FETCH d.college WHERE LOWER(d.departmentName) = :name")})
 @Schema(description = "Department representation")
@@ -21,7 +31,7 @@ public class DepartmentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "department_uuid")
+    @Column(name = "department_uuid", nullable = false)
     private UUID departmentId;
 
     @Schema(required = true)
@@ -41,6 +51,7 @@ public class DepartmentEntity {
     @Column(length = 64)
     private String description;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "college_uuid", nullable = false, foreignKey = @ForeignKey(name = "college_department_fk_constraint"))
@@ -54,74 +65,19 @@ public class DepartmentEntity {
 //        return listAll(Sort.by("name"));
 //    }
 
-
-    public DepartmentEntity() {
-    }
-
-    public UUID getDepartmentId() {
-        return departmentId;
-    }
-
-    public void setDepartmentId(UUID departmentId) {
-        this.departmentId = departmentId;
-    }
-
-    public String getDepartmentName() {
-        return departmentName;
-    }
-
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
-    }
-
-    public String getDepartmentCode() {
-        return departmentCode;
-    }
-
-    public void setDepartmentCode(String departmentCode) {
-        this.departmentCode = departmentCode;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public CollegeEntity getCollege() {
-        return college;
-    }
-
-    public void setCollege(CollegeEntity college) {
-        this.college = college;
-    }
-
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DepartmentEntity that)) return false;
-        return Objects.equals(getDepartmentId(), that.getDepartmentId())
-                && Objects.equals(getDepartmentName(), that.getDepartmentName())
-                && Objects.equals(getDepartmentCode(), that.getDepartmentCode())
-                && Objects.equals(getDescription(), that.getDescription())
-                && Objects.equals(getCollege(), that.getCollege());
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        DepartmentEntity that = (DepartmentEntity) o;
+        return getDepartmentId() != null && Objects.equals(getDepartmentId(), that.getDepartmentId());
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(getDepartmentId(), getDepartmentName(), getDepartmentCode(), getDescription(), getCollege());
-    }
-
-    @Override
-    public String toString() {
-        return "DepartmentEntity{" +
-                "departmentId=" + departmentId +
-                ", departmentName='" + departmentName + '\'' +
-                ", departmentCode='" + departmentCode + '\'' +
-                ", description='" + description + '\'' +
-                ", college=" + college +
-                '}';
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }
