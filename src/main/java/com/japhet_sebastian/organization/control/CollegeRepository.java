@@ -41,7 +41,8 @@ public class CollegeRepository implements PanacheRepositoryBase<CollegeEntity, U
     }
 
     public Optional<CollegeEntity> findByEmailOrPhone(String name, String code) {
-        return find("#College.nameOrCode", Parameters.with("name", name).and("code", code).map())
+        return find("#College.nameOrCode",
+                Parameters.with("name", name.toLowerCase(Locale.ROOT)).and("code", code.toLowerCase(Locale.ROOT)).map())
                 .firstResultOptional();
     }
 

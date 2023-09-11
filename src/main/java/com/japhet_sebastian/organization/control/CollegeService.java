@@ -11,6 +11,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.jboss.logging.Logger;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,9 @@ public class CollegeService implements CollegeInterface {
 
     @Inject
     CollegeMapper collegeMapper;
+
+    @Inject
+    Logger LOGGER;
 
     public List<CollegeDto> listColleges(OrgPage orgPage) {
         List<CollegeEntity> collegeEntities = collegeRepository.allColleges(orgPage).list();
@@ -47,7 +51,7 @@ public class CollegeService implements CollegeInterface {
     public void saveCollege(@Valid CollegeDto collegeDto) {
         collegeRepository.findByEmailOrPhone(collegeDto.getCollegeName(), collegeDto.getCollegeCode())
                 .ifPresent(employeeEntity -> {
-                    throw new ServiceException("College already exists");
+                     throw new ServiceException("College already exists");
                 });
 
         CollegeEntity collegeEntity = collegeMapper.toEntity(collegeDto);

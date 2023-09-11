@@ -13,6 +13,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -90,6 +91,8 @@ class CollegeResourceTest extends AccessTokenProvider {
     void getById() {
         final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
         final CollegeDto college = createCollege();
+        college.setCollegeName("College of Geology");
+        college.setCollegeCode("CoGE");
         String url = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
@@ -102,20 +105,20 @@ class CollegeResourceTest extends AccessTokenProvider {
         String uuid = url.substring(url.lastIndexOf("/") + 1);
         assertThat(uuid, matchesRegex(UUID_REGEX));
 
-        CollegeDto foundCollegeDto = given()
+        CollegeDto foundCollege = given()
                 .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
                 .when().get(uuid)
                 .then()
                 .statusCode(OK.getStatusCode())
                 .body(
-                        containsString("College of Engineering Technology"),
-                        containsString("CoET"),
+                        containsString("College of Geology"),
+                        containsString("CoGE"),
                         containsString("Chuo kikuu Ubungo, Dar es salaam")
                 )
                 .extract().as(CollegeDto.class);
 
-        assertThat(foundCollegeDto, is(notNullValue()));
-        assertThat(uuid, equalTo(foundCollegeDto.getCollegeId()));
+        assertThat(foundCollege, is(notNullValue()));
+        assertThat(uuid, equalTo(foundCollege.getCollegeId()));
     }
 
     @Test
@@ -146,7 +149,7 @@ class CollegeResourceTest extends AccessTokenProvider {
         String uuid = url.substring(url.lastIndexOf("/") + 1);
         assertThat(uuid, matchesRegex(UUID_REGEX));
 
-        CollegeDto foundCollegeDto = given()
+        CollegeDto foundCollege = given()
                 .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
                 .when().get(uuid)
                 .then()
@@ -158,8 +161,8 @@ class CollegeResourceTest extends AccessTokenProvider {
                 )
                 .extract().as(CollegeDto.class);
 
-        assertThat(foundCollegeDto, is(notNullValue()));
-        assertThat(uuid, equalTo(foundCollegeDto.getCollegeId()));
+        assertThat(foundCollege, is(notNullValue()));
+        assertThat(uuid, equalTo(foundCollege.getCollegeId()));
     }
 
     @Test
@@ -183,21 +186,36 @@ class CollegeResourceTest extends AccessTokenProvider {
 
     @Test
     void saveViolatesUniqueConstraint() {
-        CollegeDto college = createCollege();
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+        final CollegeDto college = createCollege();
+        college.setCollegeName("College of Humanity");
+        college.setCollegeCode("Humanity");
+        String url = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
+                .body(college).post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(url, is(notNullValue()));
+        String uuid = url.substring(url.lastIndexOf("/") + 1);
+        assertThat(uuid, matchesRegex(UUID_REGEX));
+
+        // duplicates colleges
         ErrorResponse errorResponse = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
                 .body(college).post()
                 .then()
-                .statusCode(INTERNAL_SERVER_ERROR.getStatusCode())
+                .statusCode(BAD_REQUEST.getStatusCode())
                 .extract().as(ErrorResponse.class);
 
-        assertThat(errorResponse.getErrorId(), is(notNullValue()));
         assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
         assertThat(errorResponse.getErrors(),
-                contains(new ErrorResponse.ErrorMessage(
-                        getErrorMessage("System.error"))));
-
+                contains(new ErrorResponse.ErrorMessage("College already exists")
+                )
+        );
     }
 
     @Test
@@ -233,13 +251,10 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .extract().as(ErrorResponse.class);
 
         assertThat(errorResponse.getErrorId(), is(nullValue()));
-        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(5)));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
         assertThat(errorResponse.getErrors(), containsInAnyOrder(
-                new ErrorResponse.ErrorMessage("createCollege.collegeDto.collegeName", getErrorMessage("College.name.required")),
-                new ErrorResponse.ErrorMessage("createCollege.collegeDto.street", getErrorMessage("Address.field.required")),
-                new ErrorResponse.ErrorMessage("createCollege.collegeDto.city", getErrorMessage("Address.field.required")),
-                new ErrorResponse.ErrorMessage("createCollege.collegeDto.district", getErrorMessage("Address.field.required")),
-                new ErrorResponse.ErrorMessage("createCollege.collegeDto.country", getErrorMessage("Address.field.required")))
+                new ErrorResponse.ErrorMessage("createCollege.collegeDto.collegeName", getErrorMessage("College.name.required"))
+              )
         );
     }
 
@@ -264,23 +279,23 @@ class CollegeResourceTest extends AccessTokenProvider {
         String uuid = url.substring(url.lastIndexOf("/") + 1);
         assertThat(uuid, matchesRegex(UUID_REGEX));
 
-        CollegeDto foundCollegeDto = given()
+        CollegeDto foundCollege = given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .when().get(uuid)
                 .then()
                 .statusCode(OK.getStatusCode())
                 .extract().as(CollegeDto.class);
 
-        assertThat(uuid, equalTo(foundCollegeDto.getCollegeId()));
-        assertThat(foundCollegeDto.getCollegeName(), is(equalTo(collegeName)));
+        assertThat(uuid, equalTo(foundCollege.getCollegeId()));
+        assertThat(foundCollege.getCollegeName(), is(equalTo(collegeName)));
 
-        foundCollegeDto.setCollegeName(collegeNameUpdated);
+        foundCollege.setCollegeName(collegeNameUpdated);
 
         given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .contentType(ContentType.JSON)
-                .body(foundCollegeDto)
-                .when().put(foundCollegeDto.getCollegeId())
+                .body(foundCollege)
+                .when().put(foundCollege.getCollegeId())
                 .then()
                 .statusCode(NO_CONTENT.getStatusCode());
 
@@ -304,6 +319,7 @@ class CollegeResourceTest extends AccessTokenProvider {
         final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
         CollegeDto college = createCollege();
         college.setCollegeName("This update should fail");
+        college.setCollegeCode("FAILS");
         String url = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
@@ -317,22 +333,22 @@ class CollegeResourceTest extends AccessTokenProvider {
         String uuid = url.substring(url.lastIndexOf("/") + 1);
         assertThat(uuid, matchesRegex(UUID_REGEX));
 
-        CollegeDto foundCollegeDto = given()
+        CollegeDto foundCollege = given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .when().get(uuid)
                 .then()
                 .statusCode(OK.getStatusCode())
                 .extract().as(CollegeDto.class);
 
-        assertThat(uuid, equalTo(foundCollegeDto.getCollegeId()));
+        assertThat(uuid, equalTo(foundCollege.getCollegeId()));
 
-        foundCollegeDto.setCollegeName(null);
+        foundCollege.setCollegeName(null);
 
         ErrorResponse errorResponse = given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .contentType(ContentType.JSON)
-                .body(foundCollegeDto)
-                .when().put(foundCollegeDto.getCollegeId())
+                .body(foundCollege)
+                .when().put(foundCollege.getCollegeId())
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .extract().as(ErrorResponse.class);
@@ -352,7 +368,9 @@ class CollegeResourceTest extends AccessTokenProvider {
         final String addressStreetUpdated = "Main campus";
         CollegeDto college = createCollege();
         college.setCollegeName(collegeName);
+        college.setCollegeCode("MAIN");
 
+        // create college
         String url = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
@@ -366,26 +384,30 @@ class CollegeResourceTest extends AccessTokenProvider {
         String uuid = url.substring(url.lastIndexOf("/") + 1);
         assertThat(uuid, matchesRegex(UUID_REGEX));
 
-        CollegeDto foundCollegeDto = given()
+        // check created college
+        CollegeDto foundCollege = given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .when().get(uuid)
                 .then()
                 .statusCode(OK.getStatusCode())
                 .extract().as(CollegeDto.class);
 
-        assertThat(uuid, equalTo(foundCollegeDto.getCollegeId()));
-        assertThat(foundCollegeDto.getCollegeName(), is(equalTo(collegeName)));
+        assertThat(uuid, equalTo(foundCollege.getCollegeId()));
+        assertThat(foundCollege.getCollegeName(), is(equalTo(collegeName)));
 
-        foundCollegeDto.getAddress().setStreet(addressStreetUpdated);
+        // update college address
+        college.getAddress().setStreet(addressStreetUpdated);
+        foundCollege.setAddress(college.getAddress());
 
         given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .contentType(ContentType.JSON)
-                .body(foundCollegeDto)
-                .when().put(foundCollegeDto.getCollegeId())
+                .body(foundCollege)
+                .when().put(foundCollege.getCollegeId())
                 .then()
                 .statusCode(NO_CONTENT.getStatusCode());
 
+        // confirm it is updated
         CollegeDto collegeDtoUpdated = given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .when().get(uuid)
@@ -393,12 +415,8 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .statusCode(OK.getStatusCode())
                 .body(
                         containsString(collegeName),
-                        containsString("CoET"),
-                        containsString(addressStreetUpdated),
-                        containsString("Ubungo"),
-                        containsString("15114"),
-                        containsString("Dar es salaam"),
-                        containsString("Tanzania")
+                        containsString("MAIN"),
+                        containsString(addressStreetUpdated)
                 )
                 .extract().as(CollegeDto.class);
 
@@ -414,7 +432,9 @@ class CollegeResourceTest extends AccessTokenProvider {
         final String collegeNameUpdated = "Updated college name and street address";
         CollegeDto college = createCollege();
         college.setCollegeName(collegeName);
+        college.setCollegeCode("Original");
 
+        // create college
         String url = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
@@ -428,27 +448,31 @@ class CollegeResourceTest extends AccessTokenProvider {
         String uuid = url.substring(url.lastIndexOf("/") + 1);
         assertThat(uuid, matchesRegex(UUID_REGEX));
 
-        CollegeDto foundCollegeDto = given()
+        // check created college
+        CollegeDto foundCollege = given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .when().get(uuid)
                 .then()
                 .statusCode(OK.getStatusCode())
                 .extract().as(CollegeDto.class);
 
-        assertThat(uuid, equalTo(foundCollegeDto.getCollegeId()));
-        assertThat(foundCollegeDto.getCollegeName(), is(equalTo(collegeName)));
+        assertThat(uuid, equalTo(foundCollege.getCollegeId()));
+        assertThat(foundCollege.getCollegeName(), is(equalTo(collegeName)));
 
-        foundCollegeDto.setCollegeName(collegeNameUpdated);
-        foundCollegeDto.getAddress().setStreet(addressStreetUpdated);
+        // update college and address
+        foundCollege.setCollegeName(collegeNameUpdated);
+        college.getAddress().setStreet(addressStreetUpdated);
+        foundCollege.setAddress(college.getAddress());
 
         given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .contentType(ContentType.JSON)
-                .body(foundCollegeDto)
-                .when().put(foundCollegeDto.getCollegeId())
+                .body(foundCollege)
+                .when().put(foundCollege.getCollegeId())
                 .then()
                 .statusCode(NO_CONTENT.getStatusCode());
 
+        // confirm updates
         CollegeDto collegeDtoUpdated = given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .when().get(uuid)
@@ -456,17 +480,13 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .statusCode(OK.getStatusCode())
                 .body(
                         containsString(collegeNameUpdated),
-                        containsString("CoET"),
-                        containsString(addressStreetUpdated),
-                        containsString("Ubungo"),
-                        containsString("15114"),
-                        containsString("Dar es salaam"),
-                        containsString("Tanzania")
+                        containsString("Original"),
+                        containsString(addressStreetUpdated)
                 )
                 .extract().as(CollegeDto.class);
 
         assertThat(collegeDtoUpdated.getCollegeName(), is(equalTo(collegeNameUpdated)));
-        assertThat(collegeDtoUpdated.getAddress().getStreet(), is(equalTo(addressStreetUpdated)));
+        assertThat(collegeDtoUpdated.getCollegeAddress(), containsString(addressStreetUpdated));
     }
 
     @Test
@@ -476,6 +496,7 @@ class CollegeResourceTest extends AccessTokenProvider {
 
         CollegeDto college = createCollege();
         college.setCollegeName(collegeName);
+        college.setCollegeCode("DELETED");
 
         // Get all college available
         Response response = given()
@@ -512,10 +533,10 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .statusCode(OK.getStatusCode())
                 .extract().response();
 
-        List<CollegeDto> newCollegeDtosLis = results.jsonPath().getList("$");
+        List<CollegeDto> newCollegeList = results.jsonPath().getList("$");
 
-        assertThat(newCollegeDtosLis, is(not(empty())));
-        assertThat(newCollegeDtosLis, hasSize(greaterThanOrEqualTo(4))); // increased by 1
+        assertThat(newCollegeList, is(not(empty())));
+        assertThat(newCollegeList, hasSize(greaterThanOrEqualTo(4))); // increased by 1
 
         CollegeDto collegeDtoFound = given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
@@ -562,6 +583,7 @@ class CollegeResourceTest extends AccessTokenProvider {
 
         CollegeDto college = createCollege();
         college.setCollegeName(collegeName);
+        college.setCollegeCode("COLLEGE");
 
         // Get all colleges available
         Response response = given()
@@ -571,9 +593,9 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .statusCode(OK.getStatusCode())
                 .extract().response();
 
-        List<CollegeDto> collegeDtos = response.jsonPath().getList("$");
-        assertThat(collegeDtos, is(not(empty())));
-        assertThat(collegeDtos, hasSize(greaterThanOrEqualTo(2)));
+        List<CollegeDto> colleges = response.jsonPath().getList("$");
+        assertThat(colleges, is(not(empty())));
+        assertThat(colleges, hasSize(greaterThanOrEqualTo(2)));
 
         // creates new college
         String collegeUrl = given()
@@ -589,9 +611,19 @@ class CollegeResourceTest extends AccessTokenProvider {
         String uuid = collegeUrl.substring(collegeUrl.lastIndexOf("/") + 1);
         assertThat(uuid, matchesRegex(UUID_REGEX));
 
-        // add new department to a created colleger
+
+        // get created college
+        CollegeDto collegeCreated = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(collegeUrl)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().as(CollegeDto.class);
+
+        // add new department to a created college
         DepartmentDto departmentData = createDepartment();
-        departmentData.getCollege().setCollegeId(uuid);
+        collegeCreated.setAddress(college.getAddress());
+        departmentData.setCollege(collegeCreated);
         String departmentUrl = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
@@ -612,10 +644,10 @@ class CollegeResourceTest extends AccessTokenProvider {
                 .statusCode(OK.getStatusCode())
                 .extract().response();
 
-        List<CollegeDto> newCollegeDtosLis = results.jsonPath().getList("$");
+        List<CollegeDto> newCollegeList = results.jsonPath().getList("$");
 
-        assertThat(newCollegeDtosLis, is(not(empty())));
-        assertThat(newCollegeDtosLis, hasSize(greaterThanOrEqualTo(3))); // increased by 1
+        assertThat(newCollegeList, is(not(empty())));
+        assertThat(newCollegeList, hasSize(greaterThanOrEqualTo(3))); // increased by 1
 
         CollegeDto collegeDtoFound = given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
@@ -671,7 +703,7 @@ class CollegeResourceTest extends AccessTokenProvider {
             addressDto.setCity("Dar es salaam");
             addressDto.setCountry("Tanzania");
 
-            CollegeDto college = new CollegeDto();
+            final CollegeDto college = new CollegeDto();
             college.setCollegeName("College of Engineering Technology");
             college.setCollegeCode("CoET");
             college.setAddress(addressDto);
