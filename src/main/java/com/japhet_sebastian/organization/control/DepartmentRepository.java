@@ -67,7 +67,6 @@ public class DepartmentRepository implements PanacheRepositoryBase<DepartmentEnt
 //        delete(departmentEntity);
 //    }
 
-//
 //    private Optional<DepartmentEntity> getById(String departmentId) {
 //        return find("FROM Department d LEFT JOIN FETCH d.college c LEFT JOIN FETCH c.address " +
 //                "WHERE d.departmentId = ?1", UUID.fromString(departmentId)).firstResultOptional();

@@ -2,7 +2,7 @@
 insert into addresses (city, country, district_name, postal_code, street_name, address_uuid)
 VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi', '64365d7c-354d-11ee-be56-0242ac120002');
 insert into addresses (city, country, district_name, postal_code, street_name, address_uuid)
-VALUES ('Dar es Salaam', 'Tanzania', 'kinondoni', '09191', 'sayansi', '849ea0ce-354d-11ee-be56-0242ac120002');
+VALUES ('Dar es Salaam', 'Tanzania', 'ubungo', '15114', 'chuo kikuu', '849ea0ce-354d-11ee-be56-0242ac120002');
 
 -- COLLEGES
 insert into colleges (college_uuid, college_name, college_code)

@@ -14,13 +14,6 @@ import java.util.Objects;
 public interface EmployeeMapper {
     EmployeeEntity toEntity(EmployeeDto employeeDto);
 
-    @Mapping(target = "address", ignore = true)
-    @Mapping(target = "department", ignore = true)
-    @Mapping(target = "firstName", ignore = true)
-    @Mapping(target = "lastName", ignore = true)
-    @Mapping(target = "middleName", ignore = true)
-    @Mapping(target = "registeredAt", dateFormat = "dd-MM-yyyy HH:mm:ss")
-    @Mapping(target = "updatedAt", dateFormat = "dd-MM-yyyy HH:mm:ss")
     List<EmployeeDto> toDtoList(List<EmployeeEntity> employeeEntity);
 
     @Mapping(target = "address", ignore = true)

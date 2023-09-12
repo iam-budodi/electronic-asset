@@ -6,14 +6,11 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.JAKARTA_CDI,
-        uses = {AddressMapper.class})
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        componentModel = MappingConstants.ComponentModel.JAKARTA_CDI, uses = {AddressMapper.class})
 public interface SupplierMapper {
     SupplierEntity toSupplierEntity(SupplierDto supplierDto);
 
-    @Mapping(target = "address", ignore = true)
-    @Mapping(target = "registeredAt", dateFormat = "dd-MM-yyyy HH:mm:ss")
-    @Mapping(target = "updatedAt", dateFormat = "dd-MM-yyyy HH:mm:ss")
     List<SupplierDto> toListDto(List<SupplierEntity> supplierEntity);
 
     @Mapping(target = "address", ignore = true)
@@ -21,6 +18,7 @@ public interface SupplierMapper {
     @Mapping(target = "updatedAt", dateFormat = "dd-MM-yyyy HH:mm:ss")
     SupplierDto toDto(SupplierEntity supplierEntity);
 
+    @InheritInverseConfiguration(name = "toDto")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     SupplierEntity partialEntityUpdate(SupplierDto supplierDto, @MappingTarget SupplierEntity supplierEntity);
 

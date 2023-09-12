@@ -19,6 +19,8 @@ public class DepartmentDto implements Serializable {
 
     String departmentId;
 
+    String collegeName;
+
     @Size(message = "{Sixty-four.string.length}", min = 2, max = 64)
     @Pattern(message = "{String.special.character}", regexp = "^[\\p{L} .'-/]+$")
     @NotEmpty(message = "{Department.field.required}")
@@ -28,9 +30,11 @@ public class DepartmentDto implements Serializable {
     @Pattern(message = "{Alphanumeric.character}", regexp = "^[\\p{L}\\p{Nd} _]+$")
     String departmentCode;
 
+    CollegeDto college;
+
     @Size(message = "{Sixty-four.string.length}", min = 2, max = 64)
     @Pattern(message = "{String.special.character}", regexp = "^[\\p{L} .'-/]+$")
     String description;
 
-    CollegeDto college;
+    String address;
 }

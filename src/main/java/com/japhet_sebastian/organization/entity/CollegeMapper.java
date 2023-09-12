@@ -3,12 +3,13 @@ package com.japhet_sebastian.organization.entity;
 import org.mapstruct.*;
 
 import java.util.List;
+import java.util.Objects;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.JAKARTA_CDI, uses = {AddressMapper.class})
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        componentModel = MappingConstants.ComponentModel.JAKARTA_CDI, uses = {AddressMapper.class})
 public interface CollegeMapper {
     CollegeEntity toEntity(CollegeDto collegeDto);
 
-    @Mapping(target = "address", ignore = true)
     List<CollegeDto> toDtoList(List<CollegeEntity> collegeEntities);
 
     @Mapping(target = "address", ignore = true)
@@ -21,8 +22,10 @@ public interface CollegeMapper {
     void partialDtoUpdate(CollegeEntity collegeEntity, @MappingTarget CollegeDto collegeDto);
 
     @AfterMapping()
-    default void toString(CollegeEntity collegeEntity, @MappingTarget CollegeDto collegeDto) {
-        AddressEntity address = collegeEntity.getAddress();
-        collegeDto.setCollegeAddress(address.street + " " + address.district + ", " + address.city);
+    default void toCollegeAddress(CollegeEntity collegeEntity, @MappingTarget CollegeDto collegeDto) {
+        if (Objects.nonNull(collegeEntity.getAddress()) && Objects.nonNull(collegeEntity.getAddress().getAddressId())) {
+            AddressEntity address = collegeEntity.getAddress();
+            collegeDto.setCollegeAddress(address.street + " " + address.district + ", " + address.city);
+        }
     }
 }

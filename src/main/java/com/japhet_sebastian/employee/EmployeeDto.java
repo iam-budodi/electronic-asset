@@ -18,7 +18,7 @@ import java.util.Set;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
+//@JsonIgnoreProperties(ignoreUnknown = true)
 public class EmployeeDto implements Serializable {
 
     @Size(message = "{Sixty-four.string.length}", min = 2, max = 64)

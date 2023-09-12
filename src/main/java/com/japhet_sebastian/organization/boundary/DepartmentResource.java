@@ -43,10 +43,10 @@ public class DepartmentResource extends AbstractDepartmentType {
     DepartmentService departmentService;
 
     @GET
-    @Operation(summary = "Get all available departments information")
+    @Operation(summary = "Get all departments")
     @APIResponse(
             responseCode = "200",
-            description = "Lists all the departments information",
+            description = "Lists all departments",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = DepartmentDto.class, type = SchemaType.ARRAY)))
@@ -58,22 +58,21 @@ public class DepartmentResource extends AbstractDepartmentType {
 
     @GET
     @Path("/{departmentId}")
-    @Operation(summary = "Get department details for a given identifier")
+    @Operation(summary = "Get department")
     @APIResponses({
             @APIResponse(
                     responseCode = "200",
-                    description = "Get department by department identifier",
+                    description = "Get department by departmentId",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON,
                             schema = @Schema(implementation = DepartmentDto.class, type = SchemaType.OBJECT))),
             @APIResponse(
                     responseCode = "404",
-                    description = "Department does not exist for a given identifier",
+                    description = "Department don't exist",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON))
     })
     public Response getDepartment(
-            @Parameter(description = "Department identifier", required = true)
-            @PathParam("departmentId") @NotNull String departmentId) {
+            @Parameter(description = "departmentId", required = true) @PathParam("departmentId") @NotNull String departmentId) {
         return this.departmentService.getDepartment(departmentId)
                 .map(department -> Response.ok(department).build())
                 .orElseGet(() -> Response.status(Response.Status.NOT_FOUND).build());
@@ -94,7 +93,7 @@ public class DepartmentResource extends AbstractDepartmentType {
     }
 
     @POST
-    @Operation(summary = "Creates valid department")
+    @Operation(summary = "Creates department")
     @APIResponses({
             @APIResponse(
                     responseCode = "201",
