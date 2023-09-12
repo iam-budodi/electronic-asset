@@ -18,6 +18,8 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -50,145 +52,153 @@ class EmployeeResourceTest extends AccessTokenProvider {
     @TestHTTPResource("select")
     @TestHTTPEndpoint(EmployeeResource.class)
     String select;
-//
-//    @Test
-//    void shouldGetAllEmployees() {
-//        List<EmployeeDto> employees = given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .when().get()
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .extract().response().jsonPath().getList("$");
-//
-//        assertThat(employees, is(not(empty())));
-//        assertThat(employees, hasSize(greaterThanOrEqualTo(2)));
-//    }
-//
-//    @Test
-//    void shouldGetPagesEmployeesList() {
-//        Response response = given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .contentType(ContentType.JSON)
-//                .when().get("?page=0&size=1")
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .extract().response();
-//
-//        List<EmployeeDto> employees = response.jsonPath().getList("$");
-//        assertThat(employees, is(not(empty())));
-//        assertThat(employees, hasSize(greaterThanOrEqualTo(1)));
-//        assertThat(Integer.valueOf(response.getHeader("X-Total-Count")), is(greaterThanOrEqualTo(2)));
-//    }
-//
-//    @Test
-//    void employeesReport() {
-//        List<EmployeeDto> employees = given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .when().get(report + "?start=2023-03-01&end=2023-03-30")
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .extract().body().as(employeesReportTypeRef());
-//
-//        assertThat(employees, is(not(empty())));
-//        assertThat(employees, hasSize(2));
-//    }
-//
-//    @Test
-//    void getFormSelectionOptions() {
-//        given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .contentType(ContentType.JSON)
-//                .when().get(select)
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .body("$.size()", is(greaterThanOrEqualTo(2)))
-//                .body(
-//                        containsString("hellen M. John"),
-//                        containsString("Michael J. Mbaga")
-//                );
-//    }
-//
-//    @Test
-//    void getEmployeeById() {
-//        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
-//
-//        // create college
-//        final CollegeDto collegeDto = createCollegeDto();
-//        String collegeURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(collegeDto).post(college)
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(collegeURL, notNullValue());
-//        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
-//        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
-//
-//        // create department
-//        final DepartmentDto DepartmentDto = createDepartment();
-//        DepartmentDto.setCollegeId(collegeUUID);
-//        String departmentURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(DepartmentDto)
-//                .post(department)
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(departmentURL, notNullValue());
-//        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
-//        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
-//
-//        // Get the created department
-//        DepartmentDto departmentDto = given()
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .when().get(department + "/{departmentId}", departmentUUID)
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .body("departmentId", is(equalTo(departmentUUID)))
-//                .extract().as(DepartmentDto.class);
-//
-//        // add employee
-//        final EmployeeDto employee = createEmployee();
-//        employee.setDepartmentName(departmentDto.getDepartmentName());
-//        String employeeURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(employee).post()
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(employeeURL, notNullValue());
-//        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
-//        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
-//
-//        // Get employee by UUID
-//        EmployeeDto employeeFound = given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .when().get(employeeUUID)
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .body(
-//                        containsString("Japhet"),
-//                        containsString("14110"),
-//                        containsString("UDSM2013-00005"),
-//                        containsString("Finance"),
-//                        containsString("lulu.shaban")
-//                )
-//                .extract().as(EmployeeDto.class);
-//
-//        Integer yearsOfExperience = Period.between(LocalDate.parse(employee.getHireDate()), LocalDate.now()).getYears();
-//        assertThat(employeeFound, is(notNullValue()));
-//        assertThat(employeeFound.getTimeOfService(), is(String.valueOf(yearsOfExperience)));
-//        assertThat(employeeUUID, equalTo(employeeFound.getEmployeeId()));
-//    }
+
+    @Test
+    void shouldGetAllEmployees() {
+        List<EmployeeDto> employees = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .header(ACCEPT, APPLICATION_JSON)
+                .when().get()
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().response().jsonPath().getList("$");
+
+        assertThat(employees, is(not(empty())));
+        assertThat(employees, hasSize(greaterThanOrEqualTo(2)));
+    }
+
+    @Test
+    void shouldGetPagesEmployeesList() {
+        Response response = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .when().get("?page=0&size=1")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().response();
+
+        List<EmployeeDto> employees = response.jsonPath().getList("$");
+        assertThat(employees, is(not(empty())));
+        assertThat(employees, hasSize(greaterThanOrEqualTo(1)));
+        assertThat(Integer.valueOf(response.getHeader("X-Total-Count")), is(greaterThanOrEqualTo(2)));
+    }
+
+    @Test
+    void employeesReport() {
+        List<EmployeeDto> employees = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .header(ACCEPT, APPLICATION_JSON)
+                .when().get(report + "?start=2023-03-01&end=2023-03-30")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().body().as(employeesReportTypeRef());
+
+        assertThat(employees, is(not(empty())));
+        assertThat(employees, hasSize(2));
+    }
+
+    @Test
+    void getFormSelectionOptions() {
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .when().get(select)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("$.size()", is(greaterThanOrEqualTo(2)))
+                .body(
+                        containsString("hellen M. John"),
+                        containsString("Michael J. Mbaga")
+                );
+    }
+
+    @Test
+    void getEmployeeById() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+        // create college
+        final CollegeDto collegeBody = createCollegeDto();
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeBody).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // get created college
+        CollegeDto collegeCreated = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(college + "/{collegeId}", collegeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().as(CollegeDto.class);
+
+        // create department
+        final DepartmentDto departmentBody = createDepartment();
+        departmentBody.setCollege(collegeCreated);
+        String departmentURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentBody).post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentURL, notNullValue());
+        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get the created department
+        DepartmentDto departmentCreated = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUUID)))
+                .extract().as(DepartmentDto.class);
+
+        // add employee
+        final EmployeeDto employee = createEmployee();
+        employee.setDepartmentName(departmentCreated.getDepartmentName());
+        String employeeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(employeeURL, notNullValue());
+        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
+        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
+
+        // Get employee by UUID
+        EmployeeDto employeeFound = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Japhet"),
+                        containsString("14110"),
+                        containsString("UDSM2013-00005"),
+                        containsString("Finance"),
+                        containsString("lulu.shaban")
+                )
+                .extract().as(EmployeeDto.class);
+
+        Integer yearsOfExperience = Period.between(LocalDate.parse(employee.getHireDate()), LocalDate.now()).getYears();
+        assertThat(employeeFound, is(notNullValue()));
+        assertThat(employeeFound.getTimeOfService(), is(String.valueOf(yearsOfExperience)));
+        assertThat(employeeUUID, equalTo(employeeFound.getEmployeeId()));
+    }
 //
 //    @Test
 //    void getForbidGetEmployeeById() {
@@ -264,7 +274,7 @@ class EmployeeResourceTest extends AccessTokenProvider {
 //                .then()
 //                .statusCode(FORBIDDEN.getStatusCode());
 //    }
-//
+
 //    @Test
 //    void shouldGetEmployeeNotFound() {
 //        final String randomUUIDString = UUID.randomUUID().toString();
@@ -299,7 +309,7 @@ class EmployeeResourceTest extends AccessTokenProvider {
         CollegeDto collegeCreated = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-                .body(collegeDto).get(collegeUUID)
+                .when().get(college + "/{collegeId}", collegeUUID)
                 .then()
                 .statusCode(OK.getStatusCode())
                 .extract().as(CollegeDto.class);

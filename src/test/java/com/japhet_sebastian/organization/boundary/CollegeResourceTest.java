@@ -252,8 +252,8 @@ class CollegeResourceTest extends AccessTokenProvider {
         assertThat(errorResponse.getErrorId(), is(nullValue()));
         assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
         assertThat(errorResponse.getErrors(), containsInAnyOrder(
-                new ErrorResponse.ErrorMessage("createCollege.collegeDto.collegeName", getErrorMessage("College.name.required"))
-              )
+                        new ErrorResponse.ErrorMessage("createCollege.collegeDto.collegeName", getErrorMessage("College.name.required"))
+                )
         );
     }
 
@@ -694,30 +694,30 @@ class CollegeResourceTest extends AccessTokenProvider {
         assertThat(newDeletedList, hasSize(greaterThanOrEqualTo(2))); // reduced by 1
     }
 
-        private CollegeDto createCollege() {
-            final AddressDto addressDto = new AddressDto();
-            addressDto.setStreet("Chuo kikuu");
-            addressDto.setPostalCode("15114");
-            addressDto.setDistrict("Ubungo");
-            addressDto.setCity("Dar es salaam");
-            addressDto.setCountry("Tanzania");
+    private CollegeDto createCollege() {
+        final AddressDto addressDto = new AddressDto();
+        addressDto.setStreet("Chuo kikuu");
+        addressDto.setPostalCode("15114");
+        addressDto.setDistrict("Ubungo");
+        addressDto.setCity("Dar es salaam");
+        addressDto.setCountry("Tanzania");
 
-            final CollegeDto college = new CollegeDto();
-            college.setCollegeName("College of Engineering Technology");
-            college.setCollegeCode("CoET");
-            college.setAddress(addressDto);
-            return college;
-        }
-
-        private DepartmentDto createDepartment () {
-            final DepartmentDto departmentDto = new DepartmentDto();
-            departmentDto.setDepartmentName("Deleted Dept");
-            departmentDto.setDepartmentCode("DEL012");
-            departmentDto.setCollege(null);
-            return departmentDto;
-        }
-
-        private String getErrorMessage (String key){
-            return ResourceBundle.getBundle("ValidationMessages").getString(key);
-        }
+        final CollegeDto college = new CollegeDto();
+        college.setCollegeName("College of Engineering Technology");
+        college.setCollegeCode("CoET");
+        college.setAddress(addressDto);
+        return college;
     }
+
+    private DepartmentDto createDepartment() {
+        final DepartmentDto departmentDto = new DepartmentDto();
+        departmentDto.setDepartmentName("Deleted Dept");
+        departmentDto.setDepartmentCode("DEL012");
+        departmentDto.setCollege(null);
+        return departmentDto;
+    }
+
+    private String getErrorMessage(String key) {
+        return ResourceBundle.getBundle("ValidationMessages").getString(key);
+    }
+}

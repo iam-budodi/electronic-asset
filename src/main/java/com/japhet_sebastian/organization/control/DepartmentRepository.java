@@ -41,37 +41,6 @@ public class DepartmentRepository implements PanacheRepositoryBase<DepartmentEnt
                 .list();
     }
 
-//    public void saveDepartment(@Valid DepartmentInput departmentInput) {
-//        if (checkDepartmentByName(departmentInput.getDepartmentName()).isPresent())
-//            throw new ServiceException("Department with same name already exists");
-//
-//        DepartmentEntity departmentEntity = this.departmentMapper.toDepartmentEntity(departmentInput);
-//        persist(departmentEntity);
-//        this.departmentMapper.updateDepartmentInputFromDepartmentEntity(departmentEntity, departmentInput);
-//    }
-
-
-//    public void updateDepartment(@Valid DepartmentInput department) {
-//        String departmentId = department.getDepartmentId();
-//        DepartmentEntity departmentEntity = getById(departmentId)
-//                .orElseThrow(() -> new ServiceException("No department found for departmentId[%s]", departmentId));
-//
-//        this.departmentMapper.updateDepartmentEntityFromDepartmentInput(department, departmentEntity);
-//        persist(departmentEntity);
-//        this.departmentMapper.updateDepartmentInputFromDepartmentEntity(departmentEntity, department);
-//    }
-
-//    public void deleteDepartment(@NotNull String departmentId) {
-//        DepartmentEntity departmentEntity = getById(departmentId)
-//                .orElseThrow(() -> new ServiceException("No department found for departmentId[%s]", departmentId));
-//        delete(departmentEntity);
-//    }
-
-//    private Optional<DepartmentEntity> getById(String departmentId) {
-//        return find("FROM Department d LEFT JOIN FETCH d.college c LEFT JOIN FETCH c.address " +
-//                "WHERE d.departmentId = ?1", UUID.fromString(departmentId)).firstResultOptional();
-//    }
-
     public Optional<DepartmentEntity> checkDepartmentByName(String departmentName) {
         return find("#Department.getName", Parameters.with("name", departmentName.toLowerCase(Locale.ROOT)))
                 .firstResultOptional();

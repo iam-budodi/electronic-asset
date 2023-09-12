@@ -9,8 +9,8 @@ import org.mapstruct.*;
 import java.util.List;
 import java.util.Objects;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.JAKARTA_CDI,
-        uses = {AddressMapper.class, DepartmentMapper.class})
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        componentModel = MappingConstants.ComponentModel.JAKARTA_CDI, uses = {AddressMapper.class, DepartmentMapper.class})
 public interface EmployeeMapper {
     EmployeeEntity toEntity(EmployeeDto employeeDto);
 
@@ -42,6 +42,6 @@ public interface EmployeeMapper {
 
         employeeDto.setFullName(employeeEntity.getFirstName() + " " + middleName + employeeEntity.getLastName());
         employeeDto.setEmployeeAddress(address.street + " " + address.district + ", " + address.city);
-        employeeDto.setDepartmentName(department.getDepartmentName() + "(" + department.getDepartmentCode() + ")");
+//        employeeDto.setDepartmentName(department.getDepartmentName() + "(" + department.getDepartmentCode() + ")");
     }
 }

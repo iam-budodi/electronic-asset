@@ -18,7 +18,7 @@ import java.util.Set;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-//@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EmployeeDto implements Serializable {
 
     @Size(message = "{Sixty-four.string.length}", min = 2, max = 64)
@@ -35,23 +35,33 @@ public class EmployeeDto implements Serializable {
     @NotEmpty(message = "{Employee.lastName.required}")
     String lastName;
 
+    String employeeId;
+
     String fullName;
-
-    Gender gender;
-
-    @Pattern(message = "{Phone.number.invalid}", regexp = "^[((((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3})]{10,18}$")
-    @NotEmpty(message = "{Phone.number.required}")
-    String mobile;
 
     @Pattern(message = "{Email.invalid}", regexp = "^(?=.{1,64}@)[\\p{L}0-9_-]+(\\.[\\p{L}0-9_-]+)*@[^-][\\p{L}0-9-]+(\\.[\\p{L}0-9-]+)*(\\.[\\p{L}]{2,})$")
     @Email
     @NotEmpty(message = "{Email.required}")
     String email;
 
-    String employeeId;
+    @Pattern(message = "{Phone.number.invalid}", regexp = "^[((((\\+)?\\(\\d{3}\\)[- ]?\\d{3})|\\d{4})[- ]?\\d{3}[- ]?\\d{3})]{10,18}$")
+    @NotEmpty(message = "{Phone.number.required}")
+    String mobile;
+
+    @NotNull(message = "{Employee.dob.required}")
+    String dateOfBirth;
+
+    Gender gender;
 
     @NotEmpty(message = "{Employee.work-id.required}")
     String workId;
+
+    @NotNull(message = "{Employee.hire-date.required}")
+    String hireDate;
+
+    Set<EmploymentStatus> status;
+
+    String timeOfService;
 
     DepartmentDto department;
 
@@ -61,16 +71,6 @@ public class EmployeeDto implements Serializable {
     AddressDto address;
 
     String employeeAddress;
-
-    @NotNull(message = "{Employee.dob.required}")
-    String dateOfBirth;
-
-    @NotNull(message = "{Employee.hire-date.required}")
-    String hireDate;
-
-    String timeOfService;
-
-    Set<EmploymentStatus> status;
 
     String registeredAt;
 

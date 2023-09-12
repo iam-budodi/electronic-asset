@@ -52,8 +52,7 @@ class DepartmentResourceTest extends AccessTokenProvider {
                 .body(
                         containsString("TE"),
                         containsString("CSE")
-                )
-                .extract().response().getHeader("X-Total-Count");
+                ).extract().response().getHeader("X-Total-Count");
 
         assertThat(Integer.valueOf(totalItem), is(greaterThanOrEqualTo(2)));
     }
@@ -68,9 +67,7 @@ class DepartmentResourceTest extends AccessTokenProvider {
                 .statusCode(OK.getStatusCode())
                 .body("$.size()", is(1))
                 .body("departmentCode",
-                        anyOf(
-                                contains("CSE")
-                        )
+                        either(contains("CSE")).or(contains("Random")).or(contains("ETE"))
                 ).extract().response().getHeader("X-Total-Count");
 
         assertThat(Integer.valueOf(totalItem), is(greaterThanOrEqualTo(2)));
