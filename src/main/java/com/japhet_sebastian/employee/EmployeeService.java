@@ -17,10 +17,6 @@ import java.util.Optional;
 
 @ApplicationScoped
 public class EmployeeService implements EmployeeInterface {
-//
-//    @Inject
-//    @RestClient
-//    QRGeneratorServiceProxy generatorProxy;
 
     @Inject
     EmployeeRepository employeeRepository;
@@ -66,7 +62,6 @@ public class EmployeeService implements EmployeeInterface {
         EmployeeEntity employeeEntity = employeeMapper.toEntity(employeeDto);
         addressRepository.persist(employeeEntity.getAddress());
         employeeEntity.setDepartment(departmentEntity);
-//            employeeEntity.setAddress(addressEntity);
         employeeRepository.persist(employeeEntity);
         this.employeeMapper.partialDtoUpdate(employeeEntity, employeeDto);
     }
@@ -80,15 +75,6 @@ public class EmployeeService implements EmployeeInterface {
         addressRepository.persist(employeeEntity.getAddress());
         employeeRepository.persist(employeeEntity);
         employeeMapper.partialDtoUpdate(employeeEntity, employeeDto);
-
-//        this.addressRepository.findByIdOptional(employeeEntity.getEmployeeId()).map(addressEntity -> {
-//            this.employeeMapper.updateAddressEntityFromEmployee(employee, addressEntity);
-//            addressEntity.setAddressId(employeeEntity.getEmployeeId());
-//            this.addressRepository.persist(addressEntity);
-//            return addressEntity;
-//        });
-//
-//        this.employeeMapper.updateEmployeeFromEmployeeEntity(employeeEntity, employee);
     }
 
     public void deleteEmployee(@NotNull String employeeId) {

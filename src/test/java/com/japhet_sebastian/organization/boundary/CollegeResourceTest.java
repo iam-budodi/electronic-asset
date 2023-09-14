@@ -186,9 +186,10 @@ class CollegeResourceTest extends AccessTokenProvider {
     @Test
     void saveViolatesUniqueConstraint() {
         final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
         final CollegeDto college = createCollege();
-        college.setCollegeName("College of Humanity");
-        college.setCollegeCode("Humanity");
+        college.setCollegeName("College of Duplicate");
+        college.setCollegeCode("CoDU");
         String url = given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))

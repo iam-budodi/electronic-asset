@@ -14,13 +14,6 @@ import java.util.*;
 
 @ApplicationScoped
 public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity, UUID> {
-//
-//    @Inject
-//    EmployeeMapperDto employeeMapper;
-//
-//
-//    @Inject
-//    AddressRepository addressRepository;
 
     private String getString(EmployeePage employeePage) {
         String query = "SELECT DISTINCT e FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.address " +
@@ -66,56 +59,6 @@ public class EmployeeRepository implements PanacheRepositoryBase<EmployeeEntity,
         return find("SELECT e.id, e.firstName || ' ' || CONCAT(SUBSTRING(e.middleName, 1, 1), '.') || ' ' || " +
                 "e.lastName FROM Employee e").project(SelectOptions.class).list();
     }
-
-//    public void saveEmployee(@Valid Employee employee) {
-//        DepartmentEntity departmentEntity = getDepartment(employee);
-//        checkByEmailOrPhone(employee.getEmail(), employee.getMobile()).ifPresent(
-//                employeeEntity -> {
-//                    throw new ServiceException("Employee exists");
-//                });
-//
-//        AddressEntity addressEntity = this.employeeMapper.toAddressEntity(employee);
-//        this.addressRepository.persist(addressEntity);
-//
-//        EmployeeEntity employeeEntity = this.employeeMapper.toEmployeeEntity(employee);
-//        employeeEntity.setDepartment(departmentEntity);
-//        employeeEntity.setAddress(addressEntity);
-//        persist(employeeEntity);
-//
-//        this.employeeMapper.updateEmployeeFromEmployeeEntity(employeeEntity, employee);
-//    }
-
-//    public void updateEmployee(@Valid Employee employee) {
-//        DepartmentEntity departmentEntity = getDepartment(employee);
-//        EmployeeEntity employeeEntity = find(employeeQuery(),
-//                Parameters.with("employeeId", UUID.fromString(employee.getEmployeeId())))
-//                .firstResultOptional()
-//                .orElseThrow(() -> new ServiceException("No employee found for employeeId[%s]", employee.getEmployeeId()));
-//
-//        this.employeeMapper.updateEmployeeEntityFromEmployee(employee, employeeEntity);
-//        employeeEntity.setDepartment(departmentEntity);
-//        persist(employeeEntity);
-//
-//        this.addressRepository.findByIdOptional(employeeEntity.getEmployeeId()).map(addressEntity -> {
-//            this.employeeMapper.updateAddressEntityFromEmployee(employee, addressEntity);
-//            addressEntity.setAddressId(employeeEntity.getEmployeeId());
-//            this.addressRepository.persist(addressEntity);
-//            return addressEntity;
-//        });
-//
-//        this.employeeMapper.updateEmployeeFromEmployeeEntity(employeeEntity, employee);
-//    }
-
-//    public void deleteEmployee(@NotNull String employeeId) {
-//        EmployeeEntity employeeEntity = find(employeeQuery(),
-//                Parameters.with("employeeId", UUID.fromString(employeeId)))
-//                .firstResultOptional()
-//                .orElseThrow(() -> new ServiceException("Could not find employee for employeeId[%s]", employeeId));
-//
-//        AddressEntity addressEntity = employeeEntity.getAddress();
-//        delete(employeeEntity);
-//        this.addressRepository.delete(addressEntity);
-//    }
 
     public Optional<EmployeeEntity> searchByEmailOrPhone(String email, String mobile) {
         return find("#Employee.getByEmailOrPhone", Parameters.with("email", email).and("mobile", mobile).map())

@@ -4,13 +4,14 @@ import com.japhet_sebastian.organization.entity.AddressEntity;
 import com.japhet_sebastian.organization.entity.AddressMapper;
 import com.japhet_sebastian.organization.entity.DepartmentEntity;
 import com.japhet_sebastian.organization.entity.DepartmentMapper;
+import com.japhet_sebastian.vo.DateMapper;
 import org.mapstruct.*;
 
 import java.util.List;
 import java.util.Objects;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        componentModel = MappingConstants.ComponentModel.JAKARTA_CDI, uses = {AddressMapper.class, DepartmentMapper.class})
+        componentModel = MappingConstants.ComponentModel.JAKARTA_CDI, uses = {AddressMapper.class, DepartmentMapper.class, DateMapper.class})
 public interface EmployeeMapper {
     EmployeeEntity toEntity(EmployeeDto employeeDto);
 
@@ -21,8 +22,6 @@ public interface EmployeeMapper {
     @Mapping(target = "firstName", ignore = true)
     @Mapping(target = "lastName", ignore = true)
     @Mapping(target = "middleName", ignore = true)
-    @Mapping(target = "registeredAt", dateFormat = "dd-MM-yyyy HH:mm:ss")
-    @Mapping(target = "updatedAt", dateFormat = "dd-MM-yyyy HH:mm:ss")
     EmployeeDto toDto(EmployeeEntity employeeEntity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -42,6 +41,6 @@ public interface EmployeeMapper {
 
         employeeDto.setFullName(employeeEntity.getFirstName() + " " + middleName + employeeEntity.getLastName());
         employeeDto.setEmployeeAddress(address.street + " " + address.district + ", " + address.city);
-//        employeeDto.setDepartmentName(department.getDepartmentName() + "(" + department.getDepartmentCode() + ")");
+        employeeDto.setDepartmentName(department.getDepartmentName() + "(" + department.getDepartmentCode() + ")");
     }
 }

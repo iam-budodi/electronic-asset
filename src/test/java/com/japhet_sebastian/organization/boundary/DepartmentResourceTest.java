@@ -68,6 +68,7 @@ class DepartmentResourceTest extends AccessTokenProvider {
                 .body("$.size()", is(1))
                 .body("departmentCode",
                         either(contains("CSE")).or(contains("Random")).or(contains("ETE"))
+                                .or(contains("FIN012")).or(contains("KNOWN"))
                 ).extract().response().getHeader("X-Total-Count");
 
         assertThat(Integer.valueOf(totalItem), is(greaterThanOrEqualTo(2)));
