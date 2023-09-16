@@ -53,43 +53,49 @@ public class EmployeeService implements EmployeeInterface {
     }
 
     public void saveEmployee(@Valid EmployeeDto employeeDto) {
-        DepartmentEntity departmentEntity = getDepartment(employeeDto);
-        employeeRepository.searchByEmailOrPhone(employeeDto.getEmail(), employeeDto.getMobile())
-                .ifPresent(employeeEntity -> {
-                    throw new ServiceException("Employee exists");
-                });
+        if (departmentExists(employeeDto)) {
+            employeeRepository.searchByEmailOrPhone(employeeDto.getEmail(), employeeDto.getMobile())
+                    .ifPresent(employeeEntity -> {
+                        throw new ServiceException("Employee exists");
+                    });
 
-        EmployeeEntity employeeEntity = employeeMapper.toEntity(employeeDto);
-        employeeRepository.persist(employeeEntity);
-        this.employeeMapper.partialDtoUpdate(employeeEntity, employeeDto);
+            EmployeeEntity employeeEntity = employeeMapper.toEntity(employeeDto);
+            employeeRepository.persist(employeeEntity);
+            this.employeeMapper.partialDtoUpdate(employeeEntity, employeeDto);
+        }
     }
 
     public void updateEmployee(@Valid EmployeeDto employeeDto) {
-        EmployeeEntity employeeEntity = checkEmployee(employeeDto.employeeId);
-        DepartmentEntity departmentEntity = getDepartment(employeeDto);
+        EmployeeEntity employeeEntity = getEmployeeEntity(employeeDto.employeeId);
+        employeeEntity.setDepartment(getDepartmentEntity(employeeDto));
         employeeEntity = employeeMapper.partialUpdate(employeeDto, employeeEntity);
-//        employeeEntity.getAddress().setAddressId(employeeEntity.getEmployeeId());
-//        employeeEntity.getDepartment().setDepartmentId(departmentEntity.getDepartmentId());
-//        employeeEntity.setDepartment(departmentEntity);
-//        addressRepository.persist(employeeEntity.getAddress());
         employeeRepository.persist(employeeEntity);
         employeeMapper.partialDtoUpdate(employeeEntity, employeeDto);
     }
 
     public void deleteEmployee(@NotNull String employeeId) {
-        EmployeeEntity employeeEntity = checkEmployee(employeeId);
+        EmployeeEntity employeeEntity = getEmployeeEntity(employeeId);
         AddressEntity addressEntity = employeeEntity.getAddress();
         this.employeeRepository.delete(employeeEntity);
         this.addressRepository.delete(addressEntity);
     }
 
-    private DepartmentEntity getDepartment(EmployeeDto employeeDto) {
-        String departmentName = employeeDto.getDepartment().getDepartmentName();
-        return departmentRepository.checkDepartmentByName(departmentName)
+    private DepartmentEntity getDepartmentEntity(EmployeeDto employeeDto) {
+        return departmentEntityOptional(employeeDto)
                 .orElseThrow(() -> new ServiceException("Could not find department for associated employee"));
     }
 
-    private EmployeeEntity checkEmployee(String employeeId) {
+    private Boolean departmentExists(EmployeeDto employeeDto) {
+        return departmentEntityOptional(employeeDto).map(department -> true)
+                .orElseThrow(() -> new ServiceException("Could not find department for associated employee"));
+    }
+
+    private Optional<DepartmentEntity> departmentEntityOptional(EmployeeDto employeeDto) {
+        String departmentName = employeeDto.getDepartment().getDepartmentName();
+        return departmentRepository.checkDepartmentByName(departmentName);
+    }
+
+    private EmployeeEntity getEmployeeEntity(String employeeId) {
         return employeeRepository.findEmployee(employeeId)
                 .orElseThrow(() -> new ServiceException("No employee found for employeeId[%s]", employeeId));
     }

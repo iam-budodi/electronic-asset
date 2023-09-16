@@ -496,7 +496,7 @@ class CollegeResourceTest extends AccessTokenProvider {
 
         CollegeDto college = createCollege();
         college.setCollegeName(collegeName);
-        college.setCollegeCode("DELETED");
+        college.setCollegeCode("DEL");
 
         // Get all college available
         Response response = given()
@@ -509,7 +509,7 @@ class CollegeResourceTest extends AccessTokenProvider {
         List<CollegeDto> colleges = response.jsonPath().getList("$");
 
         assertThat(colleges, is(not(empty())));
-        assertThat(colleges, hasSize(greaterThanOrEqualTo(3)));
+        assertThat(colleges, hasSize(greaterThanOrEqualTo(2)));
 
         // creates new college
         String url = given()

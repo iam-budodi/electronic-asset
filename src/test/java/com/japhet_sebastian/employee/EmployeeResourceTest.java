@@ -17,6 +17,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -904,7 +905,6 @@ class EmployeeResourceTest extends AccessTokenProvider {
                 .body("departmentId", is(equalTo(departmentUUID)))
                 .extract().as(DepartmentDto.class);
 
-
         // add employee
         final EmployeeDto employee = createEmployee();
         employee.setFirstName("Japhet department");
@@ -935,7 +935,7 @@ class EmployeeResourceTest extends AccessTokenProvider {
                         containsString("Japhet department"),
                         containsString("Sebastian department"),
                         containsString("japhet.department@gmail.com"),
-                        containsString(" "),
+                        containsString("0744608522"),
                         containsString("UDSM2013-00010")
                 )
                 .extract().as(EmployeeDto.class);
@@ -970,14 +970,7 @@ class EmployeeResourceTest extends AccessTokenProvider {
                 .body("departmentId", is(equalTo(newDepartmentUUID)))
                 .extract().as(DepartmentDto.class);
 
-//        // update employee department
-//        employeeSaved.setFirstName("Japhet street updated");
-//        employeeSaved.setLastName("Sebastian street updated");
-//        employeeSaved.setEmail("japhet.street@gmail.com");
-//        employeeSaved.setMobile("0744608544");
-//        employeeSaved.setWorkId("UDSM2013-00018");
-//        employeeSaved.setDepartment(departmentCreated);
-//        employeeSaved.setAddress(employee.getAddress());
+        // update employee department
         employee.setEmployeeId(employeeSaved.getEmployeeId());
         employee.setDepartment(departmentToUpdate);
         given()
@@ -988,550 +981,623 @@ class EmployeeResourceTest extends AccessTokenProvider {
                 .statusCode(NO_CONTENT.getStatusCode());
 
 //        // confirm it is updated
-//        given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .when().get(employeeUUID)
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .body(
-//                        containsString("Department updated")
-//                );
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Department updated")
+                );
     }
 
-//    @Test
-//    void updateFailsEmployeeEmptyStringId() {
-//        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
-//
-//        // create college
-//        final CollegeDto collegeDto = createCollege();
-//        collegeDto.setCollegeName("Employee empty ID");
-//        String collegeURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(collegeDto).post(college)
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(collegeURL, notNullValue());
-//        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
-//        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
-//
-//        // create department
-//        final DepartmentDto DepartmentDto = createDepartment();
-//        DepartmentDto.setDepartmentName("Employee empty ID");
-//        DepartmentDto.setCollegeId(collegeUUID);
-//        String departmentURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(DepartmentDto)
-//                .post(department)
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(departmentURL, notNullValue());
-//        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
-//        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
-//
-//        // Get the created department
-//        DepartmentDto departmentDto = given()
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .when().get(department + "/{departmentId}", departmentUUID)
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .body("departmentId", is(equalTo(departmentUUID)))
-//                .extract().as(DepartmentDto.class);
-//
-//        // add employee
-//        final EmployeeDto employee = createEmployee();
-//        employee.setFirstName("Japhet empty ID");
-//        employee.setLastName("Sebastian empty ID");
-//        employee.setEmail("japhet.empty@gmail.com");
-//        employee.setMobile("0744608523");
-//        employee.setWorkId("UDSM2013-00011");
-//        employee.setDepartmentName(departmentDto.getDepartmentName());
-//        String employeeURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(employee).post()
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(employeeURL, notNullValue());
-//        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
-//        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
-//
-//        // Check created employee
-//        EmployeeDto employeeSaved = given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .when().get(employeeUUID)
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .body(
-//                        containsString("Japhet empty ID"),
-//                        containsString("Sebastian empty ID"),
-//                        containsString("japhet.empty@gmail.com"),
-//                        containsString("0744608523"),
-//                        containsString("UDSM2013-00011")
-//                )
-//                .extract().as(EmployeeDto.class);
-//
-//        assertThat(employeeSaved, is(notNullValue()));
-//        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
-//        assertThat(employeeSaved.getDepartmentName(), equalTo(departmentDto.getDepartmentName()));
-//
-//        // fail to update employee with empty ID
-//        employeeSaved.setEmployeeId("");
-//        ErrorResponse errorResponse = given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .contentType(ContentType.JSON)
-//                .body(employeeSaved)
-//                .when().put(employeeUUID)
-//                .then()
-//                .statusCode(BAD_REQUEST.getStatusCode())
-//                .extract().as(ErrorResponse.class);
-//
-//        assertThat(errorResponse.getErrorId(), is(nullValue()));
-//        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
-//        assertThat(errorResponse.getErrors(),
-//                contains(new ErrorResponse.ErrorMessage("Employee does not have employeeId"))
-//        );
-//    }
-//
-//    @Test
-//    void updateFailsEmployeeNullId() {
-//        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
-//
-//        // create college
-//        final CollegeDto collegeDto = createCollege();
-//        collegeDto.setCollegeName("Employee null ID");
-//        String collegeURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(collegeDto).post(college)
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(collegeURL, notNullValue());
-//        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
-//        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
-//
-//        // create department
-//        final DepartmentDto DepartmentDto = createDepartment();
-//        DepartmentDto.setDepartmentName("Employee null ID");
-//        DepartmentDto.setCollegeId(collegeUUID);
-//        String departmentURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(DepartmentDto)
-//                .post(department)
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(departmentURL, notNullValue());
-//        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
-//        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
-//
-//        // Get the created department
-//        DepartmentDto departmentDto = given()
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .when().get(department + "/{departmentId}", departmentUUID)
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .body("departmentId", is(equalTo(departmentUUID)))
-//                .extract().as(DepartmentDto.class);
-//
-//        // add employee
-//        final EmployeeDto employee = createEmployee();
-//        employee.setFirstName("Japhet null ID");
-//        employee.setLastName("Sebastian null ID");
-//        employee.setEmail("japhet.null@gmail.com");
-//        employee.setMobile("0744608524");
-//        employee.setWorkId("UDSM2013-00012");
-//        employee.setDepartmentName(departmentDto.getDepartmentName());
-//        String employeeURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(employee).post()
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(employeeURL, notNullValue());
-//        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
-//        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
-//
-//        // Check created employee
-//        EmployeeDto employeeSaved = given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .when().get(employeeUUID)
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .body(
-//                        containsString("Japhet null ID"),
-//                        containsString("Sebastian null ID"),
-//                        containsString("japhet.null@gmail.com"),
-//                        containsString("0744608524"),
-//                        containsString("UDSM2013-00012")
-//                )
-//                .extract().as(EmployeeDto.class);
-//
-//        assertThat(employeeSaved, is(notNullValue()));
-//        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
-//        assertThat(employeeSaved.getDepartmentName(), equalTo(departmentDto.getDepartmentName()));
-//
-//        // fail to update employee with empty ID
-//        employeeSaved.setEmployeeId(null);
-//        ErrorResponse errorResponse = given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .contentType(ContentType.JSON)
-//                .body(employeeSaved)
-//                .when().put(employeeUUID)
-//                .then()
-//                .statusCode(BAD_REQUEST.getStatusCode())
-//                .extract().as(ErrorResponse.class);
-//
-//        assertThat(errorResponse.getErrorId(), is(nullValue()));
-//        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
-//        assertThat(errorResponse.getErrors(),
-//                contains(new ErrorResponse.ErrorMessage("Employee does not have employeeId"))
-//        );
-//    }
-//
-//    @Test
-//    void updateFailsEmployeeIdMismatch() {
-//        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
-//
-//        // create college
-//        final CollegeDto collegeDto = createCollege();
-//        collegeDto.setCollegeName("Employee ID mismatch");
-//        String collegeURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(collegeDto).post(college)
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(collegeURL, notNullValue());
-//        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
-//        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
-//
-//        // create department
-//        final DepartmentDto DepartmentDto = createDepartment();
-//        DepartmentDto.setDepartmentName("Employee ID mismatch");
-//        DepartmentDto.setCollegeId(collegeUUID);
-//        String departmentURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(DepartmentDto)
-//                .post(department)
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(departmentURL, notNullValue());
-//        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
-//        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
-//
-//        // Get the created department
-//        DepartmentDto departmentDto = given()
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .when().get(department + "/{departmentId}", departmentUUID)
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .body("departmentId", is(equalTo(departmentUUID)))
-//                .extract().as(DepartmentDto.class);
-//
-//        // add employee
-//        final EmployeeDto employee = createEmployee();
-//        employee.setFirstName("Japhet ID mismatch");
-//        employee.setLastName("Sebastian ID mismatch");
-//        employee.setEmail("japhet.mismatch@gmail.com");
-//        employee.setMobile("0744608525");
-//        employee.setWorkId("UDSM2013-00013");
-//        employee.setDepartmentName(departmentDto.getDepartmentName());
-//        String employeeURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(employee).post()
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(employeeURL, notNullValue());
-//        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
-//        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
-//
-//        // Check created employee
-//        EmployeeDto employeeSaved = given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .when().get(employeeUUID)
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .body(
-//                        containsString("Japhet ID mismatch"),
-//                        containsString("Sebastian ID mismatch"),
-//                        containsString("japhet.mismatch@gmail.com"),
-//                        containsString("0744608525"),
-//                        containsString("UDSM2013-00013")
-//                )
-//                .extract().as(EmployeeDto.class);
-//
-//        assertThat(employeeSaved, is(notNullValue()));
-//        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
-//        assertThat(employeeSaved.getDepartmentName(), equalTo(departmentDto.getDepartmentName()));
-//
-//        // fail to update employee with empty ID
-//        employeeSaved.setEmployeeId(RandomStringUtils.randomAlphabetic(15));
-//        ErrorResponse errorResponse = given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .contentType(ContentType.JSON)
-//                .body(employeeSaved)
-//                .when().put(employeeUUID)
-//                .then()
-//                .statusCode(BAD_REQUEST.getStatusCode())
-//                .extract().as(ErrorResponse.class);
-//
-//        assertThat(errorResponse.getErrorId(), is(nullValue()));
-//        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
-//        assertThat(errorResponse.getErrors(),
-//                contains(new ErrorResponse.ErrorMessage("path variable employeeId does not match Employee.employeeId"))
-//        );
-//    }
-//
-//    @Test
-//    void updateFailsEmployeeDepartmentNotFound() {
-//        final EmployeeDto employee = createEmployee();
-//        employee.setEmployeeId(UUID.randomUUID().toString());
-//        employee.setFirstName("Japhet not found");
-//        employee.setLastName("Sebastian not found");
-//        employee.setEmail("japhet.mismatch@gmail.com");
-//        employee.setMobile("0744608525");
-//        employee.setWorkId("UDSM2013-00013");
-//        employee.setDepartmentName(RandomStringUtils.randomAlphabetic(20));
-//
-//        ErrorResponse errorResponse = given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .contentType(ContentType.JSON)
-//                .body(employee)
-//                .when().put(employee.getEmployeeId())
-//                .then()
-//                .statusCode(BAD_REQUEST.getStatusCode())
-//                .extract().as(ErrorResponse.class);
-//
-//        assertThat(errorResponse.getErrorId(), is(nullValue()));
-//        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
-//        assertThat(errorResponse.getErrors(),
-//                contains(new ErrorResponse.ErrorMessage("Could not find department for associated employee"))
-//        );
-//    }
-//
-//    @Test
-//    void updateFailsEmployeeNotFound() {
-//        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
-//
-//        // create college
-//        final CollegeDto collegeDto = createCollege();
-//        collegeDto.setCollegeName("Employee not found");
-//        String collegeURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(collegeDto).post(college)
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(collegeURL, notNullValue());
-//        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
-//        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
-//
-//        // create department
-//        final DepartmentDto DepartmentDto = createDepartment();
-//        DepartmentDto.setDepartmentName("Employee not found");
-//        DepartmentDto.setCollegeId(collegeUUID);
-//        String departmentURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(DepartmentDto)
-//                .post(department)
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(departmentURL, notNullValue());
-//        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
-//        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
-//
-//        // Get the created department
-//        DepartmentDto departmentDto = given()
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .when().get(department + "/{departmentId}", departmentUUID)
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .body("departmentId", is(equalTo(departmentUUID)))
-//                .extract().as(DepartmentDto.class);
-//
-//        // add employee
-//        final EmployeeDto employee = createEmployee();
-//        employee.setEmployeeId(UUID.randomUUID().toString());
-//        employee.setFirstName("Japhet not found");
-//        employee.setLastName("Sebastian not found");
-//        employee.setEmail("japhet.mismatch@gmail.com");
-//        employee.setMobile("0744608525");
-//        employee.setWorkId("UDSM2013-00013");
-//        employee.setDepartmentName(departmentDto.getDepartmentName());
-//
-//        ErrorResponse errorResponse = given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .contentType(ContentType.JSON)
-//                .body(employee)
-//                .when().put(employee.getEmployeeId())
-//                .then()
-//                .statusCode(BAD_REQUEST.getStatusCode())
-//                .extract().as(ErrorResponse.class);
-//
-//        assertThat(errorResponse.getErrorId(), is(nullValue()));
-//        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
-//        assertThat(errorResponse.getErrors(),
-//                contains(new ErrorResponse.ErrorMessage(String.format("No employee found for employeeId[%s]", employee.getEmployeeId())))
-//        );
-//    }
-//
-//    @Test
-//    void deleteEmployeeFailsNotFound() {
-//        String employeeUUID = UUID.randomUUID().toString();
-//        ErrorResponse errorResponse = given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .when().delete(employeeUUID)
-//                .then()
-//                .statusCode(BAD_REQUEST.getStatusCode())
-//                .extract().as(ErrorResponse.class);
-//
-//        assertThat(errorResponse.getErrorId(), is(nullValue()));
-//        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
-//        assertThat(errorResponse.getErrors(),
-//                contains(new ErrorResponse.ErrorMessage(String.format("Could not find employee for employeeId[%s]", employeeUUID)))
-//        );
-//    }
-//
-//    @Test
-//    void deleteEmployee() {
-//        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
-//
-//        // create college
-//        final CollegeDto collegeDto = createCollege();
-//        collegeDto.setCollegeName("Employee deleted");
-//        String collegeURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(collegeDto).post(college)
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(collegeURL, notNullValue());
-//        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
-//        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
-//
-//        // create department
-//        final DepartmentDto DepartmentDto = createDepartment();
-//        DepartmentDto.setDepartmentName("Employee deleted");
-//        DepartmentDto.setCollegeId(collegeUUID);
-//        String departmentURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(DepartmentDto)
-//                .post(department)
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(departmentURL, notNullValue());
-//        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
-//        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
-//
-//        // Get the created department
-//        DepartmentDto departmentDto = given()
-//                .header(ACCEPT, APPLICATION_JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .when().get(department + "/{departmentId}", departmentUUID)
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .body("departmentId", is(equalTo(departmentUUID)))
-//                .extract().as(DepartmentDto.class);
-//
-//        // add employee
-//        final EmployeeDto employee = createEmployee();
-//        employee.setFirstName("Japhet deleted");
-//        employee.setLastName("Sebastian deleted");
-//        employee.setEmail("japhet.deleted@gmail.com");
-//        employee.setMobile("0744608533");
-//        employee.setWorkId("UDSM2013-00077");
-//        employee.setDepartmentName(departmentDto.getDepartmentName());
-//        String employeeURL = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .body(employee).post()
-//                .then()
-//                .statusCode(CREATED.getStatusCode())
-//                .extract().response().getHeader("Location");
-//
-//        assertThat(employeeURL, notNullValue());
-//        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
-//        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
-//
-//        // Check created employee
-//        EmployeeDto employeeSaved = given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .when().get(employeeUUID)
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .body(
-//                        containsString("Japhet deleted"),
-//                        containsString("Sebastian deleted"),
-//                        containsString("japhet.deleted@gmail.com"),
-//                        containsString("0744608533"),
-//                        containsString("UDSM2013-00077")
-//                )
-//                .extract().as(EmployeeDto.class);
-//
-//        assertThat(employeeSaved, is(notNullValue()));
-//        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
-//        assertThat(employeeSaved.getDepartmentName(), equalTo(departmentDto.getDepartmentName()));
-//
-//        // delete employee
-//        given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .when().delete(employeeUUID)
-//                .then()
-//                .statusCode(NO_CONTENT.getStatusCode());
-//
-//        // confirm deletion
-//        given()
-//                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
-//                .when().get(employeeUUID)
-//                .then()
-//                .statusCode(NOT_FOUND.getStatusCode());
-//    }
+    @Test
+    void updateFailsEmployeeEmptyStringId() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
 
+        // create college
+        final CollegeDto collegeBody = createCollege();
+        collegeBody.setCollegeName("Employee empty ID");
+        collegeBody.setCollegeCode("EMPTYID");
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeBody).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // get created college
+        CollegeDto collegeCreated = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(college + "/{collegeId}", collegeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().as(CollegeDto.class);
+
+        // create department
+        final DepartmentDto departmentBody = createDepartment();
+        departmentBody.setDepartmentName("Employee empty ID");
+        departmentBody.setCollege(collegeCreated);
+        String departmentURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentBody).post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentURL, notNullValue());
+        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get the created department
+        DepartmentDto departmentCreated = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUUID)))
+                .extract().as(DepartmentDto.class);
+
+        // add employee
+        final EmployeeDto employee = createEmployee();
+        employee.setFirstName("Japhet empty ID");
+        employee.setLastName("Sebastian empty ID");
+        employee.setEmail("japhet.empty@gmail.com");
+        employee.setMobile("0744608523");
+        employee.setWorkId("UDSM2013-00011");
+        employee.setDepartment(departmentCreated);
+        String employeeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(employeeURL, notNullValue());
+        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
+        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
+
+        // Check created employee
+        EmployeeDto employeeSaved = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Japhet empty ID"),
+                        containsString("Sebastian empty ID"),
+                        containsString("japhet.empty@gmail.com"),
+                        containsString("0744608523"),
+                        containsString("UDSM2013-00011")
+                )
+                .extract().as(EmployeeDto.class);
+
+        assertThat(employeeSaved, is(notNullValue()));
+        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
+
+
+        // fail to update employee with empty ID
+        employee.setEmployeeId("");
+        ErrorResponse errorResponse = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .body(employee).put(employeeUUID)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
+        assertThat(errorResponse.getErrors(),
+                contains(new ErrorResponse.ErrorMessage("Employee does not have employeeId"))
+        );
+    }
+
+    @Test
+    void updateFailsEmployeeNullId() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+        // create college
+        final CollegeDto collegeBody = createCollege();
+        collegeBody.setCollegeName("Employee null ID");
+        collegeBody.setCollegeCode("NULLID");
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeBody).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // get created college
+        CollegeDto collegeCreated = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(college + "/{collegeId}", collegeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().as(CollegeDto.class);
+
+        // create department
+        final DepartmentDto departmentBody = createDepartment();
+        departmentBody.setDepartmentName("Employee null ID");
+        departmentBody.setCollege(collegeCreated);
+        String departmentURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentBody).post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentURL, notNullValue());
+        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get the created department
+        DepartmentDto departmentCreated = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUUID)))
+                .extract().as(DepartmentDto.class);
+
+        // add employee
+        final EmployeeDto employee = createEmployee();
+        employee.setFirstName("Japhet null ID");
+        employee.setLastName("Sebastian null ID");
+        employee.setEmail("japhet.null@gmail.com");
+        employee.setMobile("0744608524");
+        employee.setWorkId("UDSM2013-00044");
+        employee.setDepartment(departmentCreated);
+        String employeeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(employeeURL, notNullValue());
+        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
+        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
+
+        // Check created employee
+        EmployeeDto employeeSaved = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Japhet null ID"),
+                        containsString("Sebastian null ID"),
+                        containsString("japhet.null@gmail.com"),
+                        containsString("0744608524"),
+                        containsString("UDSM2013-00044")
+                )
+                .extract().as(EmployeeDto.class);
+
+        assertThat(employeeSaved, is(notNullValue()));
+        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
+
+
+        // fail to update employee with null ID
+        employee.setEmployeeId(null);
+        ErrorResponse errorResponse = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .body(employee)
+                .when().put(employeeUUID)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
+        assertThat(errorResponse.getErrors(),
+                contains(new ErrorResponse.ErrorMessage("Employee does not have employeeId"))
+        );
+    }
+
+    @Test
+    void updateFailsEmployeeIdMismatch() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+
+        // create college
+        final CollegeDto collegeBody = createCollege();
+        collegeBody.setCollegeName("Employee ID mismatch");
+        collegeBody.setCollegeCode("MISMATCH");
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeBody).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // get created college
+        CollegeDto collegeCreated = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(college + "/{collegeId}", collegeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().as(CollegeDto.class);
+
+        // create department
+        final DepartmentDto departmentBody = createDepartment();
+        departmentBody.setDepartmentName("Employee ID mismatch");
+        departmentBody.setCollege(collegeCreated);
+        String departmentURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentBody).post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentURL, notNullValue());
+        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get the created department
+        DepartmentDto departmentCreated = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUUID)))
+                .extract().as(DepartmentDto.class);
+
+        // add employee
+        final EmployeeDto employee = createEmployee();
+        employee.setFirstName("Japhet ID mismatch");
+        employee.setLastName("Sebastian ID mismatch");
+        employee.setEmail("japhet.mismatch@gmail.com");
+        employee.setMobile("0744608525");
+        employee.setWorkId("UDSM2013-00013");
+        employee.setDepartment(departmentCreated);
+        String employeeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(employeeURL, notNullValue());
+        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
+        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
+
+        // Check created employee
+        EmployeeDto employeeSaved = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Japhet ID mismatch"),
+                        containsString("Sebastian ID mismatch"),
+                        containsString("japhet.mismatch@gmail.com"),
+                        containsString("0744608525"),
+                        containsString("UDSM2013-00013")
+                )
+                .extract().as(EmployeeDto.class);
+
+        assertThat(employeeSaved, is(notNullValue()));
+        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
+
+
+        // fail to update employee with null ID
+        employee.setEmployeeId(RandomStringUtils.randomAlphabetic(15));
+        ErrorResponse errorResponse = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .body(employee)
+                .when().put(employeeUUID)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
+        assertThat(errorResponse.getErrors(),
+                contains(new ErrorResponse.ErrorMessage("path variable employeeId does not match Employee.employeeId"))
+        );
+    }
+
+    @Test
+    void updateFailsEmployeeDepartmentNotFound() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+        // create college
+        final CollegeDto collegeBody = createCollege();
+        collegeBody.setCollegeName("Employee no dept");
+        collegeBody.setCollegeCode("NODEPT");
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeBody).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // get created college
+        CollegeDto collegeCreated = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(college + "/{collegeId}", collegeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().as(CollegeDto.class);
+
+        // create department
+        final DepartmentDto departmentBody = createDepartment();
+        departmentBody.setDepartmentName("Employee no dept");
+        departmentBody.setCollege(collegeCreated);
+        String departmentURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentBody).post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentURL, notNullValue());
+        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get the created department
+        DepartmentDto departmentCreated = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUUID)))
+                .extract().as(DepartmentDto.class);
+
+        // add employee
+        final EmployeeDto employee = createEmployee();
+        employee.setFirstName("Japhet no dept");
+        employee.setLastName("Sebastian no dept");
+        employee.setEmail("japhet.dept@gmail.com");
+        employee.setMobile("0744608535");
+        employee.setWorkId("UDSM2013-00031");
+        employee.setDepartment(departmentCreated);
+        String employeeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+
+        assertThat(employeeURL, notNullValue());
+        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
+        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
+
+        // Check created employee
+        EmployeeDto employeeSaved = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Japhet no dept"),
+                        containsString("Sebastian no dept"),
+                        containsString("japhet.dept@gmail.com"),
+                        containsString("0744608535"),
+                        containsString("UDSM2013-00031")
+                )
+                .extract().as(EmployeeDto.class);
+
+        assertThat(employeeSaved, is(notNullValue()));
+        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
+
+
+        // fails to update department dont exists
+        employee.setEmployeeId(employeeSaved.getEmployeeId());
+        employee.getDepartment().setDepartmentName(UUID.randomUUID().toString());
+        ErrorResponse errorResponse = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .body(employee).put(employee.getEmployeeId())
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
+        assertThat(errorResponse.getErrors(),
+                contains(new ErrorResponse.ErrorMessage("Could not find department for associated employee"))
+        );
+    }
+
+    @Test
+    void updateFailsEmployeeNotFound() {
+        // add employee
+        final EmployeeDto employee = createEmployee();
+        employee.setEmployeeId(UUID.randomUUID().toString());
+        employee.setFirstName("Japhet not found");
+        employee.setLastName("Sebastian not found");
+        employee.setEmail("japhet.mismatch@gmail.com");
+        employee.setMobile("0744608525");
+        employee.setWorkId("UDSM2013-00013");
+
+        ErrorResponse errorResponse = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .contentType(ContentType.JSON)
+                .body(employee).put(employee.getEmployeeId())
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
+        assertThat(errorResponse.getErrors(),
+                contains(new ErrorResponse.ErrorMessage(String.format("No employee found for employeeId[%s]", employee.getEmployeeId())))
+        );
+    }
+
+    @Test
+    void deleteEmployeeFailsNotFound() {
+        String employeeUUID = UUID.randomUUID().toString();
+        ErrorResponse errorResponse = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().delete(employeeUUID)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
+        assertThat(errorResponse.getErrors(),
+                contains(new ErrorResponse.ErrorMessage(String.format("No employee found for employeeId[%s]", employeeUUID)))
+        );
+    }
+
+    @Test
+    void deleteEmployee() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+        // create college
+        final CollegeDto collegeBody = createCollege();
+        collegeBody.setCollegeName("Employee deleted");
+        collegeBody.setCollegeCode("DELETED");
+        String collegeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(collegeBody).post(college)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(collegeURL, notNullValue());
+        String collegeUUID = collegeURL.substring(collegeURL.lastIndexOf("/") + 1);
+        assertThat(collegeUUID, matchesRegex(UUID_REGEX));
+
+        // get created college
+        CollegeDto collegeCreated = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(college + "/{collegeId}", collegeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .extract().as(CollegeDto.class);
+
+        // create department
+        final DepartmentDto departmentBody = createDepartment();
+        departmentBody.setDepartmentName("Employee deleted");
+        departmentBody.setCollege(collegeCreated);
+        String departmentURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(departmentBody).post(department)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(departmentURL, notNullValue());
+        String departmentUUID = departmentURL.substring(departmentURL.lastIndexOf("/") + 1);
+        assertThat(departmentUUID, matchesRegex(UUID_REGEX));
+
+        // Get the created department
+        DepartmentDto departmentCreated = given()
+                .header(ACCEPT, APPLICATION_JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(department + "/{departmentId}", departmentUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("departmentId", is(equalTo(departmentUUID)))
+                .extract().as(DepartmentDto.class);
+
+        // add employee
+        final EmployeeDto employee = createEmployee();
+        employee.setFirstName("Japhet deleted");
+        employee.setLastName("Sebastian deleted");
+        employee.setEmail("japhet.deleted@gmail.com");
+        employee.setMobile("0744608533");
+        employee.setWorkId("UDSM2013-00077");
+        employee.setDepartment(departmentCreated);
+        String employeeURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(employee).post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(employeeURL, notNullValue());
+        String employeeUUID = employeeURL.substring(employeeURL.lastIndexOf("/") + 1);
+        assertThat(employeeUUID, matchesRegex(UUID_REGEX));
+
+        // Check created employee
+        EmployeeDto employeeSaved = given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(
+                        containsString("Japhet deleted"),
+                        containsString("Sebastian deleted"),
+                        containsString("japhet.deleted@gmail.com"),
+                        containsString("0744608533"),
+                        containsString("UDSM2013-00077")
+                )
+                .extract().as(EmployeeDto.class);
+
+        assertThat(employeeSaved, is(notNullValue()));
+        assertThat(employeeSaved.getEmployeeId(), equalTo(employeeUUID));
+
+        // delete employee
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().delete(employeeUUID)
+                .then()
+                .statusCode(NO_CONTENT.getStatusCode());
+
+        // confirm deletion
+        given()
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .when().get(employeeUUID)
+                .then()
+                .statusCode(NOT_FOUND.getStatusCode());
+    }
+
+
+    // might be a list of objects or just an object
     private TypeRef<List<EmployeeDto>> employeesReportTypeRef() {
         return new TypeRef<>() {
         };
     }
 
-//    private TypeRef<EmployeeDto> getEmployeeTypeRef() {
-//        return new TypeRef<EmployeeDto>() {
-//        };
-//    }
 
     private EmployeeDto createEmployee() {
         final AddressDto addressDto = new AddressDto();

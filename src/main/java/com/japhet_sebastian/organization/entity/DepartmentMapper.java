@@ -27,7 +27,7 @@ public interface DepartmentMapper {
         CollegeEntity college = departmentEntity.getCollege();
 
         if (Objects.nonNull(college) && Objects.nonNull(college.getAddress()) && Objects.nonNull(college.getAddress().getAddressId())) {
-        departmentDto.setCollegeName(college.getCollegeName() + " " + "(" + college.getCollegeCode() + ")");
+            departmentDto.setCollegeName(college.getCollegeName() + " " + "(" + college.getCollegeCode() + ")");
             departmentDto.setAddress(college.getAddress().street + " " + college.getAddress().district + ", " + college.getAddress().city);
         }
     }

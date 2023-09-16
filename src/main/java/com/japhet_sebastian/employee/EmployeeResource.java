@@ -33,7 +33,7 @@ import static com.japhet_sebastian.employee.EmployeeResource.RESOURCE_PATH;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @SecurityRequirement(name = "Keycloak")
-@Tag(name = "Employee Endpoint", description = "Employees management operations")
+@Tag(name = "Employee Endpoint", description = "Employees related operations")
 public class EmployeeResource extends AbstractEmployeeType {
 
     public static final String RESOURCE_PATH = "/employees";
@@ -45,10 +45,10 @@ public class EmployeeResource extends AbstractEmployeeType {
     EmployeeService employeeService;
 
     @GET
-    @Operation(summary = "Get all available employees")
+    @Operation(summary = "Get all employees")
     @APIResponse(
             responseCode = "200",
-            description = "Lists all the employees",
+            description = "Lists employees",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = EmployeeDto.class, type = SchemaType.ARRAY)))
@@ -75,11 +75,11 @@ public class EmployeeResource extends AbstractEmployeeType {
 
     @GET
     @Path("/{employeeId}")
-    @Operation(summary = "Get employee for a given identifier")
+    @Operation(summary = "Get employee by employeeId")
     @APIResponses({
             @APIResponse(
                     responseCode = "200",
-                    description = "Get a found employee object",
+                    description = "Get employee",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON,
                             schema = @Schema(implementation = EmployeeDto.class, type = SchemaType.OBJECT))),
@@ -98,10 +98,10 @@ public class EmployeeResource extends AbstractEmployeeType {
 
     @GET
     @Path("/select")
-    @Operation(summary = "Get all selection options projection of the employee")
+    @Operation(summary = "Get all projection of the employee")
     @APIResponse(
             responseCode = "200",
-            description = "ID and first name for all employees available",
+            description = "ID and first name for all employees",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY))
@@ -111,7 +111,7 @@ public class EmployeeResource extends AbstractEmployeeType {
     }
 
     @POST
-    @Operation(summary = "Creates valid employee")
+    @Operation(summary = "Creates employee")
     @APIResponses({
             @APIResponse(
                     responseCode = "201",
@@ -138,7 +138,7 @@ public class EmployeeResource extends AbstractEmployeeType {
 
     @PUT
     @Path("/{employeeId}")
-    @Operation(summary = "Updates existing employee")
+    @Operation(summary = "Updates employee")
     @APIResponses({
             @APIResponse(
                     responseCode = "204",
