@@ -26,8 +26,8 @@ public interface DepartmentMapper {
     default void toString(DepartmentEntity departmentEntity, @MappingTarget DepartmentDto departmentDto) {
         CollegeEntity college = departmentEntity.getCollege();
 
+        if (Objects.nonNull(college) && Objects.nonNull(college.getAddress()) && Objects.nonNull(college.getAddress().getAddressId())) {
         departmentDto.setCollegeName(college.getCollegeName() + " " + "(" + college.getCollegeCode() + ")");
-        if (Objects.nonNull(college.getAddress()) && Objects.nonNull(college.getAddress().getAddressId())) {
             departmentDto.setAddress(college.getAddress().street + " " + college.getAddress().district + ", " + college.getAddress().city);
         }
     }

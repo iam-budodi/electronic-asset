@@ -60,8 +60,6 @@ public class EmployeeService implements EmployeeInterface {
                 });
 
         EmployeeEntity employeeEntity = employeeMapper.toEntity(employeeDto);
-        addressRepository.persist(employeeEntity.getAddress());
-        employeeEntity.setDepartment(departmentEntity);
         employeeRepository.persist(employeeEntity);
         this.employeeMapper.partialDtoUpdate(employeeEntity, employeeDto);
     }
@@ -70,9 +68,10 @@ public class EmployeeService implements EmployeeInterface {
         EmployeeEntity employeeEntity = checkEmployee(employeeDto.employeeId);
         DepartmentEntity departmentEntity = getDepartment(employeeDto);
         employeeEntity = employeeMapper.partialUpdate(employeeDto, employeeEntity);
-        employeeEntity.getAddress().setAddressId(employeeEntity.getEmployeeId());
-        employeeEntity.getDepartment().setDepartmentId(departmentEntity.getDepartmentId());
-        addressRepository.persist(employeeEntity.getAddress());
+//        employeeEntity.getAddress().setAddressId(employeeEntity.getEmployeeId());
+//        employeeEntity.getDepartment().setDepartmentId(departmentEntity.getDepartmentId());
+//        employeeEntity.setDepartment(departmentEntity);
+//        addressRepository.persist(employeeEntity.getAddress());
         employeeRepository.persist(employeeEntity);
         employeeMapper.partialDtoUpdate(employeeEntity, employeeDto);
     }
