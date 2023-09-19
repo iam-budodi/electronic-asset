@@ -63,7 +63,7 @@ public class SupplierEntity extends BaseEntity {
     private SupplierType supplierType;
 
     @Pattern(regexp = "^[\\p{L} .'-?!;,]+$", message = "{String.special.character}")
-    @Column(length = 500, nullable = false)
+    @Column(length = 500, nullable = true)
     private String description;
 
     @ToString.Exclude

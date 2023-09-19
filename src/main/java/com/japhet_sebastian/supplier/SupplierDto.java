@@ -15,16 +15,6 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SupplierDto implements Serializable {
 
-    @Pattern(message = "{String.special.character}", regexp = "^[\\p{L} .'-]+$")
-    String registeredBy;
-
-    String registeredAt;
-
-    @Pattern(message = "{String.special.character}", regexp = "^[\\p{L} .'-]+$")
-    String updatedBy;
-
-    String updatedAt;
-
     String supplierId;
 
     @Size(message = "{Sixty-four.string.length}", min = 2, max = 64)
@@ -41,16 +31,27 @@ public class SupplierDto implements Serializable {
     @NotEmpty(message = "{Phone.number.required}")
     String companyPhone;
 
-    String website;
-
     @NotNull(message = "{Supplier.category.required}")
     SupplierType supplierType;
+
+    String website;
 
     @Pattern(message = "{String.special.character}", regexp = "^[\\p{L} .'-?!;,]+$")
     String description;
 
-    @NotNull(message = "{Address.field.required}")
+//    @NotNull(message = "{Address.field.required}")
     AddressDto address;
 
     String supplierAddress;
+
+    @Pattern(message = "{String.special.character}", regexp = "^[\\p{L} .'-]+$")
+    String registeredBy;
+
+    String registeredAt;
+
+    @Pattern(message = "{String.special.character}", regexp = "^[\\p{L} .'-]+$")
+    String updatedBy;
+
+    String updatedAt;
+
 }

@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @ApplicationScoped
@@ -43,32 +44,29 @@ public class SupplierService implements SupplierInterface {
     public void saveSupplier(@Valid SupplierDto supplierDto) {
         supplierRepository.searchByEmailOrPhone(supplierDto.companyEmail, supplierDto.companyPhone)
                 .ifPresent(employeeEntity -> {
-                    throw new ServiceException("Email/phone number is taken");
+                    throw new ServiceException("Email or phone number is taken");
                 });
 
         SupplierEntity supplierEntity = supplierMapper.toSupplierEntity(supplierDto);
-        addressRepository.persist(supplierEntity.getAddress());
         supplierRepository.persist(supplierEntity);
         supplierMapper.partialDtoUpdate(supplierEntity, supplierDto);
     }
 
     public void updateSupplier(@Valid SupplierDto supplierDto) {
-        SupplierEntity supplierEntity = checkSupplier(supplierDto.supplierId);
+        if (Objects.isNull(supplierDto.address)) throw new ServiceException("Address is missing");
+        SupplierEntity supplierEntity = getSupplierEntity(supplierDto.supplierId);
         supplierEntity = supplierMapper.partialEntityUpdate(supplierDto, supplierEntity);
-        supplierEntity.getAddress().setAddressId(supplierEntity.getSupplierId());
-        addressRepository.persist(supplierEntity.getAddress());
         supplierRepository.persist(supplierEntity);
         supplierMapper.partialDtoUpdate(supplierEntity, supplierDto);
     }
 
     public void deleteSupplier(@NotNull String supplierId) {
-        SupplierEntity supplierEntity = checkSupplier(supplierId);
-        AddressEntity addressEntity = supplierEntity.getAddress();
-        supplierRepository.delete(supplierEntity);
+        AddressEntity addressEntity = getSupplierEntity(supplierId).getAddress();
+        supplierRepository.delete(getSupplierEntity(supplierId));
         addressRepository.delete(addressEntity);
     }
 
-    private SupplierEntity checkSupplier(String supplierId) {
+    private SupplierEntity getSupplierEntity(String supplierId) {
         return supplierRepository.findSupplier(supplierId)
                 .orElseThrow(() -> new ServiceException("No supplier found for supplierId[%s]", supplierId));
     }

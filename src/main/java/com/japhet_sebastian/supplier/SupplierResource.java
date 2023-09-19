@@ -42,10 +42,10 @@ public class SupplierResource extends AbstractSupplierType {
     SecurityContext keycloakSecurityContext;
 
     @GET
-    @Operation(summary = "Get all available suppliers")
+    @Operation(summary = "Get all suppliers")
     @APIResponse(
             responseCode = "200",
-            description = "Lists all the suppliers",
+            description = "Lists all suppliers",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = SupplierDto.class, type = SchemaType.ARRAY)))
@@ -56,8 +56,22 @@ public class SupplierResource extends AbstractSupplierType {
     }
 
     @GET
+    @Path("/select")
+    @Transactional(Transactional.TxType.SUPPORTS)
+    @Operation(summary = "Get selection options projection of the suppliers")
+    @APIResponse(
+            responseCode = "200",
+            description = "Get key value pair representation",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY)))
+    public Response supplierSelectOptions() {
+        return Response.ok(supplierService.selectOptions()).build();
+    }
+
+    @GET
     @Path("/{supplierId}")
-    @Operation(summary = "Get supplier for a given identifier")
+    @Operation(summary = "Get supplier by supplierId")
     @APIResponses({
             @APIResponse(
                     responseCode = "200",
@@ -74,20 +88,6 @@ public class SupplierResource extends AbstractSupplierType {
         return supplierService.findSupplier(supplierId)
                 .map(supplier -> Response.ok(supplier).build())
                 .orElseGet(() -> Response.status(Response.Status.NOT_FOUND).build());
-    }
-
-    @GET
-    @Path("/select")
-    @Transactional(Transactional.TxType.SUPPORTS)
-    @Operation(summary = "Get all selection options projection of the suppliers")
-    @APIResponse(
-            responseCode = "200",
-            description = "Get key value pair representation",
-            content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY)))
-    public Response supplierSelectOptions() {
-        return Response.ok(supplierService.selectOptions()).build();
     }
 
     @POST
@@ -134,7 +134,7 @@ public class SupplierResource extends AbstractSupplierType {
                             schema = @Schema(implementation = ErrorResponse.class))),
             @APIResponse(
                     responseCode = "400",
-                    description = "Supplier object does not have supplierId",
+                    description = "Supplier does not have supplierId",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON,
                             schema = @Schema(implementation = ErrorResponse.class))),
@@ -148,15 +148,15 @@ public class SupplierResource extends AbstractSupplierType {
     public Response updateSupplier(
             @Parameter(description = "supplierId", required = true) @PathParam("supplierId") @NotNull String supplierId,
             @RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
-                    schema = @Schema(implementation = SupplierDto.class))) @Valid SupplierDto supplierDto) {
-        if (Objects.isNull(supplierDto.supplierId) || supplierDto.supplierId.isEmpty())
-            throw new ServiceException("Supplier object does not have supplierId");
+                    schema = @Schema(implementation = SupplierDto.class))) @Valid SupplierDto supplier) {
+        if (Objects.isNull(supplier.supplierId) || supplier.supplierId.isEmpty())
+            throw new ServiceException("Supplier does not have supplierId");
 
-        if (!Objects.equals(supplierId, supplierDto.supplierId))
-            throw new ServiceException("path variable supplierId does not match Supplier.SupplierId");
+        if (!Objects.equals(supplierId, supplier.supplierId))
+            throw new ServiceException("path variable supplierId does not match Supplier.supplierId");
 
-        supplierDto.setUpdatedBy(keycloakSecurityContext.getUserPrincipal().getName());
-        supplierService.updateSupplier(supplierDto);
+        supplier.setUpdatedBy(keycloakSecurityContext.getUserPrincipal().getName());
+        supplierService.updateSupplier(supplier);
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 

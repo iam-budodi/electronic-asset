@@ -74,9 +74,8 @@ public class EmployeeService implements EmployeeInterface {
     }
 
     public void deleteEmployee(@NotNull String employeeId) {
-        EmployeeEntity employeeEntity = getEmployeeEntity(employeeId);
-        AddressEntity addressEntity = employeeEntity.getAddress();
-        this.employeeRepository.delete(employeeEntity);
+        AddressEntity addressEntity = getEmployeeEntity(employeeId).getAddress();
+        this.employeeRepository.delete(getEmployeeEntity(employeeId));
         this.addressRepository.delete(addressEntity);
     }
 

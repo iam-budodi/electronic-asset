@@ -1310,7 +1310,7 @@ class EmployeeResourceTest extends AccessTokenProvider {
 
 
         // fail to update employee with null ID
-        employee.setEmployeeId(RandomStringUtils.randomAlphabetic(15));
+        employee.setEmployeeId(UUID.randomUUID().toString());
         ErrorResponse errorResponse = given()
                 .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
                 .contentType(ContentType.JSON)
@@ -1629,7 +1629,7 @@ class EmployeeResourceTest extends AccessTokenProvider {
         address.setCity("Dar es salaam");
         address.setCountry("Tanzania");
 
-        CollegeDto college = new CollegeDto();
+        final CollegeDto college = new CollegeDto();
         college.setCollegeName("College of Humanity");
         college.setCollegeCode("CoHu");
         college.setAddress(address);

@@ -11,7 +11,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.jboss.logging.Logger;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,8 +27,6 @@ public class CollegeService implements CollegeInterface {
     @Inject
     CollegeMapper collegeMapper;
 
-    @Inject
-    Logger LOGGER;
 
     public List<CollegeDto> listColleges(OrgPage orgPage) {
         List<CollegeEntity> collegeEntities = collegeRepository.allColleges(orgPage).list();
@@ -55,28 +52,24 @@ public class CollegeService implements CollegeInterface {
                 });
 
         CollegeEntity collegeEntity = collegeMapper.toEntity(collegeDto);
-        addressRepository.persist(collegeEntity.getAddress());
         collegeRepository.persist(collegeEntity);
         collegeMapper.partialDtoUpdate(collegeEntity, collegeDto);
     }
 
     public void updateCollege(@Valid CollegeDto collegeDto) {
-        CollegeEntity collegeEntity = checkCollege(collegeDto.getCollegeId());
+        CollegeEntity collegeEntity = getCollegeEntity(collegeDto.getCollegeId());
         collegeEntity = collegeMapper.partialEntityUpdate(collegeDto, collegeEntity);
-        collegeEntity.getAddress().setAddressId(collegeEntity.getCollegeId());
-        addressRepository.persist(collegeEntity.getAddress());
         collegeRepository.persist(collegeEntity);
         collegeMapper.partialDtoUpdate(collegeEntity, collegeDto);
     }
 
     public void deleteCollege(@NotNull String collegeId) {
-        CollegeEntity collegeEntity = checkCollege(collegeId);
-        AddressEntity addressEntity = collegeEntity.getAddress();
-        collegeRepository.delete(collegeEntity);
+        AddressEntity addressEntity = getCollegeEntity(collegeId).getAddress();
+        collegeRepository.delete(getCollegeEntity(collegeId));
         addressRepository.delete(addressEntity);
     }
 
-    private CollegeEntity checkCollege(String supplierId) {
+    private CollegeEntity getCollegeEntity(String supplierId) {
         return collegeRepository.singleCollege(supplierId)
                 .orElseThrow(() -> new ServiceException("No college found for collegeId[%s]", supplierId));
     }
