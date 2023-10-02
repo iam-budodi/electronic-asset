@@ -1,4 +1,4 @@
-package com.japhet_sebastian.supplier;
+package com.japhet_sebastian.procurement.supplier;
 
 import com.japhet_sebastian.vo.SelectOptions;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;

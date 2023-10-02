@@ -1,5 +1,6 @@
-package com.japhet_sebastian.supplier;
+package com.japhet_sebastian.procurement.supplier;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.japhet_sebastian.organization.entity.AddressDto;
 import jakarta.validation.constraints.*;
@@ -13,6 +14,7 @@ import java.io.Serializable;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SupplierDto implements Serializable {
 
     String supplierId;
@@ -39,7 +41,7 @@ public class SupplierDto implements Serializable {
     @Pattern(message = "{String.special.character}", regexp = "^[\\p{L} .'-?!;,]+$")
     String description;
 
-//    @NotNull(message = "{Address.field.required}")
+    //    @NotNull(message = "{Address.field.required}")
     AddressDto address;
 
     String supplierAddress;

@@ -1,7 +1,8 @@
-package com.japhet_sebastian.supplier;
+package com.japhet_sebastian.procurement.supplier;
 
 import com.japhet_sebastian.exception.ErrorResponse;
 import com.japhet_sebastian.exception.ServiceException;
+import com.japhet_sebastian.vo.AbstractGenericType;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -23,7 +24,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import java.net.URI;
 import java.util.Objects;
 
-import static com.japhet_sebastian.supplier.SupplierResource.RESOURCE_PATH;
+import static com.japhet_sebastian.procurement.supplier.SupplierResource.RESOURCE_PATH;
 
 @Path(RESOURCE_PATH)
 @Transactional
@@ -31,7 +32,7 @@ import static com.japhet_sebastian.supplier.SupplierResource.RESOURCE_PATH;
 @Consumes(MediaType.APPLICATION_JSON)
 @SecurityRequirement(name = "Keycloak")
 @Tag(name = "Supplier Endpoint", description = "Supplier related operation")
-public class SupplierResource extends AbstractSupplierType {
+public class SupplierResource extends AbstractGenericType {
 
     public static final String RESOURCE_PATH = "/suppliers";
 

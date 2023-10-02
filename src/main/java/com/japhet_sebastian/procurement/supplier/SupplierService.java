@@ -1,4 +1,4 @@
-package com.japhet_sebastian.supplier;
+package com.japhet_sebastian.procurement.supplier;
 
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.control.AddressRepository;

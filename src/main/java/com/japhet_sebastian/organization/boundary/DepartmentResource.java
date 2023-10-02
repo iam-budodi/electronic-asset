@@ -3,6 +3,7 @@ package com.japhet_sebastian.organization.boundary;
 import com.japhet_sebastian.exception.ServiceException;
 import com.japhet_sebastian.organization.control.DepartmentService;
 import com.japhet_sebastian.organization.entity.DepartmentDto;
+import com.japhet_sebastian.vo.AbstractGenericType;
 import com.japhet_sebastian.vo.SelectOptions;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -35,7 +36,7 @@ import static com.japhet_sebastian.organization.boundary.DepartmentResource.RESO
 @Produces(MediaType.APPLICATION_JSON)
 @SecurityRequirement(name = "Keycloak")
 @Tag(name = "Department Endpoint", description = "Department operations")
-public class DepartmentResource extends AbstractDepartmentType {
+public class DepartmentResource extends AbstractGenericType {
 
     public static final String RESOURCE_PATH = "/departments";
 

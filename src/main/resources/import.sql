@@ -182,10 +182,14 @@ VALUES ('71f2f7cd-85c0-4bfd-ab3a-9326f706ceb2', '2020-09-12', 'Habiba',
 -- VALUES (504, 'scanner', 'scanner');
 --
 -- -- PURCHASE TABLE - five perchase max
--- insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
--- VALUES (550, 'RPC4-123456', '2022-09-12', 35000000, 15, 300);
--- insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
--- VALUES (551, 'RPC4-987654', '2022-09-12', 55000000, 16, 301);
+insert into purchases (purchase_uuid, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity,
+                       supplier_uuid)
+VALUES ('05bf69a2-5981-11ee-8c99-0242ac120002', 'RPC4-123456', '2022-09-12', 35000000, 15,
+        '71f2f7cd-85c0-4bfd-ab3a-9326f706ceb2');
+insert into purchases (purchase_uuid, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity,
+                       supplier_uuid)
+VALUES ('05bf7154-5981-11ee-8c99-0242ac120002', 'RPC4-987654', '2022-09-12', 55000000, 16,
+        '71f2f7cd-85c0-4bfd-ab3a-9326f706ceb2');
 -- insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)
 -- VALUES (552, 'JPC4-123456', '2023-10-12', 40000000, 15, 302);
 -- insert into purchases (id, purchase_invoice_number, purchase_date, purchase_price, purchase_quantity, supplier_fk)

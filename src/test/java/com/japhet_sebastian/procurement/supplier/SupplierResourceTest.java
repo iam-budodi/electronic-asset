@@ -1,9 +1,12 @@
-package com.japhet_sebastian.supplier;
+package com.japhet_sebastian.procurement.supplier;
 
 import com.japhet_sebastian.AccessTokenProvider;
 import com.japhet_sebastian.KeycloakResource;
 import com.japhet_sebastian.exception.ErrorResponse;
 import com.japhet_sebastian.organization.entity.AddressDto;
+import com.japhet_sebastian.procurement.supplier.SupplierDto;
+import com.japhet_sebastian.procurement.supplier.SupplierResource;
+import com.japhet_sebastian.procurement.supplier.SupplierType;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
@@ -18,7 +21,6 @@ import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static jakarta.ws.rs.core.Response.Status.*;
-import static jakarta.ws.rs.core.Response.Status.CREATED;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -110,10 +112,10 @@ class SupplierResourceTest extends AccessTokenProvider {
 
 
         assertThat(foundSupplier, is(notNullValue()));
-        assertThat(foundSupplier.registeredAt, is(notNullValue()));
-        assertThat(foundSupplier.updatedAt, is(notNullValue()));
-        assertThat(foundSupplier.registeredBy, is(equalTo("lulu.shaban")));
-        assertThat(foundSupplier.updatedBy, is(nullValue()));
+        assertThat(foundSupplier.getRegisteredAt(), is(notNullValue()));
+        assertThat(foundSupplier.getUpdatedAt(), is(notNullValue()));
+        assertThat(foundSupplier.getRegisteredBy(), is(equalTo("lulu.shaban")));
+        assertThat(foundSupplier.getUpdatedBy(), is(nullValue()));
     }
 
     @Test
@@ -164,10 +166,10 @@ class SupplierResourceTest extends AccessTokenProvider {
 
 
         assertThat(foundSupplier, is(notNullValue()));
-        assertThat(foundSupplier.registeredAt, is(notNullValue()));
-        assertThat(foundSupplier.updatedAt, is(notNullValue()));
-        assertThat(foundSupplier.registeredBy, is(equalTo("lulu.shaban")));
-        assertThat(foundSupplier.updatedBy, is(nullValue()));
+        assertThat(foundSupplier.getRegisteredAt(), is(notNullValue()));
+        assertThat(foundSupplier.getUpdatedAt(), is(notNullValue()));
+        assertThat(foundSupplier.getRegisteredBy(), is(equalTo("lulu.shaban")));
+        assertThat(foundSupplier.getUpdatedBy(), is(nullValue()));
     }
 
     @Test
@@ -213,7 +215,7 @@ class SupplierResourceTest extends AccessTokenProvider {
         assertThat(errorResponse.getErrorId(), is(nullValue()));
         assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
         assertThat(errorResponse.getErrors(), contains(
-                new ErrorResponse.ErrorMessage("Email or phone number is taken")
+                        new ErrorResponse.ErrorMessage("Email or phone number is taken")
                 )
         );
     }
@@ -238,7 +240,7 @@ class SupplierResourceTest extends AccessTokenProvider {
         assertThat(errorResponse.getErrorId(), both(matchesRegex(UUID_REGEX)).and(notNullValue()));
         assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
         assertThat(errorResponse.getErrors(), contains(
-                new ErrorResponse.ErrorMessage(getErrorMessage("System.error"))
+                        new ErrorResponse.ErrorMessage(getErrorMessage("System.error"))
                 )
         );
     }
@@ -279,13 +281,13 @@ class SupplierResourceTest extends AccessTokenProvider {
                 .extract().as(SupplierDto.class);
 
         assertThat(foundSupplier, is(notNullValue()));
-        assertThat(foundSupplier.registeredAt, is(notNullValue()));
-        assertThat(foundSupplier.updatedAt, is(notNullValue()));
-        assertThat(foundSupplier.registeredBy, is(equalTo("lulu.shaban")));
-        assertThat(foundSupplier.updatedBy, is(nullValue()));
+        assertThat(foundSupplier.getRegisteredAt(), is(notNullValue()));
+        assertThat(foundSupplier.getUpdatedAt(), is(notNullValue()));
+        assertThat(foundSupplier.getRegisteredBy(), is(equalTo("lulu.shaban")));
+        assertThat(foundSupplier.getUpdatedBy(), is(nullValue()));
 
         // update supplier
-        supplier.setSupplierId(foundSupplier.supplierId);
+        supplier.setSupplierId(foundSupplier.getSupplierId());
         supplier.setCompanyName("Supplier updated");
         supplier.setCompanyPhone("255744608515");
         supplier.setCompanyEmail("customercare@updated.com");
@@ -311,10 +313,10 @@ class SupplierResourceTest extends AccessTokenProvider {
                 .extract().as(SupplierDto.class);
 
         assertThat(updatedSupplier, is(notNullValue()));
-        assertThat(updatedSupplier.registeredAt, is(notNullValue()));
-        assertThat(updatedSupplier.updatedAt, is(notNullValue()));
-        assertThat(updatedSupplier.registeredBy, is(equalTo("lulu.shaban")));
-        assertThat(updatedSupplier.updatedBy, allOf(is(not(nullValue())), is(equalTo("habiba.baanda"))));
+        assertThat(updatedSupplier.getRegisteredAt(), is(notNullValue()));
+        assertThat(updatedSupplier.getUpdatedAt(), is(notNullValue()));
+        assertThat(updatedSupplier.getRegisteredBy(), is(equalTo("lulu.shaban")));
+        assertThat(updatedSupplier.getUpdatedBy(), allOf(is(not(nullValue())), is(equalTo("habiba.baanda"))));
     }
 
     @Test
@@ -353,17 +355,17 @@ class SupplierResourceTest extends AccessTokenProvider {
                 .extract().as(SupplierDto.class);
 
         assertThat(foundSupplier, is(notNullValue()));
-        assertThat(foundSupplier.registeredAt, is(notNullValue()));
-        assertThat(foundSupplier.updatedAt, is(notNullValue()));
-        assertThat(foundSupplier.registeredBy, is(equalTo("lulu.shaban")));
-        assertThat(foundSupplier.updatedBy, is(nullValue()));
+        assertThat(foundSupplier.getRegisteredAt(), is(notNullValue()));
+        assertThat(foundSupplier.getUpdatedAt(), is(notNullValue()));
+        assertThat(foundSupplier.getRegisteredBy(), is(equalTo("lulu.shaban")));
+        assertThat(foundSupplier.getUpdatedBy(), is(nullValue()));
 
         // update supplier address
         AddressDto address = new AddressDto();
         address.setStreet("Chaburuma street");
         address.setDistrict("Kinondoni");
         address.setPostalCode("16772");
-        supplier.setSupplierId(foundSupplier.supplierId);
+        supplier.setSupplierId(foundSupplier.getSupplierId());
         supplier.setAddress(address);
         given()
                 .contentType(ContentType.JSON)
@@ -385,10 +387,10 @@ class SupplierResourceTest extends AccessTokenProvider {
                 .extract().as(SupplierDto.class);
 
         assertThat(updatedSupplier, is(notNullValue()));
-        assertThat(updatedSupplier.registeredAt, is(notNullValue()));
-        assertThat(updatedSupplier.updatedAt, is(notNullValue()));
-        assertThat(updatedSupplier.registeredBy, is(equalTo("lulu.shaban")));
-        assertThat(updatedSupplier.updatedBy, allOf(is(not(nullValue())), is(equalTo("habiba.baanda"))));
+        assertThat(updatedSupplier.getRegisteredAt(), is(notNullValue()));
+        assertThat(updatedSupplier.getUpdatedAt(), is(notNullValue()));
+        assertThat(updatedSupplier.getRegisteredBy(), is(equalTo("lulu.shaban")));
+        assertThat(updatedSupplier.getUpdatedBy(), allOf(is(not(nullValue())), is(equalTo("habiba.baanda"))));
     }
 
     @Test
@@ -427,17 +429,17 @@ class SupplierResourceTest extends AccessTokenProvider {
                 .extract().as(SupplierDto.class);
 
         assertThat(foundSupplier, is(notNullValue()));
-        assertThat(foundSupplier.registeredAt, is(notNullValue()));
-        assertThat(foundSupplier.updatedAt, is(notNullValue()));
-        assertThat(foundSupplier.registeredBy, is(equalTo("lulu.shaban")));
-        assertThat(foundSupplier.updatedBy, is(nullValue()));
+        assertThat(foundSupplier.getRegisteredAt(), is(notNullValue()));
+        assertThat(foundSupplier.getUpdatedAt(), is(notNullValue()));
+        assertThat(foundSupplier.getRegisteredBy(), is(equalTo("lulu.shaban")));
+        assertThat(foundSupplier.getUpdatedBy(), is(nullValue()));
 
         // update supplier address
         AddressDto address = new AddressDto();
         address.setStreet("Chaburuma updated");
         address.setDistrict("Kinondoni");
         address.setPostalCode("16772");
-        supplier.setSupplierId(foundSupplier.supplierId);
+        supplier.setSupplierId(foundSupplier.getSupplierId());
         supplier.setAddress(address);
         given()
                 .contentType(ContentType.JSON)
@@ -459,10 +461,10 @@ class SupplierResourceTest extends AccessTokenProvider {
                 .extract().as(SupplierDto.class);
 
         assertThat(updatedSupplier, is(notNullValue()));
-        assertThat(updatedSupplier.registeredAt, is(notNullValue()));
-        assertThat(updatedSupplier.updatedAt, is(notNullValue()));
-        assertThat(updatedSupplier.registeredBy, is(equalTo("lulu.shaban")));
-        assertThat(updatedSupplier.updatedBy, allOf(is(not(nullValue())), is(equalTo("habiba.baanda"))));
+        assertThat(updatedSupplier.getRegisteredAt(), is(notNullValue()));
+        assertThat(updatedSupplier.getUpdatedAt(), is(notNullValue()));
+        assertThat(updatedSupplier.getRegisteredBy(), is(equalTo("lulu.shaban")));
+        assertThat(updatedSupplier.getUpdatedBy(), allOf(is(not(nullValue())), is(equalTo("habiba.baanda"))));
     }
 
     @Test
@@ -501,10 +503,10 @@ class SupplierResourceTest extends AccessTokenProvider {
                 .extract().as(SupplierDto.class);
 
         assertThat(foundSupplier, is(notNullValue()));
-        assertThat(foundSupplier.registeredAt, is(notNullValue()));
-        assertThat(foundSupplier.updatedAt, is(notNullValue()));
-        assertThat(foundSupplier.registeredBy, is(equalTo("lulu.shaban")));
-        assertThat(foundSupplier.updatedBy, is(nullValue()));
+        assertThat(foundSupplier.getRegisteredAt(), is(notNullValue()));
+        assertThat(foundSupplier.getUpdatedAt(), is(notNullValue()));
+        assertThat(foundSupplier.getRegisteredBy(), is(equalTo("lulu.shaban")));
+        assertThat(foundSupplier.getUpdatedBy(), is(nullValue()));
 
         // update supplier address
         supplier.setSupplierId(null);
@@ -560,10 +562,10 @@ class SupplierResourceTest extends AccessTokenProvider {
                 .extract().as(SupplierDto.class);
 
         assertThat(foundSupplier, is(notNullValue()));
-        assertThat(foundSupplier.registeredAt, is(notNullValue()));
-        assertThat(foundSupplier.updatedAt, is(notNullValue()));
-        assertThat(foundSupplier.registeredBy, is(equalTo("lulu.shaban")));
-        assertThat(foundSupplier.updatedBy, is(nullValue()));
+        assertThat(foundSupplier.getRegisteredAt(), is(notNullValue()));
+        assertThat(foundSupplier.getUpdatedAt(), is(notNullValue()));
+        assertThat(foundSupplier.getRegisteredBy(), is(equalTo("lulu.shaban")));
+        assertThat(foundSupplier.getUpdatedBy(), is(nullValue()));
 
         // update supplier address
         supplier.setSupplierId("");
@@ -619,10 +621,10 @@ class SupplierResourceTest extends AccessTokenProvider {
                 .extract().as(SupplierDto.class);
 
         assertThat(foundSupplier, is(notNullValue()));
-        assertThat(foundSupplier.registeredAt, is(notNullValue()));
-        assertThat(foundSupplier.updatedAt, is(notNullValue()));
-        assertThat(foundSupplier.registeredBy, is(equalTo("lulu.shaban")));
-        assertThat(foundSupplier.updatedBy, is(nullValue()));
+        assertThat(foundSupplier.getRegisteredAt(), is(notNullValue()));
+        assertThat(foundSupplier.getUpdatedAt(), is(notNullValue()));
+        assertThat(foundSupplier.getRegisteredBy(), is(equalTo("lulu.shaban")));
+        assertThat(foundSupplier.getUpdatedBy(), is(nullValue()));
 
         // update supplier address
         supplier.setSupplierId(UUID.randomUUID().toString());
@@ -678,13 +680,13 @@ class SupplierResourceTest extends AccessTokenProvider {
                 .extract().as(SupplierDto.class);
 
         assertThat(foundSupplier, is(notNullValue()));
-        assertThat(foundSupplier.registeredAt, is(notNullValue()));
-        assertThat(foundSupplier.updatedAt, is(notNullValue()));
-        assertThat(foundSupplier.registeredBy, is(equalTo("lulu.shaban")));
-        assertThat(foundSupplier.updatedBy, is(nullValue()));
+        assertThat(foundSupplier.getRegisteredAt(), is(notNullValue()));
+        assertThat(foundSupplier.getUpdatedAt(), is(notNullValue()));
+        assertThat(foundSupplier.getRegisteredBy(), is(equalTo("lulu.shaban")));
+        assertThat(foundSupplier.getUpdatedBy(), is(nullValue()));
 
         // update supplier address
-        supplier.setSupplierId(foundSupplier.supplierId);
+        supplier.setSupplierId(foundSupplier.getSupplierId());
         supplier.setAddress(null);
         ErrorResponse errorResponse = given()
                 .contentType(ContentType.JSON)
@@ -737,13 +739,13 @@ class SupplierResourceTest extends AccessTokenProvider {
                 .extract().as(SupplierDto.class);
 
         assertThat(foundSupplier, is(notNullValue()));
-        assertThat(foundSupplier.registeredAt, is(notNullValue()));
-        assertThat(foundSupplier.updatedAt, is(notNullValue()));
-        assertThat(foundSupplier.registeredBy, is(equalTo("lulu.shaban")));
-        assertThat(foundSupplier.updatedBy, is(nullValue()));
+        assertThat(foundSupplier.getRegisteredAt(), is(notNullValue()));
+        assertThat(foundSupplier.getUpdatedAt(), is(notNullValue()));
+        assertThat(foundSupplier.getRegisteredBy(), is(equalTo("lulu.shaban")));
+        assertThat(foundSupplier.getUpdatedBy(), is(nullValue()));
 
         // update supplier address
-        supplier.setSupplierId(foundSupplier.supplierId);
+        supplier.setSupplierId(foundSupplier.getSupplierId());
         supplier.setCompanyName(null);
         ErrorResponse errorResponse = given()
                 .contentType(ContentType.JSON)
@@ -796,16 +798,16 @@ class SupplierResourceTest extends AccessTokenProvider {
                 .extract().as(SupplierDto.class);
 
         assertThat(foundSupplier, is(notNullValue()));
-        assertThat(foundSupplier.registeredAt, is(notNullValue()));
-        assertThat(foundSupplier.updatedAt, is(notNullValue()));
-        assertThat(foundSupplier.registeredBy, is(equalTo("lulu.shaban")));
-        assertThat(foundSupplier.updatedBy, is(nullValue()));
+        assertThat(foundSupplier.getRegisteredAt(), is(notNullValue()));
+        assertThat(foundSupplier.getUpdatedAt(), is(notNullValue()));
+        assertThat(foundSupplier.getRegisteredBy(), is(equalTo("lulu.shaban")));
+        assertThat(foundSupplier.getUpdatedBy(), is(nullValue()));
 
         // DELETE supplier
         given()
                 .contentType(ContentType.JSON)
                 .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
-                .when().delete(foundSupplier.supplierId)
+                .when().delete(foundSupplier.getSupplierId())
                 .then()
                 .statusCode(NO_CONTENT.getStatusCode());
 

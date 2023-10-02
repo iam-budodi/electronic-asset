@@ -1,6 +1,7 @@
 package com.japhet_sebastian.employee;
 
 import com.japhet_sebastian.exception.ServiceException;
+import com.japhet_sebastian.vo.AbstractGenericType;
 import com.japhet_sebastian.vo.SelectOptions;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
@@ -34,7 +35,7 @@ import static com.japhet_sebastian.employee.EmployeeResource.RESOURCE_PATH;
 @Produces(MediaType.APPLICATION_JSON)
 @SecurityRequirement(name = "Keycloak")
 @Tag(name = "Employee Endpoint", description = "Employees related operations")
-public class EmployeeResource extends AbstractEmployeeType {
+public class EmployeeResource extends AbstractGenericType {
 
     public static final String RESOURCE_PATH = "/employees";
 
@@ -53,8 +54,8 @@ public class EmployeeResource extends AbstractEmployeeType {
                     mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = EmployeeDto.class, type = SchemaType.ARRAY)))
     public Response listEmployees(@BeanParam EmployeePage employeePage) {
-        return Response.ok(this.employeeService.listEmployees(employeePage))
-                .header("X-Total-Count", this.employeeService.totalEmployees())
+        return Response.ok(employeeService.listEmployees(employeePage))
+                .header("X-Total-Count", employeeService.totalEmployees())
                 .build();
     }
 
@@ -85,7 +86,7 @@ public class EmployeeResource extends AbstractEmployeeType {
                             schema = @Schema(implementation = EmployeeDto.class, type = SchemaType.OBJECT))),
             @APIResponse(
                     responseCode = "404",
-                    description = "Employee does not exist for a given identifier",
+                    description = "Employee does not exist for a given employeeId",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON))
     })
     public Response findEmployee(
@@ -107,7 +108,7 @@ public class EmployeeResource extends AbstractEmployeeType {
                     schema = @Schema(implementation = SelectOptions.class, type = SchemaType.ARRAY))
     )
     public Response selectOptions() {
-        return Response.ok(this.employeeService.selected()).build();
+        return Response.ok(employeeService.selected()).build();
     }
 
     @POST
@@ -131,7 +132,7 @@ public class EmployeeResource extends AbstractEmployeeType {
     public Response createEmployee(@RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON,
             schema = @Schema(implementation = EmployeeDto.class))) @Valid EmployeeDto employeeDto, @Context UriInfo uriInfo) {
         employeeDto.setRegisteredBy(keycloakSecurityContext.getPrincipal().getName());
-        this.employeeService.saveEmployee(employeeDto);
+        employeeService.saveEmployee(employeeDto);
         URI employeeUri = employeeUriBuilder(employeeDto.employeeId, uriInfo).build();
         return Response.created(employeeUri).build();
     }

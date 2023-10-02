@@ -15,6 +15,6 @@ import java.time.LocalDate;
 public class EmployeePage extends PageRequest {
 
     @RestQuery("date")
-    @Parameter(description = "Date query parameter")
+    @Parameter(description = "Date parameter")
     private LocalDate date;
 }
