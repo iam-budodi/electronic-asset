@@ -26,7 +26,7 @@ class PurchaseResourceTest extends AccessTokenProvider {
     @Test
     void shouldGetPurchases() {
         String totalItem = given()
-                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
                 .header(ACCEPT, APPLICATION_JSON)
                 .when().get()
                 .then()

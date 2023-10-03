@@ -139,16 +139,22 @@
             <artifactId>testcontainers-keycloak</artifactId>
             <version>${testcontainers.keyckloak.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.keycloak</groupId>
+                    <artifactId>keycloak-admin-client</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
-            <version>3.5.0</version>
+            <version>3.5.1</version>
         </dependency>
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
-            <version>3.5.0</version>
+            <version>3.5.1</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
