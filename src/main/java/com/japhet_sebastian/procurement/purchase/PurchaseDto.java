@@ -3,10 +3,7 @@ package com.japhet_sebastian.procurement.purchase;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.japhet_sebastian.procurement.supplier.SupplierDto;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -36,7 +33,7 @@ public class PurchaseDto implements Serializable {
     @Min(message = "{Purchase.min-price.required}", value = 1)
     BigDecimal purchasePrice;
 
-    @NotNull(message = "Purchase.invoice-number.required")
+    @NotEmpty(message = "{Purchase.invoice-number.required}")
     String invoiceNumber;
 
     String supplierName;

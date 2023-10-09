@@ -2,10 +2,7 @@ package com.japhet_sebastian.procurement.purchase;
 
 import com.japhet_sebastian.procurement.supplier.SupplierEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -53,7 +50,7 @@ public class PurchaseEntity {
     @Column(name = "purchase_price", nullable = false)
     private BigDecimal purchasePrice;
 
-    @NotNull(message = "Purchase.invoice-number.required")
+    @NotEmpty(message = "Purchase.invoice-number.required")
     @Schema(required = true)
     @Column(name = "purchase_invoice_number", nullable = false)
     private String invoiceNumber;
