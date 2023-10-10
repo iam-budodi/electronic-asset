@@ -14,7 +14,6 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -37,7 +36,6 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 @TestHTTPEndpoint(PurchaseResource.class)
 @QuarkusTestResource(KeycloakResource.class)
 class PurchaseResourceTest extends AccessTokenProvider {
-    private static final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
 
     @TestHTTPResource
     @TestHTTPEndpoint(SupplierResource.class)
@@ -561,15 +559,6 @@ class PurchaseResourceTest extends AccessTokenProvider {
         String purchaseUUID = purchaseURL.substring(purchaseURL.lastIndexOf("/") + 1);
         assertThat(purchaseUUID, matchesRegex(UUID_REGEX));
 
-        // get purchase by id
-//        PurchaseDto foundPurchase = given()
-//                .contentType(ContentType.JSON)
-//                .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
-//                .when().get(purchaseUUID)
-//                .then()
-//                .statusCode(OK.getStatusCode())
-//                .extract().as(PurchaseDto.class);
-
         // update purchase
         purchase.setPurchaseId(UUID.randomUUID().toString());
         purchase.setInvoiceNumber("UPT123456INV");
@@ -587,6 +576,7 @@ class PurchaseResourceTest extends AccessTokenProvider {
                 contains(new ErrorResponse.ErrorMessage("Path variable purchaseId does not match Purchase.purchaseId"))
         );
     }
+
     @Test
     void shouldFailToUpdatePurchaseWithNullSupplier() {
         final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
@@ -650,6 +640,78 @@ class PurchaseResourceTest extends AccessTokenProvider {
         assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
         assertThat(errorResponse.getErrors(),
                 contains(new ErrorResponse.ErrorMessage("Invalid input"))
+        );
+    }
+
+    @Test
+    void shouldDeletePurchase() {
+        final String UUID_REGEX = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
+        // create supplier
+        final SupplierDto supplier = createSupplier();
+        supplier.setCompanyName(RandomStringUtils.randomAlphabetic(24));
+        supplier.setCompanyEmail("deletepurchase@techassociate.co.tz");
+        supplier.setCompanyPhone(RandomStringUtils.randomNumeric(10));
+        String supplierURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("lulu.shaban", "shaban"))
+                .body(supplier).post(supplierResource)
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(supplierURL, notNullValue());
+        String supplierUUID = supplierURL.substring(supplierURL.lastIndexOf("/") + 1);
+        assertThat(supplierUUID, matchesRegex(UUID_REGEX));
+
+        // create purchase
+        final PurchaseDto purchase = createPurchase();
+        purchase.setInvoiceNumber(RandomStringUtils.randomAlphanumeric(10));
+        supplier.setSupplierId(supplierUUID);
+        purchase.setSupplier(supplier);
+        String purchaseURL = given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
+                .body(purchase).post()
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().response().getHeader("Location");
+
+        assertThat(purchaseURL, notNullValue());
+        String purchaseUUID = purchaseURL.substring(purchaseURL.lastIndexOf("/") + 1);
+        assertThat(purchaseUUID, matchesRegex(UUID_REGEX));
+
+        // update purchase
+        given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
+                .when().delete(purchaseUUID)
+                .then()
+                .statusCode(NO_CONTENT.getStatusCode());
+
+        // verify purchase delete
+        given()
+                .contentType(ContentType.JSON)
+                .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
+                .when().get(purchaseUUID)
+                .then()
+                .statusCode(NOT_FOUND.getStatusCode());
+    }
+
+    @Test
+    void deletePurchaseFailsNotFound() {
+        String supplierUUID = UUID.randomUUID().toString();
+        ErrorResponse errorResponse = given()
+                .auth().oauth2(getAccessToken("habiba.baanda", "baanda"))
+                .when().delete(supplierUUID)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.getErrorId(), is(nullValue()));
+        assertThat(errorResponse.getErrors(), allOf(notNullValue(), hasSize(1)));
+        assertThat(errorResponse.getErrors(),
+                contains(new ErrorResponse.ErrorMessage(String.format("No purchase found for purchaseId[%s]", supplierUUID)))
         );
     }
 
