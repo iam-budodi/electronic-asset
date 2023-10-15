@@ -1,7 +1,6 @@
 package com.japhet_sebastian.vo;
 
 import com.japhet_sebastian.employee.EmployeeResource;
-import com.japhet_sebastian.organization.boundary.CollegeResource;
 import com.japhet_sebastian.organization.boundary.DepartmentResource;
 import com.japhet_sebastian.procurement.purchase.PurchaseResource;
 import com.japhet_sebastian.procurement.supplier.SupplierResource;

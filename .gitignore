@@ -42,7 +42,7 @@ nb-configuration.xml
 # system
 src/main/resources/application.properties
 src/test/resources/udsm-assets-management.json
-src/main/resources/import.sql
+src/main/resources/import.txt
 
 src/test/java/com/japhet_sebastian/AccessTokenProvider.java
 src/test/java/com/japhet_sebastian/KeycloakResource.java

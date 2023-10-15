@@ -198,6 +198,23 @@ VALUES ('05bf7154-5981-11ee-8c99-0242ac120002', 'RPC4-987654', '2022-09-12', 550
 -- VALUES (554, 'HPC4-123456', '2021-09-12', 35000000, 10, 300);
 --
 -- -- ASSETS TABLE - add at least 20 computers
+
+insert into categories (category_uuid, description, category_name)
+VALUES ('4c462cc0-6b2f-11ee-b962-0242ac120002', 'Laptop computer', 'Laptop');
+
+insert into assets (asset_discriminator, asset_uuid, brand_name, manufacturer, model_name, model_number, serial_number,
+                    display_size, graphics_card, computer_memory, operating_system, computer_processor,
+                    computer_storage, category, purchase)
+VALUES ('COMPUTER', '6ff2573a-6b2e-11ee-b962-0242ac120002', 'LENOVO', 'Lenovo', 'Thinkbook 14 G2 ITL', 'MPNXB192709Z', 'M/23QNWJ', '14', '4115', '8192',
+        'Windows 11 Enterprise 64-bit (10.0, Build 22621) (22621.ni_release.220506-1250)',
+        '11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz   2.42 GHz', '1000000', '4c462cc0-6b2f-11ee-b962-0242ac120002', '05bf69a2-5981-11ee-8c99-0242ac120002');
+insert into assets (asset_discriminator, asset_uuid, brand_name, manufacturer, model_name, model_number, serial_number,
+                    display_size, graphics_card, computer_memory, operating_system, computer_processor,
+                    computer_storage, category, purchase)
+VALUES ('COMPUTER', '852f5f6c-6b2e-11ee-b962-0242ac120002', 'LENOVO', 'Lenovo', 'Thinkbook 14 G2 ITL', 'M-XB192709Z', 'M$23QNWJ', '14', '4115', '8192',
+        'Windows 11 Enterprise 64-bit (10.0, Build 22621) (22621.ni_release.220506-1250)',
+        '11th Gen Intel(R) Core(TM) i-1135G7 @ 2.40GHz   2.42 GHz', '1000000', '4c462cc0-6b2f-11ee-b962-0242ac120002', '05bf69a2-5981-11ee-8c99-0242ac120002');
+
 -- insert into assets (asset_discriminator, id, brand_name, manufacturer, model_name, model_number, serial_number,
 --                     display_size, graphics_card, computer_memory, operating_system, computer_processor,
 --                     computer_storage, category_fk, purchase_fk)

@@ -175,6 +175,7 @@
         </dependency>
     </dependencies>
     <build>
+        <finalName>assets-management</finalName>
         <plugins>
             <plugin>
                 <groupId>${quarkus.platform.group-id}</groupId>
